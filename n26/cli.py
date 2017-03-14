@@ -6,16 +6,16 @@ import click
 @click.group()
 def cli():
     """Interact with the https://n26.com API via the command line."""
-    pass
 
 
 @cli.command()
 def info():
-    """ Get account information. """
+    """ Get account information """
     account_info = api.Api()
     print('Account info:')
     print('-------------')
-    print('Name: ' + unicode(account_info.get_account_info()['firstName'] + ' ' + account_info.get_account_info()['lastName']))
+    # TODO: make it python2 compatible using unicode
+    print('Name: ' + str(account_info.get_account_info()['firstName'] + ' ' + account_info.get_account_info()['lastName']))
     print('Email: ' + account_info.get_account_info()['email'])
     print('Nationality: ' + account_info.get_account_info()['nationality'])
     print('Phone: ' + account_info.get_account_info()['mobilePhoneNumber'])
@@ -53,11 +53,7 @@ def statements():
     statements = api.Api()
     print('Statements:')
     print('-----------')
-    # print str(l)[1:-1]
-    statement_dict = str(statements.get_statements())[1:-1]
-    print(statement_dict)
-    # print(statements.get_statements())
-    # print(statements.get_statements())
+    print(statements.get_statements())
 
 
 @cli.command()
@@ -72,17 +68,3 @@ def transactions():
 
 if __name__ == '__main__':
     cli()
-
-
-# TODO: Default class, handles all the requests
-class N26():
-    pass
-
-
-# TODO: Will handle YAML configuration etc.
-class Config():
-    pass
-
-
-def calculate_total(a, b):
-    return a + b

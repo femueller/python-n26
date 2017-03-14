@@ -3,3 +3,6 @@ __pycache__
 .DS_Store
 *.pyc
 venv/
+MANIFEST
+*.egg-info
+dist/
