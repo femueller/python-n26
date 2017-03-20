@@ -8,7 +8,7 @@ The idea is to have a convenient command line interface for [n26](https://n26.co
 ### CLI setup
     pip3 install n26
     wget https://raw.githubusercontent.com/femueller/python-n26/master/n26.yml.example ~/.config/n26.yml
-    # configure username and password
+    # configure username, password and card ID
     vim ~/.config/n26.yml
 
 ### CLI example
