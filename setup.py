@@ -22,6 +22,7 @@ def get_install_requirements(path):
 def read(fname):
     return open(os.path.join(__location__, fname)).read()
 
+
 VERSION = read_version('n26')
 
 config = {
@@ -31,7 +32,7 @@ config = {
     'url': 'https://github.com/femueller/python-n26',
     'download_url': 'https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
     'version': VERSION,
-    'install_requires': ['requests', 'pyyaml', 'click'],
+    'install_requires': ['requests', 'pyyaml', 'click', 'tabulate'],
     'packages': [
         'n26'
     ],
