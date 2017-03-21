@@ -1,13 +1,15 @@
 # N26 Python CLI/API
+[![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
+
 The idea is to have a convenient command line interface for [n26](https://n26.com/) to:
 * Request account balance
-* Make transactions
+* Show transactions
 * Enable to only use API component (subclass) to integrate into own application
 
 ## CLI
 ### CLI setup
     pip3 install n26
-    wget https://raw.githubusercontent.com/femueller/python-n26/master/n26.yml.example ~/.config/n26.yml
+    wget https://raw.githubusercontent.com/femueller/python-n26/master/n26.yml.example -O ~/.config/n26.yml
     # configure username, password and card ID
     vim ~/.config/n26.yml
 
@@ -15,7 +17,7 @@ The idea is to have a convenient command line interface for [n26](https://n26.co
     n26 balance
 
 ## API
-### Api setup
+### API setup
     pip3 install n26
     wget https://raw.githubusercontent.com/femueller/python-n26/master/n26.yml.example -O ~/.config/n26.yml
     # configure username and password
