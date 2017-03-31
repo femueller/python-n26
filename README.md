@@ -13,8 +13,18 @@ The idea is to have a convenient command line interface for [n26](https://n26.co
     # configure username, password and card ID
     vim ~/.config/n26.yml
 
+You can also specify environment variables with the credentials instead of creating a config file.
+
+- N26_USER: username
+- N26_PASSWORD: password
+- N26_CARDID: card id
+
 ### CLI example
     n26 balance
+
+Or if using environment variables:
+
+    N26_USER=user N26_PASSWORD=passwd N26_CARDID:123456789 n26 balance
 
 ## API
 ### API setup

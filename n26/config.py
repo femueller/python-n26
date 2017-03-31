@@ -1,17 +1,16 @@
 import yaml
 import os
 
-config_file = os.path.expanduser('~/.config/n26.yml')
+# try to get values from ENV
+username, password, card_id = [os.environ.get(e)
+                               for e in ["N26_USER", "N26_PASSWORD", "N26_CARDID"]]
+if not username or not password or not card_id:
+    print('Environment variables not set. trying to load cfg')
 
-# if os.environ['N26_USER'] and os.environ['N26_PASSWORD'] is None:
-#    print('Environment variables not set. trying to load cfg')
-# Load config.yml
-with open(config_file, 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
+    config_file = os.path.expanduser('~/.config/n26.yml')
+    with open(config_file, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
 
-    username = cfg['n26']['username']  # TODO: or os.environ['N26_USER']
-    password = cfg['n26']['password']  # TODO: or os.environ['N26_PASSWORD']
-    card_id = cfg['n26']['card_id']  # TODO: or os.environ['N26_PASSWORD']
-# else:
-#    username = os.environ['N26_USER']
-#    password = os.environ['N26_PASSWORD']
+        username = cfg['n26']['username']
+        password = cfg['n26']['password']
+        card_id = cfg['n26']['card_id']
