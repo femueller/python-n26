@@ -38,6 +38,14 @@ Or if using environment variables:
     balance = api.Api()
     print(balance.get_balance())
 
+This is going to use the same mechanism to load configuration as the CLI tool, to specify your own configuration you can use it as:
+
+    from n26 import api
+    from n26 import config
+    conf = config.Config('username', 'passwd', 'card_id')
+    balance = api.Api(conf)
+    print(balance.get_balance())
+
 ## Run locally
     git clone git@github.com:femueller/python-n26.git
     cd python-n26
