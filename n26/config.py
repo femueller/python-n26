@@ -8,7 +8,7 @@ Config = namedtuple('Config', ['username', 'password', 'card_id'])
 def get_config():
     # try to get values from ENV
     username, password, card_id = [os.environ.get(e)
-                                   for e in ["N26_USER", "N26_PASSWORD", "N26_CARDID"]]
+                                   for e in ["N26_USER", "N26_PASSWORD", "N26_CARD_ID"]]
 
     if not username or not password or not card_id:
         print('Environment variables not set. trying to load cfg')

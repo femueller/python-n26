@@ -17,14 +17,14 @@ You can also specify environment variables with the credentials instead of creat
 
 - N26_USER: username
 - N26_PASSWORD: password
-- N26_CARDID: card id
+- N26_CARD_ID: card id
 
 ### CLI example
     n26 balance
 
 Or if using environment variables:
 
-    N26_USER=user N26_PASSWORD=passwd N26_CARDID:123456789 n26 balance
+    N26_USER=user N26_PASSWORD=passwd N26_CARD_ID:123456789 n26 balance
 
 ## API
 ### API setup
