@@ -7,7 +7,7 @@ url = 'https://api.tech26.de'
 # Api class can be imported as a library in order to use it within applications
 class Api(object):
     # constructor accepting None to maintain backward compatibility
-    def __init__(self, cfg = None):
+    def __init__(self, cfg=None):
         if not cfg:
             cfg = config.get_config()
         self.config = cfg
@@ -103,3 +103,17 @@ class Api(object):
         req_statements = requests.get(url + '/api/statements', headers=headers_balance)
         statements = req_statements.json()
         return statements
+
+    def block_card(self, card_id):
+        access_token = self.get_token()
+        headers_balance = {'Authorization': 'bearer' + str(access_token)}
+        req_block_card = requests.post(url + '/api/cards/' + card_id + '/block', headers=headers_balance)
+        blocked_card = req_block_card.json()
+        return blocked_card
+
+    def unblock_card(self, card_id):
+        access_token = self.get_token()
+        headers_balance = {'Authorization': 'bearer' + str(access_token)}
+        req_unblock_card = requests.post(url + '/api/cards/' + card_id + '/unblock', headers=headers_balance)
+        unblocked_card = req_unblock_card.json()
+        return unblocked_card

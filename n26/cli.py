@@ -2,9 +2,11 @@ import n26.api as api
 import click
 from tabulate import tabulate
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
 
 # Cli returns command line requests
-@click.group()
+@click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     """Interact with the https://n26.com API via the command line."""
 
@@ -30,6 +32,27 @@ def balance():
     print('Current balance:')
     print('----------------')
     print(str(balance.get_balance()['availableBalance']))
+
+
+@cli.command()
+# @click.option('--all', default=False, help='Blocks all n26 cards.')
+def card_block():
+    """ Blocks the card. """
+    card = api.Api()
+    for i in card.get_cards():
+        card_id = i['id']
+        card.block_card(card_id)
+        print('Blocked card: ' + card_id)
+
+
+@cli.command()
+def card_unblock():
+    """ Unblocks the card. """
+    card = api.Api()
+    for i in card.get_cards():
+        card_id = i['id']
+        card.unblock_card(card_id)
+        print('Unblocked card: ' + card_id)
 
 
 @cli.command()
@@ -69,12 +92,12 @@ def transactions(limit):
     for i, val in enumerate(output):
         try:
             if val['merchantName'] in val.values():
-                li.append([i, val['amount'], val['merchantName']])
+                li.append([i, str(val['amount']), val['merchantName']])
         except KeyError:
             if val['referenceText'] in val.values():
-                li.append([i, val['amount'], val['referenceText']])
+                li.append([i, str(val['amount']), val['referenceText']])
             else:
-                li.append([i, val['amount'], 'no details available'])
+                li.append([i, str(val['amount']), 'no details available'])
 
     # Tabulate
     table = li

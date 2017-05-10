@@ -11,7 +11,7 @@ def get_config():
                                    for e in ["N26_USER", "N26_PASSWORD", "N26_CARD_ID"]]
 
     if not username or not password or not card_id:
-        print('Environment variables not set. trying to load cfg')
+        # print('Environment variables not set. trying to load cfg')
 
         config_file = os.path.expanduser('~/.config/n26.yml')
         with open(config_file, 'r') as ymlfile:
