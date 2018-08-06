@@ -85,7 +85,7 @@ class Api(object):
     def get_transactions(self):
         access_token = self.get_token()
         headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_transactions = requests.get(url + '/api/smrt/transaction', headers=headers_balance)
+        req_transactions = requests.get(url + '/api/smrt/transactions', headers=headers_balance)
         transactions = req_transactions.json()
         return transactions
 
