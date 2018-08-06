@@ -27,6 +27,7 @@ VERSION = read_version('n26')
 
 config = {
     'description': 'API and command line tools to interact with the https://n26.com/ API',
+    'long_description': 'API and command line tools to interact with the https://n26.com/ API',
     'author': 'Felix Mueller',
     'author_email': 'felix@s4ku.com',
     'url': 'https://github.com/femueller/python-n26',
