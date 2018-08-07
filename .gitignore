@@ -6,3 +6,5 @@ venv/
 MANIFEST
 *.egg-info
 dist/
+*.sublime-workspace
+*.sublime-project
