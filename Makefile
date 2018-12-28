@@ -8,6 +8,9 @@ build:
 	python setup.py sdist
 	- git stash pop
 
+test:
+	pipenv run pytest
+
 upload:
 	# Upload to Gemfury
 	#	curl -F package=@dist/`ls -t1 dist/ | grep tar.gz | head -n1` https://gems.gemfury.com/<gem fury tokena
