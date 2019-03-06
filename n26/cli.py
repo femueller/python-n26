@@ -35,6 +35,23 @@ def balance():
 
 
 @cli.command()
+def spaces():
+    """ Show spaces """
+    spaces = api.Api()
+    print('Spaces:')
+    print('----------------')
+    print('Total balance: ' + str(spaces.get_spaces()['totalBalance']))
+    for space in spaces.get_spaces()['spaces']:
+        balance = space['balance']['availableBalance']
+        string = str(space['name']) + ': ' + str(balance)
+        if "goal" in space:
+            goal = space['goal']['amount']
+            percentage = balance/goal
+            string += "/" + str(goal) + ' <- ' + "{:.2%}".format(percentage)
+        print(string)
+
+
+@cli.command()
 # @click.option('--all', default=False, help='Blocks all n26 cards.')
 def card_block():
     """ Blocks the card. """
