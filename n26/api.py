@@ -54,6 +54,13 @@ class Api(object):
         balance = req_balance.json()
         return balance
 
+    def get_spaces(self):
+        access_token = self.get_token()
+        headers_spaces = {'Authorization': 'bearer' + str(access_token)}
+        req_spaces = requests.get(url + '/api/spaces', headers=headers_spaces)
+        spaces = req_spaces.json()
+        return spaces
+
     def barzahlen_check(self):
         access_token = self.get_token()
         headers_balance = {'Authorization': 'bearer' + str(access_token)}
