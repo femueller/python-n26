@@ -52,7 +52,7 @@ def spaces():
         string = str(space['name']) + ': ' + str(balance)
         if 'goal' in space:
             goal = space['goal']['amount']
-            percentage = balance/goal
+            percentage = balance / goal
             string += '/' + str(goal) + ' <- ' + '{:.2%}'.format(percentage)
         print(string)
 
@@ -104,11 +104,11 @@ def statements():
 
 
 @cli.command()
-@click.option('--limit', default=5, help='Limit transaction output.')
+@click.option('--limit', default=5, type=click.IntRange(1, 10000), help='Limit transaction output.')
 def transactions(limit):
     """ Show transactions (default: 5) """
     transactions = api.Api()
-    output = transactions.get_transactions_limited(str(limit))
+    output = transactions.get_transactions(limit=limit)
     print('Transactions:')
     print('-------------')
     li = []

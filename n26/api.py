@@ -160,7 +160,7 @@ class Api(object):
         Returns the access token to use for api authentication.
         If a token has been requested before it will be reused if it is still valid.
         If the previous token has expired it will be refreshed.
-        If no token has has been requested it will be requested from the server.
+        If no token has been requested it will be requested from the server.
 
         :return: the access token
         """
