@@ -1,7 +1,12 @@
+import time
+
 import requests
 from n26 import config
 
-url = 'https://api.tech26.de'
+BASE_URL = 'https://api.tech26.de'
+
+GET = "get"
+POST = "post"
 
 
 # Api class can be imported as a library in order to use it within applications
@@ -16,43 +21,27 @@ class Api(object):
         values_token = {'grant_type': 'password', 'username': self.config.username, 'password': self.config.password}
         headers_token = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
 
-        response_token = requests.post(url + '/oauth/token', data=values_token, headers=headers_token)
+        response_token = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=headers_token)
         token_info = response_token.json()
         # TODO check if access_token is not nil
         return token_info['access_token']
 
     # TODO: this method will check if token is valid, if not it will run get_token
-    def validate_token():
+    def validate_token(self):
         pass
 
     # IDEA: @get_token decorator
     def get_account_info(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_account_info = requests.get(url + '/api/me', headers=headers_balance)
-        info = req_account_info.json()
-        return info
+        return self._do_request(GET, BASE_URL + '/api/me')
 
     def get_account_statuses(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_account_statuses = requests.get(url + '/api/me/statuses', headers=headers_balance)
-        status = req_account_statuses.json()
-        return status
+        return self._do_request(GET, BASE_URL + '/api/me/statuses')
 
     def get_addresses(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_addresses = requests.get(url + '/api/addresses', headers=headers_balance)
-        addresses = req_addresses.json()
-        return addresses
+        return self._do_request(GET, BASE_URL + '/api/addresses')
 
     def get_balance(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_balance = requests.get(url + '/api/accounts', headers=headers_balance)
-        balance = req_balance.json()
-        return balance
+        return self._do_request(GET, BASE_URL + '/api/accounts')
 
     def get_spaces(self):
         access_token = self.get_token()
@@ -62,65 +51,108 @@ class Api(object):
         return spaces
 
     def barzahlen_check(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_barzahlen_check = requests.get(url + '/api/barzahlen/check', headers=headers_balance)
-        barzahlen_check = req_barzahlen_check.json()
-        return barzahlen_check
+        return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
 
     def get_cards(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_cards = requests.get(url + '/api/v2/cards', headers=headers_balance)
-        cards = req_cards.json()
-        return cards
+        return self._do_request(GET, BASE_URL + '/api/v2/cards')
 
     def get_account_limits(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_limits = requests.get(url + '/api/settings/account/limits', headers=headers_balance)
-        limits = req_limits.json()
-        return limits
+        return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
 
     def get_contacts(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_contacts = requests.get(url + '/api/smrt/contacts', headers=headers_balance)
-        contacts = req_contacts.json()
-        return contacts
+        return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
 
-    def get_transactions(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_transactions = requests.get(url + '/api/smrt/transactions', headers=headers_balance)
-        transactions = req_transactions.json()
-        return transactions
+    def get_standing_orders(self):
+        return self._do_request(GET, BASE_URL + '/api/transactions/so')
+
+    def get_transactions(self, from_time=None, to_time=None, limit=None, pending=None, categories=None,
+                         text_filter=None, last_id=None):
+        """
+        Get a list of transactions.
+
+        Note that some parameters can not be combined in a single request (like text_filter and pending) and
+        will result in a bad request (400) error.
+
+        :param from_time: earliest transaction time as a Timestamp - milliseconds since 1970 in CET
+        :param to_time: latest transaction time as a Timestamp - milliseconds since 1970 in CET
+        :param limit: Limit the number of transactions to return to the given amount
+        :param pending: show pending or not pending only
+        :param categories: Comma separated list of category IDs
+        :param text_filter: Query string to search for
+        :param last_id: ??
+        :return: list of transactions
+        """
+        return self._do_request(GET, BASE_URL + '/api/smrt/transactions', {
+            'from': from_time,
+            'to': to_time,
+            'limit': limit,
+            'pending': pending,
+            'categories': categories,
+            'textFilter': text_filter,
+            'lastId': last_id
+        })
 
     def get_transactions_limited(self, limit=5):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_transactions = requests.get(url + '/api/smrt/transactions?limit=' +
-                                        str(limit), headers=headers_balance)
-        transactions = req_transactions.json()
-        return transactions
+        import warnings
+        warnings.warn(
+            "get_transactions_limited is deprecated, use get_transactions(limit=5) instead",
+            DeprecationWarning
+        )
+        return self.get_transactions(limit=limit)
 
     def get_statements(self):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_statements = requests.get(url + '/api/statements', headers=headers_balance)
-        statements = req_statements.json()
-        return statements
+        return self._do_request(GET, BASE_URL + '/api/statements')
 
     def block_card(self, card_id):
-        access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_block_card = requests.post(url + '/api/cards/' + card_id + '/block', headers=headers_balance)
-        blocked_card = req_block_card.json()
-        return blocked_card
+        return self._do_request(POST, BASE_URL + '/api/cards/%s/block' % card_id)
 
     def unblock_card(self, card_id):
+        return self._do_request(POST, BASE_URL + '/api/cards/%s/unblock' % card_id)
+
+    def get_spaces(self):
+        return self._do_request(GET, BASE_URL + '/api/spaces')['spaces']
+
+    def get_savings(self):
+        return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
+
+    def get_statistics(self, from_time, to_time=int(time.time()) * 1000):
+        """
+        Get statistics in a given timeframe
+        :param from_time: Timestamp - milliseconds since 1970 in CET
+        :param to_time: Timestamp - milliseconds since 1970 in CET
+        """
+        return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
+
+    def get_available_categories(self):
+        return self._do_request(GET, BASE_URL + '/api/smrt/categories')
+
+    def get_invitations(self):
+        return self._do_request(GET, BASE_URL + '/api/aff/invitations')
+
+    def _do_request(self, method=GET, url="/", params={}):
         access_token = self.get_token()
-        headers_balance = {'Authorization': 'bearer' + str(access_token)}
-        req_unblock_card = requests.post(url + '/api/cards/' + card_id + '/unblock', headers=headers_balance)
-        unblocked_card = req_unblock_card.json()
-        return unblocked_card
+        headers = {'Authorization': 'bearer' + str(access_token)}
+
+        first_param = True
+        for k, v in params.items():
+            if not v:
+                # skip None values
+                continue
+
+            if first_param:
+                url += '?'
+                first_param = False
+            else:
+                url += '&'
+
+            url += "%s=%s" % (k, v)
+
+        if method is GET:
+            result = requests.get(url, headers=headers)
+        elif method is POST:
+            result = requests.post(url, headers=headers)
+        else:
+            return None
+
+        result.raise_for_status()
+        return result.json()
