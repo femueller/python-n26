@@ -1,5 +1,4 @@
 import os
-import sys
 import inspect
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
@@ -25,22 +24,22 @@ def read(fname):
 
 VERSION = read_version('n26')
 
-config = {
-    'description': 'API and command line tools to interact with the https://n26.com/ API',
-    'long_description': 'API and command line tools to interact with the https://n26.com/ API',
-    'author': 'Felix Mueller',
-    'author_email': 'felix@s4ku.com',
-    'url': 'https://github.com/femueller/python-n26',
-    'download_url': 'https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
-    'version': VERSION,
-    'install_requires': ['requests', 'pyyaml', 'click', 'tabulate'],
-    'packages': [
+setup(
+    description='API and command line tools to interact with the https://n26.com/ API',
+    long_description='API and command line tools to interact with the https://n26.com/ API',
+    author='Felix Mueller',
+    author_email='felix@s4ku.com',
+    url='https://github.com/femueller/python-n26',
+    download_url='https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
+    version=VERSION,
+    install_requires=['requests', 'pyyaml', 'click', 'tabulate'],
+    test_requires=['mock', 'pytest'],
+    packages=[
         'n26'
     ],
-    'scripts': [],
-    'name': 'n26',
-    'entry_points': {
-        'console_scripts': ['n26 = n26.cli:cli']}
-}
-
-setup(**config)
+    scripts=[],
+    name='n26',
+    entry_points={
+        'console_scripts': ['n26 = n26.cli:cli']
+    }
+)
