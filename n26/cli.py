@@ -1,5 +1,6 @@
 import n26.api as api
 import click
+import webbrowser
 from tabulate import tabulate
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -35,19 +36,24 @@ def balance():
 
 
 @cli.command()
+def browse():
+    """ Browse on the web https://app.n26.com/ """
+    webbrowser.open('https://app.n26.com/')
+
+
+@cli.command()
 def spaces():
     """ Show spaces """
     spaces = api.Api()
     print('Spaces:')
     print('----------------')
-    print('Total balance: ' + str(spaces.get_spaces()['totalBalance']))
-    for space in spaces.get_spaces()['spaces']:
+    for space in spaces.get_spaces():
         balance = space['balance']['availableBalance']
         string = str(space['name']) + ': ' + str(balance)
-        if "goal" in space:
+        if 'goal' in space:
             goal = space['goal']['amount']
             percentage = balance/goal
-            string += "/" + str(goal) + ' <- ' + "{:.2%}".format(percentage)
+            string += '/' + str(goal) + ' <- ' + '{:.2%}'.format(percentage)
         print(string)
 
 

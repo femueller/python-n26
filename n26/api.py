@@ -44,11 +44,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL + '/api/accounts')
 
     def get_spaces(self):
-        access_token = self.get_token()
-        headers_spaces = {'Authorization': 'bearer' + str(access_token)}
-        req_spaces = requests.get(url + '/api/spaces', headers=headers_spaces)
-        spaces = req_spaces.json()
-        return spaces
+        return self._do_request(GET, BASE_URL + '/api/spaces')
 
     def barzahlen_check(self):
         return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
