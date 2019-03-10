@@ -38,10 +38,16 @@ def test_init_explicit():
 # test token
 def test_get_token():
     with mock.patch('n26.api.requests.post') as mock_post:
-       mock_post.return_value.json.return_value = {'access_token':
-               'some token'}
+       mock_post.return_value.json.return_value = {
+           'access_token': '12345678-1234-1234-1234-123456789012',
+           'token_type': 'bearer',
+           'refresh_token': '12345678-1234-1234-1234-123456789012',
+           'expires_in': 1798,
+           'scope': 'trust',
+           'host_url': 'https://api.tech26.de'
+       }
        new_api = api.Api(conf)
-       token = new_api.get_token()
+       token = new_api._get_token()
     assert token  == 'some token'
 
 
