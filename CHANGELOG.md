@@ -1,3 +1,9 @@
+### 0.2.2 (10-03-2019)
+
+FIXES:
+
+* [Reworked token authentication](https://github.com/femueller/python-n26/pull/15)
+
 ## 0.2.1 (09-03-2019)
 
 FEATURES:
