@@ -10,23 +10,6 @@ GET = "get"
 POST = "post"
 
 
-# Api class can be imported as a library in order to use it within applications
-def _refresh_token(refresh_token):
-    """
-    Refreshes an authentication token
-    :param refresh_token: the refresh token issued by the server when requesting a token
-    :return: the refreshed token data
-    """
-    values_token = {
-        'grant_type': 'refresh_token',
-        'refresh_token': refresh_token
-    }
-
-    response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
-    response.raise_for_status()
-    return response.json()
-
-
 class Api(object):
     # constructor accepting None to maintain backward compatibility
     def __init__(self, cfg=None):
@@ -195,6 +178,23 @@ class Api(object):
         # add expiration time to expiration in _validate_token()
         response_json["expiration_time"] = time.time() + response_json["expires_in"]
         return response_json
+
+    # Api class can be imported as a library in order to use it within applications
+    @staticmethod
+    def _refresh_token(refresh_token):
+        """
+        Refreshes an authentication token
+        :param refresh_token: the refresh token issued by the server when requesting a token
+        :return: the refreshed token data
+        """
+        values_token = {
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+        }
+
+        response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
+        response.raise_for_status()
+        return response.json()
 
     @staticmethod
     def _validate_token(token_data):
