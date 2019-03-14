@@ -14,10 +14,16 @@ ACCESS_TOKEN_KEY = "access_token"
 REFRESH_TOKEN_KEY = "refresh_token"
 
 
-# Api class can be imported as a library in order to use it within applications
 class Api(object):
-    # constructor accepting None to maintain backward compatibility
+    """
+    Api class can be imported as a library in order to use it within applications
+    """
+
     def __init__(self, cfg=None):
+        """
+        # constructor accepting None to maintain backward compatibility
+        :param cfg: configuration object
+        """
         if not cfg:
             cfg = config.get_config()
         self.config = cfg
