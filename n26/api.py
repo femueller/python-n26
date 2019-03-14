@@ -9,6 +9,10 @@ BASIC_AUTH_HEADERS = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
 GET = "get"
 POST = "post"
 
+EXPIRATION_TIME_KEY = "expiration_time"
+ACCESS_TOKEN_KEY = "access_token"
+REFRESH_TOKEN_KEY = "refresh_token"
+
 
 class Api(object):
     # constructor accepting None to maintain backward compatibility
@@ -148,17 +152,20 @@ class Api(object):
         :return: the access token
         """
         if not self._validate_token(self._token_data):
-            if "refresh_token" in self._token_data:
-                refresh_token = self._token_data["refresh_token"]
-                self._token_data = _refresh_token(refresh_token)
+            if REFRESH_TOKEN_KEY in self._token_data:
+                refresh_token = self._token_data[REFRESH_TOKEN_KEY]
+                self._token_data = self._refresh_token(refresh_token)
             else:
                 self._token_data = self._request_token()
+
+            # add expiration time to expiration in _validate_token()
+            self._token_data[EXPIRATION_TIME_KEY] = time.time() + self._token_data["expires_in"]
 
         # if it's still not valid, raise an exception
         if not self._validate_token(self._token_data):
             raise PermissionError("Unable to request authentication token")
 
-        return self._token_data["access_token"]
+        return self._token_data[ACCESS_TOKEN_KEY]
 
     def _request_token(self):
         """
@@ -173,11 +180,7 @@ class Api(object):
 
         response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
-        response_json = response.json()
-
-        # add expiration time to expiration in _validate_token()
-        response_json["expiration_time"] = time.time() + response_json["expires_in"]
-        return response_json
+        return response.json()
 
     # Api class can be imported as a library in order to use it within applications
     @staticmethod
@@ -188,7 +191,7 @@ class Api(object):
         :return: the refreshed token data
         """
         values_token = {
-            'grant_type': 'refresh_token',
+            'grant_type': REFRESH_TOKEN_KEY,
             'refresh_token': refresh_token
         }
 
@@ -204,8 +207,11 @@ class Api(object):
         :return: true if valid, false otherwise
         """
 
-        if "expiration_time" in token_data and time.time() >= token_data["expiration_time"]:
+        if EXPIRATION_TIME_KEY not in token_data:
+            # there was a problem adding the expiration_time property
+            return False
+        elif time.time() >= token_data[EXPIRATION_TIME_KEY]:
             # token has expired
             return False
 
-        return "access_token" in token_data
+        return ACCESS_TOKEN_KEY in token_data and token_data[ACCESS_TOKEN_KEY]
