@@ -14,6 +14,7 @@ ACCESS_TOKEN_KEY = "access_token"
 REFRESH_TOKEN_KEY = "refresh_token"
 
 
+# Api class can be imported as a library in order to use it within applications
 class Api(object):
     # constructor accepting None to maintain backward compatibility
     def __init__(self, cfg=None):
@@ -182,7 +183,6 @@ class Api(object):
         response.raise_for_status()
         return response.json()
 
-    # Api class can be imported as a library in order to use it within applications
     @staticmethod
     def _refresh_token(refresh_token):
         """
