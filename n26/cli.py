@@ -57,17 +57,31 @@ def browse():
 @cli.command()
 def spaces():
     """ Show spaces """
-    text = "Spaces:\n"
-    text += "----------------"
+    spaces_data = API_CLIENT.get_spaces()["spaces"]
 
-    for space in API_CLIENT.get_spaces()["spaces"]:
-        balance = space['balance']['availableBalance']
-        line = "%s: %s" % (space['name'], balance)
+    lines = []
+    for i, space in enumerate(spaces_data):
+        line = []
+        available_balance = space['balance']['availableBalance']
+        currency = space['balance']['currency']
+        name = space['name']
+
+        line.append(name)
+        line.append("%s %s" % (available_balance, currency))
+
         if 'goal' in space:
             goal = space['goal']['amount']
-            percentage = balance / goal
-            line += '/' + str(goal) + ' <- ' + '{:.2%}'.format(percentage)
-        text += "\n" + line
+            percentage = available_balance / goal
+
+            line.append("%s %s" % (goal, currency))
+            line.append('{:.2%}'.format(percentage))
+
+        lines.append(line)
+
+    # Tabulate
+    table = lines
+    headers = ['Name', 'Balance', 'Goal', 'Progress']
+    text = tabulate(table, headers, tablefmt='simple', colalign=['left', 'right', 'right', 'right'], numalign='right')
 
     click.echo(text)
 
@@ -144,5 +158,5 @@ def transactions(limit):
 
 
 if __name__ == '__main__':
-    limits()
+    spaces()
     cli()
