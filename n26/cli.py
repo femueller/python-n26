@@ -1,9 +1,10 @@
-import textwrap
+import webbrowser
+from datetime import datetime, timezone
+
+import click
+from tabulate import tabulate
 
 import n26.api as api
-import click
-import webbrowser
-from tabulate import tabulate
 
 API_CLIENT = api.Api()
 
@@ -151,13 +152,13 @@ def statements():
 @click.option('--limit', default=5, type=click.IntRange(1, 10000), help='Limit transaction output.')
 def transactions(limit):
     """ Show transactions (default: 5) """
-    output = API_CLIENT.get_transactions(limit=limit)
+    transactions_data = API_CLIENT.get_transactions(limit=limit)
 
     text = "Transactions:\n"
     text += "-------------\n"
 
     lines = []
-    for i, val in enumerate(output):
+    for i, val in enumerate(transactions_data):
         try:
             if val['merchantName'] in val.values():
                 lines.append([i, str(val['amount']), val['merchantName']])
@@ -171,6 +172,50 @@ def transactions(limit):
     text += tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
+
+
+@cli.command()
+@click.option('--from', 'param_from', default=None, type=int,
+              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--to', default=None, type=int,
+              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+def statistics(param_from, to):
+    """Show your n26 statistics"""
+    statements_data = API_CLIENT.get_statistics(from_time=param_from, to_time=to)
+
+    text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
+    text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
+
+    lines = []
+    total = statements_data["total"]
+    total_income = statements_data["totalIncome"]
+    total_expense = statements_data["totalExpense"]
+
+    income_items = statements_data["incomeItems"]
+    expense_items = statements_data["expenseItems"]
+    items = statements_data["items"]
+
+    lines.append([total, total_income, total_expense, len(income_items), len(expense_items)])
+
+    headers = ['Total', 'Income', 'Expense', '#IncomeCategories', '#ExpenseCategories']
+    text += tabulate(lines, headers)
+
+    text += "\n\n"
+
+    headers = ['Category', 'Income', 'Expense', 'Total']
+    lines = [
+        list(x.values())
+        for x in items
+    ]
+    text += tabulate(lines, headers, numalign='right')
+
+    click.echo(text.strip())
+
+
+def _timestamp_ms_to_date(epoch_ms) -> datetime or None:
+    """Convert millisecond timestamp to datetime."""
+    if epoch_ms:
+        return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
 
 
 if __name__ == '__main__':
