@@ -1,4 +1,3 @@
 n26:
-    username: john.doe@example.com
-    password: $upersecret
-    card_id: "123456789"
+  username: john.doe@example.com
+  password: $upersecret

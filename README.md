@@ -17,14 +17,13 @@ You can also specify environment variables with the credentials instead of creat
 
 - N26_USER: username
 - N26_PASSWORD: password
-- N26_CARD_ID: card id
 
 ### CLI example
     n26 balance
 
 Or if using environment variables:
 
-    N26_USER=user N26_PASSWORD=passwd N26_CARD_ID:123456789 n26 balance
+    N26_USER=user N26_PASSWORD=passwd n26 balance
 
 ## API
 ### API setup
@@ -42,9 +41,9 @@ This is going to use the same mechanism to load configuration as the CLI tool, t
 
     from n26 import api
     from n26 import config
-    conf = config.Config('username', 'passwd', 'card_id')
-    balance = api.Api(conf)
-    print(balance.get_balance())
+    conf = config.Config('username', 'passwd')
+    client = api.Api(conf)
+    print(client.get_balance())
 
 ## Run locally
     git clone git@github.com:femueller/python-n26.git
