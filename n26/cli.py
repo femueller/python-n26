@@ -125,7 +125,8 @@ def contacts():
     headers = ['Id', 'Name', 'Subtitle']
     lines = [
         list(x.values())[1:-1]
-        for x in contacts_data]
+        for x in contacts_data
+    ]
     text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
@@ -134,9 +135,15 @@ def contacts():
 @cli.command()
 def statements():
     """ Show your n26 statements  """
-    text = "Statements:\n"
-    text += "-----------\n%s" % API_CLIENT.get_statements()
-    # TODO: useful output
+    statements_data = API_CLIENT.get_statements()
+
+    headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
+    lines = [
+        list(x.values())
+        for x in statements_data
+    ]
+    text = tabulate(lines, headers, numalign='right')
+
     click.echo(text.strip())
 
 
@@ -167,5 +174,5 @@ def transactions(limit):
 
 
 if __name__ == '__main__':
-    contacts()
+    statements()
     cli()
