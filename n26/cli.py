@@ -100,7 +100,20 @@ def card_unblock():
 @cli.command()
 def limits():
     """ Show n26 account limits  """
-    click.echo(API_CLIENT.get_account_limits())
+    limits_data = API_CLIENT.get_account_limits()
+
+    lines = []
+    for limit in limits_data:
+        name = limit["limit"]
+        amount = limit["amount"]
+        countries = limit["countryList"]
+
+        lines.append([name, amount, countries])
+
+    headers = ['Name', 'Amount', 'Country List']
+    text = tabulate(lines, headers, numalign='right')
+
+    click.echo(text)
 
 
 @cli.command()
