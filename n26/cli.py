@@ -5,6 +5,8 @@ import click
 import webbrowser
 from tabulate import tabulate
 
+API_CLIENT = api.Api()
+
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
@@ -14,13 +16,10 @@ def cli():
     """Interact with the https://n26.com API via the command line."""
 
 
-client = api.Api()
-
-
 @cli.command()
 def info():
     """ Get account information """
-    account_info = client.get_account_info()
+    account_info = API_CLIENT.get_account_info()
 
     text = """
     Account info:
@@ -43,7 +42,7 @@ def info():
 @cli.command()
 def balance():
     """ Show account balance """
-    balance_data = client.get_balance()
+    balance_data = API_CLIENT.get_balance()
     amount = balance_data.get('availableBalance')
     currency = balance_data.get('currency')
     click.echo("%s %s" % (amount, currency))
@@ -61,7 +60,7 @@ def spaces():
     text = "Spaces:\n"
     text += "----------------"
 
-    for space in client.get_spaces()["spaces"]:
+    for space in API_CLIENT.get_spaces()["spaces"]:
         balance = space['balance']['availableBalance']
         line = "%s: %s" % (space['name'], balance)
         if 'goal' in space:
@@ -77,32 +76,32 @@ def spaces():
 # @click.option('--all', default=False, help='Blocks all n26 cards.')
 def card_block():
     """ Blocks the card. """
-    for card in client.get_cards():
+    for card in API_CLIENT.get_cards():
         card_id = card['id']
-        client.block_card(card_id)
+        API_CLIENT.block_card(card_id)
         click.echo('Blocked card: ' + card_id)
 
 
 @cli.command()
 def card_unblock():
     """ Unblocks the card. """
-    for card in client.get_cards():
+    for card in API_CLIENT.get_cards():
         card_id = card['id']
-        client.unblock_card(card_id)
+        API_CLIENT.unblock_card(card_id)
         click.echo('Unblocked card: ' + card_id)
 
 
 @cli.command()
 def limits():
     """ Show n26 account limits  """
-    click.echo(client.get_account_limits())
+    click.echo(API_CLIENT.get_account_limits())
 
 
 @cli.command()
 def contacts():
     """ Show your n26 contacts  """
     text = "Contacts:\n"
-    text += "---------\n%s" % client.get_contacts()
+    text += "---------\n%s" % API_CLIENT.get_contacts()
     # TODO: useful output
     click.echo(text.strip())
 
@@ -111,7 +110,7 @@ def contacts():
 def statements():
     """ Show your n26 statements  """
     text = "Statements:\n"
-    text += "-----------\n%s" % client.get_statements()
+    text += "-----------\n%s" % API_CLIENT.get_statements()
     # TODO: useful output
     click.echo(text.strip())
 
@@ -120,7 +119,7 @@ def statements():
 @click.option('--limit', default=5, type=click.IntRange(1, 10000), help='Limit transaction output.')
 def transactions(limit):
     """ Show transactions (default: 5) """
-    output = client.get_transactions(limit=limit)
+    output = API_CLIENT.get_transactions(limit=limit)
 
     text = "Transactions:\n"
     text += "-------------\n"
