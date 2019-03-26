@@ -119,9 +119,15 @@ def limits():
 @cli.command()
 def contacts():
     """ Show your n26 contacts  """
-    text = "Contacts:\n"
-    text += "---------\n%s" % API_CLIENT.get_contacts()
-    # TODO: useful output
+
+    contacts_data = API_CLIENT.get_contacts()
+
+    headers = ['Id', 'Name', 'Subtitle']
+    lines = [
+        list(x.values())[1:-1]
+        for x in contacts_data]
+    text = tabulate(lines, headers, numalign='right')
+
     click.echo(text.strip())
 
 
@@ -161,5 +167,5 @@ def transactions(limit):
 
 
 if __name__ == '__main__':
-    info()
+    contacts()
     cli()
