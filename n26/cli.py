@@ -228,5 +228,4 @@ def _timestamp_ms_to_date(epoch_ms) -> datetime or None:
 
 
 if __name__ == '__main__':
-    statements()
     cli()
