@@ -80,20 +80,29 @@ def spaces():
 
 
 @cli.command()
-# @click.option('--all', default=False, help='Blocks all n26 cards.')
-def card_block():
+@click.option('--card', default=None, type=str, help='ID of the card to block. Omitting this will block all cards.')
+def card_block(card):
     """ Blocks the card. """
-    for card in API_CLIENT.get_cards():
-        card_id = card['id']
+    if card:
+        card_ids = [card]
+    else:
+        card_ids = [card['id'] for card in API_CLIENT.get_cards()]
+
+    for card_id in card_ids:
         API_CLIENT.block_card(card_id)
         click.echo('Blocked card: ' + card_id)
 
 
 @cli.command()
-def card_unblock():
+@click.option('--card', default=None, type=str, help='ID of the card to unblock. Omitting this will unblock all cards.')
+def card_unblock(card):
     """ Unblocks the card. """
-    for card in API_CLIENT.get_cards():
-        card_id = card['id']
+    if card:
+        card_ids = [card]
+    else:
+        card_ids = [card['id'] for card in API_CLIENT.get_cards()]
+
+    for card_id in card_ids:
         API_CLIENT.unblock_card(card_id)
         click.echo('Unblocked card: ' + card_id)
 
