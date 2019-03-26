@@ -19,6 +19,6 @@ def get_config():
 
             username = cfg['n26']['username']
             password = cfg['n26']['password']
-            card_id = cfg['n26']['card_id']
+            # card_id = cfg['n26']['card_id']
 
     return Config(username, password, card_id)

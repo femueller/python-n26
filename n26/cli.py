@@ -21,21 +21,15 @@ def info():
     """ Get account information """
     account_info = API_CLIENT.get_account_info()
 
-    text = """
-    Account info:
-    -------------
-    Name: %s %s
-    Email: %s
-    Nationality: %s
-    Phone: %s
-    """ % (account_info['firstName'],
-           account_info['lastName'],
-           account_info['email'],
-           account_info['nationality'],
-           account_info['mobilePhoneNumber']
-           )
+    lines = [
+        ["Name:", "%s %s" % (account_info['firstName'], account_info['lastName'])],
+        ["Email:", account_info['email']],
+        ["Nationality:", account_info['nationality']],
+        ["Phone:", account_info['mobilePhoneNumber']]
+    ]
 
-    text = textwrap.dedent(text).strip()
+    text = tabulate(lines, [], tablefmt="plain", colalign=["right", "left"])
+
     click.echo(text)
 
 
@@ -78,10 +72,8 @@ def spaces():
 
         lines.append(line)
 
-    # Tabulate
-    table = lines
     headers = ['Name', 'Balance', 'Goal', 'Progress']
-    text = tabulate(table, headers, tablefmt='simple', colalign=['left', 'right', 'right', 'right'], numalign='right')
+    text = tabulate(lines, headers, colalign=['left', 'right', 'right', 'right'], numalign='right')
 
     click.echo(text)
 
@@ -138,25 +130,23 @@ def transactions(limit):
     text = "Transactions:\n"
     text += "-------------\n"
 
-    li = []
+    lines = []
     for i, val in enumerate(output):
         try:
             if val['merchantName'] in val.values():
-                li.append([i, str(val['amount']), val['merchantName']])
+                lines.append([i, str(val['amount']), val['merchantName']])
         except KeyError:
             if val['referenceText'] in val.values():
-                li.append([i, str(val['amount']), val['referenceText']])
+                lines.append([i, str(val['amount']), val['referenceText']])
             else:
-                li.append([i, str(val['amount']), 'no details available'])
+                lines.append([i, str(val['amount']), 'no details available'])
 
-    # Tabulate
-    table = li
     headers = ['index', 'amount', 'details']
-    text += tabulate(table, headers, tablefmt='simple', numalign='right')
+    text += tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
 
 
 if __name__ == '__main__':
-    spaces()
+    info()
     cli()
