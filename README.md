@@ -10,13 +10,16 @@ The idea is to have a convenient command line interface for [n26](https://n26.co
 ### CLI setup
     pip3 install n26
     wget https://raw.githubusercontent.com/femueller/python-n26/master/n26.yml.example -O ~/.config/n26.yml
-    # configure username, password and card ID
+    # configure username and password
     vim ~/.config/n26.yml
 
-You can also specify environment variables with the credentials instead of creating a config file.
+You can also specify environment variables with the credentials.
 
 - N26_USER: username
 - N26_PASSWORD: password
+
+Note that **when specifying both** environment variables as well as a config file their values can be merged.
+When there is a conflict however (i.e. a key is present in both locations) the **enviroment variable values will be preferred**.
 
 ### CLI example
     n26 balance
