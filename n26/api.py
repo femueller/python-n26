@@ -149,7 +149,7 @@ class Api(object):
         response.raise_for_status()
         return response.json()
 
-    def _get_token(self):
+    def get_token(self):
         """
         Returns the access token to use for api authentication.
         If a token has been requested before it will be reused if it is still valid.
@@ -163,7 +163,7 @@ class Api(object):
                 refresh_token = self._token_data[REFRESH_TOKEN_KEY]
                 self._token_data = self._refresh_token(refresh_token)
             else:
-                self._token_data = self._request_token()
+                self._token_data = self._request_token(self.config.username, self.config.password)
 
             # add expiration time to expiration in _validate_token()
             self._token_data[EXPIRATION_TIME_KEY] = time.time() + self._token_data["expires_in"]
@@ -174,15 +174,16 @@ class Api(object):
 
         return self._token_data[ACCESS_TOKEN_KEY]
 
-    def _request_token(self):
+    @staticmethod
+    def _request_token(username, password):
         """
         Request an authentication token from the server
         :return: the token or None if the response did not contain a token
         """
         values_token = {
             'grant_type': 'password',
-            'username': self.config.username,
-            'password': self.config.password
+            'username': username,
+            'password': password
         }
 
         response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
