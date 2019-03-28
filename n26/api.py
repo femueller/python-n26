@@ -129,7 +129,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
     def _do_request(self, method=GET, url="/", params={}):
-        access_token = self._get_token()
+        access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
         first_param = True

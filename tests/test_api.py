@@ -52,7 +52,7 @@ def test_get_token():
             'host_url': 'https://api.tech26.de'
         }
         new_api = api.Api(conf)
-        token = new_api._get_token()
+        token = new_api.get_token()
     assert token == expected
 
 
