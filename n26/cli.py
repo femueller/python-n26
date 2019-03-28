@@ -17,6 +17,9 @@ def cli():
     """Interact with the https://n26.com API via the command line."""
 
 
+client = api.Api()
+
+
 @cli.command()
 def info():
     """ Get account information """
