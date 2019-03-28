@@ -107,12 +107,19 @@ class Api(object):
     def get_savings(self):
         return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
 
-    def get_statistics(self, from_time, to_time=int(time.time()) * 1000):
+    def get_statistics(self, from_time=0, to_time=int(time.time()) * 1000):
         """
-        Get statistics in a given timeframe
+        Get statistics in a given time frame
         :param from_time: Timestamp - milliseconds since 1970 in CET
         :param to_time: Timestamp - milliseconds since 1970 in CET
         """
+
+        if not from_time:
+            from_time = 0
+
+        if not to_time:
+            to_time = int(time.time()) * 1000
+
         return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
 
     def get_available_categories(self):
