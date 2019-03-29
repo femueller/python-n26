@@ -85,7 +85,7 @@ def spaces():
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to block. Omitting this will block all cards.')
 def card_block(card):
-    """ Blocks the card. """
+    """ Blocks the card/s """
     if card:
         card_ids = [card]
     else:
@@ -99,7 +99,7 @@ def card_block(card):
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to unblock. Omitting this will unblock all cards.')
 def card_unblock(card):
-    """ Unblocks the card. """
+    """ Unblocks the card/s """
     if card:
         card_ids = [card]
     else:
