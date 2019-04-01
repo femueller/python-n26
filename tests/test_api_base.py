@@ -1,3 +1,4 @@
+import functools
 import json
 import unittest
 from unittest import mock
@@ -24,9 +25,27 @@ def read_response_file(file_name: str) -> str:
     return json.loads(api_response_text)
 
 
+def mock_auth_token(func):
+    """
+    Decorator for mocking the auth token returned by the N26 api
+
+    :param func: function to patch
+    :return:
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        with mock.patch('n26.api.Api._request_token') as mock_token:
+            mock_token.return_value = read_response_file("auth_token.json")
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
 def mock_api(method: str, response_file: str = None):
     """
     Decorator to mock the http response
+
     :param method: the method to decorate
     :param response_file: the file name of the file containing the json response to use for the mock
     :return: the decorated method
@@ -36,6 +55,8 @@ def mock_api(method: str, response_file: str = None):
         if not callable(function):
             raise AttributeError("Unsupported type: {}".format(function))
 
+        @mock_auth_token
+        @functools.wraps(function)
         def wrapper(*args, **kwargs):
             with mock.patch('n26.api.requests.{}'.format(method)) as mock_post:
                 mock_post.return_value.json.return_value = read_response_file(response_file)

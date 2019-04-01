@@ -1,0 +1,8 @@
+{
+  "access_token": "12345678-1234-1234-1234-123456789012",
+  "token_type": "bearer",
+  "refresh_token": "99999999-9999-9999-9999-999999999999",
+  "expires_in": 1798,
+  "scope": "trust",
+  "host_url": "https://api.tech26.de"
+}
