@@ -3,6 +3,10 @@ from collections import namedtuple
 
 import yaml
 
+ENV_PARAM_USER = "N26_USER"
+ENV_PARAM_PASSWORD = "N26_PASSWORD"
+
+CONFIG_FILE_PATH = "~/.config/n26.yml"
 Config = namedtuple('Config', ['username', 'password'])
 
 
@@ -23,7 +27,7 @@ def _read_from_env():
     :return: Config object that may contain None values
     """
     username, password = [os.environ.get(e)
-                          for e in ["N26_USER", "N26_PASSWORD"]]
+                          for e in [ENV_PARAM_USER, ENV_PARAM_PASSWORD]]
     return Config(username, password)
 
 
@@ -35,7 +39,7 @@ def _read_from_file(config):
     :param config: a config object that might already contain values
     :return: Config object with added values from config file (if any)
     """
-    config_file = os.path.expanduser('~/.config/n26.yml')
+    config_file = os.path.expanduser(CONFIG_FILE_PATH)
     if not os.path.exists(config_file):
         # config file doesn't exist
         return config
