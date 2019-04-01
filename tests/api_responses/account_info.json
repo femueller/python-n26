@@ -1,0 +1,17 @@
+{
+  "id": "12345678-abcd-1234-abcd-1234567890ab",
+  "email": "john.doe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "kycFirstName": "John Dee",
+  "kycLastName": "Doe",
+  "title": "",
+  "gender": "MALE",
+  "birthDate": 687916800000,
+  "signupCompleted": true,
+  "nationality": "DEU",
+  "mobilePhoneNumber": "+491234567890",
+  "shadowUserId": "12345678-1234-1234-1234-1234567890ab",
+  "transferWiseTermsAccepted": false,
+  "idNowToken": null
+}
