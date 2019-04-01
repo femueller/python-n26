@@ -1,6 +1,6 @@
 from n26 import api, config
-from n26.api import BASE_URL
-from tests.test_api_base import N26TestBase, mock_auth_token
+from n26.api import BASE_URL, POST
+from tests.test_api_base import N26TestBase, mock_auth_token, mock_api
 
 
 class ApiTests(N26TestBase):
@@ -18,6 +18,15 @@ class ApiTests(N26TestBase):
     def test_get_token(self):
         expected = '12345678-1234-1234-1234-123456789012'
         result = self._underTest.get_token()
+        self.assertEqual(result, expected)
+
+    @mock_auth_token
+    @mock_api(method=POST, response_file="refresh_token.json")
+    def test_get_token(self):
+        expected = "12345678-1234-abcd-abcd-1234567890ab"
+        result = self._underTest.get_token()
+        self.assertIsNot(result, expected)
+        result = self._underTest._refresh_token("bla")
         self.assertEqual(result, expected)
 
     def test_init_without_config(self):
