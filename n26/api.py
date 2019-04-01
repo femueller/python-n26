@@ -1,6 +1,7 @@
 import time
 
 import requests
+
 from n26 import config
 
 BASE_URL = 'https://api.tech26.de'
@@ -128,23 +129,11 @@ class Api(object):
     def get_invitations(self):
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
-    def _do_request(self, method=GET, url="/", params={}):
+    def _do_request(self, method=GET, url="/", params=None):
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
-        first_param = True
-        for k, v in params.items():
-            if not v:
-                # skip None values
-                continue
-
-            if first_param:
-                url += '?'
-                first_param = False
-            else:
-                url += '&'
-
-            url += "%s=%s" % (k, v)
+        url = self._create_request_url(url, params)
 
         if method is GET:
             response = requests.get(url, headers=headers)
@@ -155,6 +144,33 @@ class Api(object):
 
         response.raise_for_status()
         return response.json()
+
+    @staticmethod
+    def _create_request_url(url, params=None):
+        """
+        Adds query params to the given url
+
+        :param url: the url to extend
+        :param params: query params as a keyed dictionary
+        :return: the url including the given query params
+        """
+
+        if params:
+            first_param = True
+            for k, v in params.items():
+                if not v:
+                    # skip None values
+                    continue
+
+                if first_param:
+                    url += '?'
+                    first_param = False
+                else:
+                    url += '&'
+
+                url += "%s=%s" % (k, v)
+
+        return url
 
     def get_token(self):
         """

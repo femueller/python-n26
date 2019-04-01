@@ -1,9 +1,18 @@
 from n26 import api, config
+from n26.api import BASE_URL
 from tests.test_api_base import N26TestBase, mock_auth_token
 
 
 class ApiTests(N26TestBase):
     """Common Api tests"""
+
+    def test_create_request_url(self):
+        expected = "https://api.tech26.de?foo=bar&bar=baz"
+        result = self._underTest._create_request_url(BASE_URL, {
+            "foo": "bar",
+            "bar": "baz"
+        })
+        self.assertEqual(result, expected)
 
     @mock_auth_token
     def test_get_token(self):
