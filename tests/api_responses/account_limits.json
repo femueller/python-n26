@@ -1,0 +1,12 @@
+[
+  {
+    "limit": "POS_DAILY_ACCOUNT",
+    "amount": 2500.00,
+    "countryList": null
+  },
+  {
+    "limit": "ATM_DAILY_ACCOUNT",
+    "amount": 2500.00,
+    "countryList": null
+  }
+]
