@@ -7,4 +7,5 @@ class BalanceTest(N26TestBase):
 
     @mock_api(method=GET, response_file="balance.json")
     def test_balance_ok(self):
-        self._underTest.get_balance()
+        result = self._underTest.get_balance()
+        self.assertIsNotNone(result)
