@@ -14,3 +14,8 @@ class AccountTests(N26TestBase):
     def test_get_account_statuses(self):
         result = self._underTest.get_account_statuses()
         self.assertIsNotNone(result)
+
+    @mock_api(method=GET, response_file="addresses.json")
+    def test_get_addresses(self):
+        result = self._underTest.get_addresses()
+        self.assertIsNotNone(result)

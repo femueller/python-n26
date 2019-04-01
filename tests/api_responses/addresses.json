@@ -1,0 +1,57 @@
+{
+  "paging": {
+    "previous": null,
+    "next": null,
+    "totalResults": 3
+  },
+  "data": [
+    {
+      "id": "12345678-1234-abcd-abcd-1234567890ab",
+      "created": 1464196274025,
+      "updated": 1497862816796,
+      "addressLine1": "",
+      "addressLine2": null,
+      "streetName": "Einbahnstraße",
+      "houseNumberBlock": "1",
+      "zipCode": "12345",
+      "cityName": "Berlin",
+      "state": null,
+      "countryName": "DEU",
+      "type": "SHIPPING",
+      "userId": "12345678-1234-abcd-abcd-1234567890ab",
+      "fromAllowedCountry": true
+    },
+    {
+      "id": "22345678-1234-abcd-abcd-1234567890ab",
+      "created": 1464197135809,
+      "updated": 1497862816833,
+      "addressLine1": "Markus Karl-Heinz Andreas Ressel",
+      "addressLine2": null,
+      "streetName": "EINBAHNSTRAßE",
+      "houseNumberBlock": "1",
+      "zipCode": "12345",
+      "cityName": "BERLIN",
+      "state": null,
+      "countryName": "DEU",
+      "type": "PASSPORT",
+      "userId": "12345678-1234-abcd-abcd-1234567890ab",
+      "fromAllowedCountry": true
+    },
+    {
+      "id": "32345678-1234-abcd-abcd-1234567890ab",
+      "created": 1488552934000,
+      "updated": 1497865225100,
+      "addressLine1": "",
+      "addressLine2": null,
+      "streetName": "Einbahnstraße",
+      "houseNumberBlock": "1",
+      "zipCode": "12345",
+      "cityName": "Berlin",
+      "state": null,
+      "countryName": "DEU",
+      "type": "LEGAL",
+      "userId": "12345678-1234-abcd-abcd-1234567890ab",
+      "fromAllowedCountry": true
+    }
+  ]
+}
