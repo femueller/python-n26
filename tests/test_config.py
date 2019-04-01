@@ -8,11 +8,13 @@ from tests.test_api_base import N26TestBase
 
 
 class ConfigTests(N26TestBase):
+    """Config tests"""
+
     PATH = os.path.dirname(os.path.abspath(__file__))
     CONFIG_FILE = os.path.join(PATH, "test_creds.yml")
 
-    EXPECTED_FILE_CONF = config.Config(username='john.doe@file.com',
-                                       password='file!?')
+    EXPECTED_FILE_CONF = config.Config(username='john.doe@example.com',
+                                       password='$upersecret')
 
     EXPECTED_ENV_CONF = config.Config(username='john.doe@env.com',
                                       password='env!?')
@@ -34,6 +36,3 @@ class ConfigTests(N26TestBase):
 
         result = config.get_config()
         self.assertEqual(result, self.EXPECTED_FILE_CONF)
-
-        assert config.get_config() == config.Config(username='john.doe@example.com',
-                                                    password='$upersecret')

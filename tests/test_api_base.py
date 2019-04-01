@@ -69,6 +69,9 @@ def mock_api(method: str, response_file: str):
 
 
 class N26TestBase(unittest.TestCase):
+    """Base class for N26 api tests"""
+
+    # this is the Api client
     _underTest = None
 
     def setUp(self):
