@@ -22,7 +22,7 @@ class ApiTests(N26TestBase):
 
     @mock_auth_token
     @mock_api(method=POST, response_file="refresh_token.json")
-    def test_get_token(self):
+    def test_refresh_token(self):
         expected = "12345678-1234-abcd-abcd-1234567890ab"
         result = self._underTest.get_token()
         self.assertIsNot(result, expected)
