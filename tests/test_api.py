@@ -21,13 +21,13 @@ class ApiTests(N26TestBase):
         self.assertEqual(result, expected)
 
     @mock_auth_token
-    @mock_api(method=POST, response_file="refresh_token.json")
+    @mock_api(url_regex=".*/token", method=POST, response_file="refresh_token.json")
     def test_refresh_token(self):
         expected = "12345678-1234-abcd-abcd-1234567890ab"
         result = self._underTest.get_token()
         self.assertIsNot(result, expected)
         result = self._underTest._refresh_token("bla")
-        self.assertEqual(result, expected)
+        self.assertEqual(result["access_token"], expected)
 
     def test_init_without_config(self):
         api_client = api.Api()
