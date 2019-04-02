@@ -38,3 +38,19 @@ class AccountTests(N26TestBase):
     def test_get_addresses(self):
         result = self._underTest.get_addresses()
         self.assertIsNotNone(result)
+
+    @mock_requests(method=GET, response_file="contacts.json")
+    def test_get_contacts(self):
+        result = self._underTest.get_contacts()
+        self.assertIsNotNone(result)
+
+    @mock_requests(method=GET, response_file="contacts.json")
+    def test_limits_cli(self):
+        from n26.cli import contacts
+        result = self._run_cli_cmd(contacts)
+        self.assertIn("ADAC", result.output)
+        self.assertIn("Cyberport", result.output)
+        self.assertIn("DB", result.output)
+        self.assertIn("ELV", result.output)
+        self.assertIn("Mindfactory", result.output)
+        self.assertIn("Seegel", result.output)

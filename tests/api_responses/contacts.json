@@ -1,0 +1,68 @@
+[
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "0fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "ADAC Berlin-Brandenburg",
+    "subtitle": "DE84 1008 0000 0616 2162 00",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE84100800000616216200",
+      "bic": "DRESDEFF100"
+    }
+  },
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "1fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "Cyberport GmbH",
+    "subtitle": "DE73 6808 0030 0723 3036 00",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE73680800300723303600",
+      "bic": "DRESDEFF680"
+    }
+  },
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "2fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "DB Vertrieb GmbH",
+    "subtitle": "DE02 1001 0010 0152 5171 08",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE02100100100152517108",
+      "bic": "PBNKDEFFXXX"
+    }
+  },
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "3fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "ELV Elektronik  www.elv.de",
+    "subtitle": "DE96 2859 0075 0012 7744 00",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE96285900750012774400",
+      "bic": "GENODEF1LER"
+    }
+  },
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "4fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "Mindfactory AG",
+    "subtitle": "DE91 2824 0023 0335 6334 02",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE91282400230335633402",
+      "bic": "COBADEFFXXX"
+    }
+  },
+  {
+    "userId": "12345678-1234-abcd-abcd-1234567890ab",
+    "id": "5fffffff-1234-abcd-abcd-1234567890ab",
+    "name": "S. Seegel - Netbank",
+    "subtitle": "DE07 2009 0500 0008 0049 35",
+    "account": {
+      "accountType": "sepa",
+      "iban": "DE07200905000008004935",
+      "bic": "GENODEF1S15"
+    }
+  }
+]
