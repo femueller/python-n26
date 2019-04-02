@@ -1,0 +1,295 @@
+{
+  "from": 0,
+  "to": 1554236823000,
+  "total": 649.0200000000048,
+  "totalIncome": 32929.41999999999,
+  "totalExpense": 32280.399999999994,
+  "items": [
+    {
+      "id": "micro-v2-income",
+      "income": 10600.950000000003,
+      "expense": 0.0,
+      "total": 10600.950000000003
+    },
+    {
+      "id": "micro-v2-salary",
+      "income": 20148.399999999998,
+      "expense": 0.0,
+      "total": 20148.399999999998
+    },
+    {
+      "id": "micro-v2-miscellaneous",
+      "income": 1854.2499999999998,
+      "expense": 11335.769999999995,
+      "total": -9481.519999999995
+    },
+    {
+      "id": "micro-v2-bars-restaurants",
+      "income": 0.0,
+      "expense": 899.0300000000001,
+      "total": -899.0300000000001
+    },
+    {
+      "id": "micro-v2-media-electronics",
+      "income": 89.30000000000001,
+      "expense": 3514.9799999999996,
+      "total": -3425.6799999999994
+    },
+    {
+      "id": "micro-v2-household-utilities",
+      "income": 0.0,
+      "expense": 5835.219999999997,
+      "total": -5835.219999999997
+    },
+    {
+      "id": "micro-v2-transport-car",
+      "income": 0.5,
+      "expense": 1884.0199999999998,
+      "total": -1883.5199999999998
+    },
+    {
+      "id": "micro-v2-atm",
+      "income": 0.0,
+      "expense": 2564.95,
+      "total": -2564.95
+    },
+    {
+      "id": "micro-v2-tax-fines",
+      "income": 0.0,
+      "expense": 276.90000000000003,
+      "total": -276.90000000000003
+    },
+    {
+      "id": "micro-v2-business",
+      "income": 1.0,
+      "expense": 581.5,
+      "total": -580.5
+    },
+    {
+      "id": "micro-v2-food-groceries",
+      "income": 0.0,
+      "expense": 1611.9500000000003,
+      "total": -1611.9500000000003
+    },
+    {
+      "id": "micro-v2-insurances-finances",
+      "income": 108.94,
+      "expense": 425.96,
+      "total": -317.02
+    },
+    {
+      "id": "micro-v2-shopping",
+      "income": 68.34,
+      "expense": 1687.0600000000002,
+      "total": -1618.7200000000003
+    },
+    {
+      "id": "micro-v2-healthcare-drugstores",
+      "income": 0.0,
+      "expense": 80.99000000000001,
+      "total": -80.99000000000001
+    },
+    {
+      "id": "micro-v2-subscriptions-donations",
+      "income": 0.0,
+      "expense": 155.51,
+      "total": -155.51
+    },
+    {
+      "id": "micro-v2-leisure-entertainment",
+      "income": 57.74,
+      "expense": 167.09000000000003,
+      "total": -109.35000000000002
+    },
+    {
+      "id": "micro-v2-education",
+      "income": 0.0,
+      "expense": 3.42,
+      "total": -3.42
+    },
+    {
+      "id": "micro-v2-family-friends",
+      "income": 0.0,
+      "expense": 413.27,
+      "total": -413.27
+    },
+    {
+      "id": "micro-v2-travel-holidays",
+      "income": 0.0,
+      "expense": 762.78,
+      "total": -762.78
+    },
+    {
+      "id": "micro-v2-cash26",
+      "income": 0.0,
+      "expense": 80.0,
+      "total": -80.0
+    }
+  ],
+  "incomeItems": [
+    {
+      "id": "micro-v2-income",
+      "income": 10600.950000000003,
+      "expense": 0.0,
+      "total": 10600.950000000003
+    },
+    {
+      "id": "micro-v2-salary",
+      "income": 20148.399999999998,
+      "expense": 0.0,
+      "total": 20148.399999999998
+    },
+    {
+      "id": "micro-v2-miscellaneous",
+      "income": 1854.2499999999998,
+      "expense": 11335.769999999995,
+      "total": -9481.519999999995
+    },
+    {
+      "id": "micro-v2-media-electronics",
+      "income": 89.30000000000001,
+      "expense": 3514.9799999999996,
+      "total": -3425.6799999999994
+    },
+    {
+      "id": "micro-v2-transport-car",
+      "income": 0.5,
+      "expense": 1884.0199999999998,
+      "total": -1883.5199999999998
+    },
+    {
+      "id": "micro-v2-business",
+      "income": 1.0,
+      "expense": 581.5,
+      "total": -580.5
+    },
+    {
+      "id": "micro-v2-insurances-finances",
+      "income": 108.94,
+      "expense": 425.96,
+      "total": -317.02
+    },
+    {
+      "id": "micro-v2-shopping",
+      "income": 68.34,
+      "expense": 1687.0600000000002,
+      "total": -1618.7200000000003
+    },
+    {
+      "id": "micro-v2-leisure-entertainment",
+      "income": 57.74,
+      "expense": 167.09000000000003,
+      "total": -109.35000000000002
+    }
+  ],
+  "expenseItems": [
+    {
+      "id": "micro-v2-miscellaneous",
+      "income": 1854.2499999999998,
+      "expense": 11335.769999999995,
+      "total": -9481.519999999995
+    },
+    {
+      "id": "micro-v2-bars-restaurants",
+      "income": 0.0,
+      "expense": 899.0300000000001,
+      "total": -899.0300000000001
+    },
+    {
+      "id": "micro-v2-media-electronics",
+      "income": 89.30000000000001,
+      "expense": 3514.9799999999996,
+      "total": -3425.6799999999994
+    },
+    {
+      "id": "micro-v2-household-utilities",
+      "income": 0.0,
+      "expense": 5835.219999999997,
+      "total": -5835.219999999997
+    },
+    {
+      "id": "micro-v2-transport-car",
+      "income": 0.5,
+      "expense": 1884.0199999999998,
+      "total": -1883.5199999999998
+    },
+    {
+      "id": "micro-v2-atm",
+      "income": 0.0,
+      "expense": 2564.95,
+      "total": -2564.95
+    },
+    {
+      "id": "micro-v2-tax-fines",
+      "income": 0.0,
+      "expense": 276.90000000000003,
+      "total": -276.90000000000003
+    },
+    {
+      "id": "micro-v2-business",
+      "income": 1.0,
+      "expense": 581.5,
+      "total": -580.5
+    },
+    {
+      "id": "micro-v2-food-groceries",
+      "income": 0.0,
+      "expense": 1611.9500000000003,
+      "total": -1611.9500000000003
+    },
+    {
+      "id": "micro-v2-insurances-finances",
+      "income": 108.94,
+      "expense": 425.96,
+      "total": -317.02
+    },
+    {
+      "id": "micro-v2-shopping",
+      "income": 68.34,
+      "expense": 1687.0600000000002,
+      "total": -1618.7200000000003
+    },
+    {
+      "id": "micro-v2-healthcare-drugstores",
+      "income": 0.0,
+      "expense": 80.99000000000001,
+      "total": -80.99000000000001
+    },
+    {
+      "id": "micro-v2-subscriptions-donations",
+      "income": 0.0,
+      "expense": 155.51,
+      "total": -155.51
+    },
+    {
+      "id": "micro-v2-leisure-entertainment",
+      "income": 57.74,
+      "expense": 167.09000000000003,
+      "total": -109.35000000000002
+    },
+    {
+      "id": "micro-v2-education",
+      "income": 0.0,
+      "expense": 3.42,
+      "total": -3.42
+    },
+    {
+      "id": "micro-v2-family-friends",
+      "income": 0.0,
+      "expense": 413.27,
+      "total": -413.27
+    },
+    {
+      "id": "micro-v2-travel-holidays",
+      "income": 0.0,
+      "expense": 762.78,
+      "total": -762.78
+    },
+    {
+      "id": "micro-v2-cash26",
+      "income": 0.0,
+      "expense": 80.0,
+      "total": -80.0
+    }
+  ]
+}
