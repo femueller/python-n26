@@ -45,7 +45,7 @@ class AccountTests(N26TestBase):
         self.assertIsNotNone(result)
 
     @mock_requests(method=GET, response_file="contacts.json")
-    def test_limits_cli(self):
+    def test_contacts_cli(self):
         from n26.cli import contacts
         result = self._run_cli_cmd(contacts)
         self.assertIn("ADAC", result.output)
