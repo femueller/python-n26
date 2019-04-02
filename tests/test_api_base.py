@@ -47,7 +47,7 @@ def mock_auth_token(func):
     return wrapper
 
 
-def mock_api(method: str, response_file: str, url_regex: str = None):
+def mock_requests(method: str, response_file: str, url_regex: str = None):
     """
     Decorator to mock the http response
 

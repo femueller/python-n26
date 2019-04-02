@@ -1,26 +1,26 @@
 from n26.api import GET
-from tests.test_api_base import N26TestBase, mock_api
+from tests.test_api_base import N26TestBase, mock_requests
 
 
 class AccountTests(N26TestBase):
     """Account tests"""
 
-    @mock_api(method=GET, response_file="account_info.json")
+    @mock_requests(method=GET, response_file="account_info.json")
     def test_get_account_info(self):
         result = self._underTest.get_account_info()
         self.assertEqual(result["email"], "john.doe@example.com")
 
-    @mock_api(method=GET, response_file="account_statuses.json")
+    @mock_requests(method=GET, response_file="account_statuses.json")
     def test_get_account_statuses(self):
         result = self._underTest.get_account_statuses()
         self.assertIsNotNone(result)
 
-    @mock_api(method=GET, response_file="account_limits.json")
+    @mock_requests(method=GET, response_file="account_limits.json")
     def test_get_account_limits(self):
         result = self._underTest.get_account_limits()
         self.assertIsNotNone(result)
 
-    @mock_api(method=GET, response_file="addresses.json")
+    @mock_requests(method=GET, response_file="addresses.json")
     def test_get_addresses(self):
         result = self._underTest.get_addresses()
         self.assertIsNotNone(result)
