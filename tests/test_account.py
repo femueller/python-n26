@@ -26,6 +26,14 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_account_limits()
         self.assertIsNotNone(result)
 
+    @mock_requests(method=GET, response_file="account_limits.json")
+    def test_limits_cli(self):
+        from n26.cli import limits
+        result = self._run_cli_cmd(limits)
+        self.assertIn("POS_DAILY_ACCOUNT", result.output)
+        self.assertIn("ATM_DAILY_ACCOUNT", result.output)
+        self.assertIn("2500", result.output)
+
     @mock_requests(method=GET, response_file="addresses.json")
     def test_get_addresses(self):
         result = self._underTest.get_addresses()
