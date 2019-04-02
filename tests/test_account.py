@@ -54,3 +54,19 @@ class AccountTests(N26TestBase):
         self.assertIn("ELV", result.output)
         self.assertIn("Mindfactory", result.output)
         self.assertIn("Seegel", result.output)
+
+    @mock_requests(method=GET, response_file="statements.json")
+    def test_get_statements(self):
+        result = self._underTest.get_statements()
+        self.assertIsNotNone(result)
+
+    @mock_requests(method=GET, response_file="statements.json")
+    def test_get_statements_cli(self):
+        from n26.cli import statements
+        result = self._run_cli_cmd(statements)
+        self.assertIn("2016-11", result.output)
+        self.assertIn("2017-01", result.output)
+        self.assertIn("2018-01", result.output)
+        self.assertIn("2019-01", result.output)
+        self.assertIn("/api/statements/statement-2019-04", result.output)
+        self.assertIn("1554076800000", result.output)
