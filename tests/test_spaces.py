@@ -9,3 +9,9 @@ class SpacesTests(N26TestBase):
     def test_get_spaces(self):
         result = self._underTest.get_spaces()
         self.assertIsNotNone(result)
+
+    @mock_requests(method=GET, response_file="spaces.json")
+    def test_spaces_cli(self):
+        from n26.cli import spaces
+        result = self._run_cli_cmd(spaces)
+        self.assertRegex(result.output, r"\d*\.\d* \w*.*")

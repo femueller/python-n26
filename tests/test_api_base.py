@@ -23,14 +23,14 @@ def read_response_file(file_name: str) -> str:
     file_path = os.path.join(directory, 'api_responses', file_name)
 
     if not os.path.isfile(file_path):
-        raise AttributeError("Couldn't find file: {}".format(file_path))
+        raise AttributeError("Couldn't find file containing response mock data: {}".format(file_path))
 
     with open(file_path, 'r') as myfile:
         api_response_text = myfile.read()
     return json.loads(api_response_text)
 
 
-def mock_auth_token(func):
+def mock_auth_token(func: callable):
     """
     Decorator for mocking the auth token returned by the N26 api
 
@@ -57,7 +57,7 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
     :return: the decorated method
     """
 
-    def decorator(function):
+    def decorator(function: callable):
         if not callable(function):
             raise AttributeError("Unsupported type: {}".format(function))
 
