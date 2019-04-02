@@ -164,8 +164,8 @@ def statements():
 @cli.command()
 @click.option('--categories', default=None, type=str,
               help='Comma separated list of category IDs.')
-@click.option('--pending', default=None, type=bool,
-              help='Whether to include pending transactions.')
+@click.option('--pending', default=None, type=bool, flag=True,
+              help='Whether to show only pending transactions.')
 @click.option('--from', 'param_from', default=None, type=int,
               help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
 @click.option('--to', default=None, type=int,

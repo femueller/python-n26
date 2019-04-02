@@ -73,12 +73,17 @@ class Api(object):
         :param from_time: earliest transaction time as a Timestamp - milliseconds since 1970 in CET
         :param to_time: latest transaction time as a Timestamp - milliseconds since 1970 in CET
         :param limit: Limit the number of transactions to return to the given amount
-        :param pending: show pending or not pending only
+        :param pending: show only pending transactions
         :param categories: Comma separated list of category IDs
         :param text_filter: Query string to search for
         :param last_id: ??
         :return: list of transactions
         """
+
+        if not pending:
+            # pending can only be True or absent
+            pending = None
+
         return self._do_request(GET, BASE_URL + '/api/smrt/transactions', {
             'from': from_time,
             'to': to_time,
