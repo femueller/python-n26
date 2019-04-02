@@ -79,10 +79,9 @@ class Api(object):
         :param last_id: ??
         :return: list of transactions
         """
-
-        if not pending:
-            # pending can only be True or absent
-            pending = None
+        if pending and limit:
+            # pending does not support limit
+            limit = None
 
         return self._do_request(GET, BASE_URL + '/api/smrt/transactions', {
             'from': from_time,

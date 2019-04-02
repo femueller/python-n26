@@ -164,7 +164,7 @@ def statements():
 @cli.command()
 @click.option('--categories', default=None, type=str,
               help='Comma separated list of category IDs.')
-@click.option('--pending', default=None, type=bool, flag=True,
+@click.option('--pending', default=None, type=bool,
               help='Whether to show only pending transactions.')
 @click.option('--from', 'param_from', default=None, type=int,
               help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
@@ -175,7 +175,7 @@ def statements():
 def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
     """ Show transactions (default: 5) """
 
-    if not limit:
+    if not pending and not limit:
         limit = 5
         click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
 
