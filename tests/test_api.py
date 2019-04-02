@@ -20,7 +20,6 @@ class ApiTests(N26TestBase):
         result = self._underTest.get_token()
         self.assertEqual(result, expected)
 
-    @mock_auth_token
     @mock_requests(url_regex=".*/token", method=POST, response_file="refresh_token.json")
     def test_refresh_token(self):
         expected = "12345678-1234-abcd-abcd-1234567890ab"
