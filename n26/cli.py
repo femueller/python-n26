@@ -5,6 +5,7 @@ import click
 from tabulate import tabulate
 
 import n26.api as api
+from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW
 
 API_CLIENT = api.Api()
 
@@ -84,7 +85,7 @@ def spaces():
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to block. Omitting this will block all cards.')
-def card_block(card):
+def card_block(card: str):
     """ Blocks the card/s """
     if card:
         card_ids = [card]
@@ -98,7 +99,7 @@ def card_block(card):
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to unblock. Omitting this will unblock all cards.')
-def card_unblock(card):
+def card_unblock(card: str):
     """ Unblocks the card/s """
     if card:
         card_ids = [card]
@@ -161,27 +162,59 @@ def statements():
 
 
 @cli.command()
-@click.option('--limit', default=5, type=click.IntRange(1, 10000), help='Limit transaction output.')
-def transactions(limit):
+@click.option('--categories', default=None, type=str,
+              help='Comma separated list of category IDs.')
+@click.option('--pending', default=None, type=bool,
+              help='Whether to include pending transactions.')
+@click.option('--from', 'param_from', default=None, type=int,
+              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--to', default=None, type=int,
+              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--text-filter', default=None, type=str, help='Text filter.')
+@click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
+def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
     """ Show transactions (default: 5) """
-    transactions_data = API_CLIENT.get_transactions(limit=limit)
 
-    text = "Transactions:\n"
-    text += "-------------\n"
+    if not limit:
+        limit = 5
+        click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
+
+    transactions_data = API_CLIENT.get_transactions(from_time=param_from, to_time=to, limit=limit, pending=pending,
+                                                    text_filter=text_filter, categories=categories)
 
     lines = []
-    for i, val in enumerate(transactions_data):
-        try:
-            if val['merchantName'] in val.values():
-                lines.append([i, str(val['amount']), val['merchantName']])
-        except KeyError:
-            if val['referenceText'] in val.values():
-                lines.append([i, str(val['amount']), val['referenceText']])
-            else:
-                lines.append([i, str(val['amount']), 'no details available'])
+    for i, transaction in enumerate(transactions_data):
+        amount = transaction.get(AMOUNT, 0)
+        currency = transaction.get(CURRENCY, None)
 
-    headers = ['index', 'amount', 'details']
-    text += tabulate(lines, headers, numalign='right')
+        if amount < 0:
+            sender_name = "You"
+            sender_iban = ""
+            recipient_name = transaction.get('merchantName', transaction.get('partnerName', ''))
+            recipient_iban = transaction.get('partnerIban', '')
+        else:
+            sender_name = transaction.get('partnerName', '')
+            sender_iban = transaction.get('partnerIban', '')
+            recipient_name = "You"
+            recipient_iban = ""
+
+        recurring = transaction.get('recurring', '')
+
+        if transaction['type'] == ATM_WITHDRAW:
+            message = "ATM Withdrawal"
+        else:
+            message = transaction.get(REFERENCE_TEXT)
+
+        lines.append([
+            "{} {}".format(amount, currency),
+            "{}\n{}".format(sender_name, sender_iban),
+            "{}\n{}".format(recipient_name, recipient_iban),
+            _insert_newlines(message),
+            recurring
+        ])
+
+    headers = ['Amount', 'From', 'To', 'Message', 'Recurring']
+    text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
 
@@ -191,7 +224,7 @@ def transactions(limit):
               help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
 @click.option('--to', default=None, type=int,
               help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-def statistics(param_from, to):
+def statistics(param_from: int, to: int):
     """Show your n26 statistics"""
     statements_data = API_CLIENT.get_statistics(from_time=param_from, to_time=to)
 
@@ -224,10 +257,26 @@ def statistics(param_from, to):
     click.echo(text.strip())
 
 
-def _timestamp_ms_to_date(epoch_ms) -> datetime or None:
+def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
     """Convert millisecond timestamp to datetime."""
     if epoch_ms:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
+
+
+def _insert_newlines(text: str, n=40):
+    """
+    Inserts a newline into the given text every n characters.
+    :param text: the text to break
+    :param n:
+    :return:
+    """
+    if not text:
+        return ""
+
+    lines = []
+    for i in range(0, len(text), n):
+        lines.append(text[i:i + n])
+    return '\n'.join(lines)
 
 
 if __name__ == '__main__':
