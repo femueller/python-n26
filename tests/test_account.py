@@ -10,6 +10,12 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_account_info()
         self.assertEqual(result["email"], "john.doe@example.com")
 
+    @mock_requests(method=GET, response_file="account_info.json")
+    def test_get_account_info_cli(self):
+        from n26.cli import info
+        result = self._run_cli_cmd(info)
+        self.assertIsNotNone(result.output)
+
     @mock_requests(method=GET, response_file="account_statuses.json")
     def test_get_account_statuses(self):
         result = self._underTest.get_account_statuses()

@@ -127,5 +127,27 @@ class N26TestBase(unittest.TestCase):
             api_response_text = myfile.read()
         return json.loads(api_response_text)
 
+    @staticmethod
+    def _run_cli_cmd(command: callable, args: list = None, ignore_exceptions: bool = False) -> any:
+        """
+        Runs a cli command and returns it's output.
+        If running the command results in an exception it is automatically rethrown by this method.
+
+        :param command: the command to execute
+        :param args: command arguments as a list
+        :param ignore_exceptions: if set to true exceptions originating from running the command
+                                  will not be rethrown and the result object from the cli call will
+                                  be returned instead.
+        :return: the result of the call
+        """
+        from click.testing import CliRunner
+        runner = CliRunner(echo_stdin=False)
+        result = runner.invoke(command, args=args or ())
+
+        if not ignore_exceptions and result.exception:
+            raise result.exception
+
+        return result
+
     if __name__ == '__main__':
         unittest.main()
