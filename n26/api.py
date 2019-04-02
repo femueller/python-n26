@@ -3,6 +3,7 @@ import time
 import requests
 
 from n26 import config
+from n26.config import Config
 
 BASE_URL = 'https://api.tech26.de'
 BASIC_AUTH_HEADERS = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
@@ -20,7 +21,7 @@ class Api(object):
     Api class can be imported as a library in order to use it within applications
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Config = None):
         """
         # constructor accepting None to maintain backward compatibility
         :param cfg: configuration object
@@ -31,38 +32,38 @@ class Api(object):
         self._token_data = {}
 
     # IDEA: @get_token decorator
-    def get_account_info(self):
+    def get_account_info(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/me')
 
-    def get_account_statuses(self):
+    def get_account_statuses(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/me/statuses')
 
-    def get_addresses(self):
+    def get_addresses(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/addresses')
 
-    def get_balance(self):
+    def get_balance(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/accounts')
 
-    def get_spaces(self):
+    def get_spaces(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/spaces')
 
-    def barzahlen_check(self):
+    def barzahlen_check(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
 
     def get_cards(self):
         return self._do_request(GET, BASE_URL + '/api/v2/cards')
 
-    def get_account_limits(self):
+    def get_account_limits(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
 
     def get_contacts(self):
         return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
 
-    def get_standing_orders(self):
+    def get_standing_orders(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/transactions/so')
 
-    def get_transactions(self, from_time=None, to_time=None, limit=None, pending=None, categories=None,
-                         text_filter=None, last_id=None):
+    def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = None, pending: bool = None,
+                         categories: str = None, text_filter: str = None, last_id: str = None) -> dict:
         """
         Get a list of transactions.
 
@@ -88,7 +89,7 @@ class Api(object):
             'lastId': last_id
         })
 
-    def get_transactions_limited(self, limit=5):
+    def get_transactions_limited(self, limit=5) -> dict:
         import warnings
         warnings.warn(
             "get_transactions_limited is deprecated, use get_transactions(limit=5) instead",
@@ -96,19 +97,19 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
-    def get_statements(self):
+    def get_statements(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/statements')
 
-    def block_card(self, card_id):
+    def block_card(self, card_id) -> dict:
         return self._do_request(POST, BASE_URL + '/api/cards/%s/block' % card_id)
 
-    def unblock_card(self, card_id):
+    def unblock_card(self, card_id) -> dict:
         return self._do_request(POST, BASE_URL + '/api/cards/%s/unblock' % card_id)
 
-    def get_savings(self):
+    def get_savings(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
 
-    def get_statistics(self, from_time=0, to_time=int(time.time()) * 1000):
+    def get_statistics(self, from_time=0, to_time=int(time.time()) * 1000) -> dict:
         """
         Get statistics in a given time frame
         :param from_time: Timestamp - milliseconds since 1970 in CET
@@ -123,13 +124,13 @@ class Api(object):
 
         return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
 
-    def get_available_categories(self):
+    def get_available_categories(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/smrt/categories')
 
-    def get_invitations(self):
+    def get_invitations(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
-    def _do_request(self, method=GET, url="/", params=None):
+    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> dict:
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
@@ -140,13 +141,13 @@ class Api(object):
         elif method is POST:
             response = requests.post(url, headers=headers)
         else:
-            return None
+            raise ValueError("Unsupported method: {}".format(method))
 
         response.raise_for_status()
         return response.json()
 
     @staticmethod
-    def _create_request_url(url, params=None):
+    def _create_request_url(url: str, params: dict = None):
         """
         Adds query params to the given url
 
@@ -198,7 +199,7 @@ class Api(object):
         return self._token_data[ACCESS_TOKEN_KEY]
 
     @staticmethod
-    def _request_token(username, password):
+    def _request_token(username: str, password: str):
         """
         Request an authentication token from the server
         :return: the token or None if the response did not contain a token
@@ -214,7 +215,7 @@ class Api(object):
         return response.json()
 
     @staticmethod
-    def _refresh_token(refresh_token):
+    def _refresh_token(refresh_token: str):
         """
         Refreshes an authentication token
         :param refresh_token: the refresh token issued by the server when requesting a token
@@ -230,7 +231,7 @@ class Api(object):
         return response.json()
 
     @staticmethod
-    def _validate_token(token_data):
+    def _validate_token(token_data: dict):
         """
         Checks if a token is valid
         :param token_data: the token data to check
