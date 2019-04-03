@@ -23,7 +23,8 @@ class Api(object):
 
     def __init__(self, cfg: Config = None):
         """
-        # constructor accepting None to maintain backward compatibility
+        Constructor accepting None to maintain backward compatibility
+
         :param cfg: configuration object
         """
         if not cfg:
@@ -33,30 +34,54 @@ class Api(object):
 
     # IDEA: @get_token decorator
     def get_account_info(self) -> dict:
+        """
+        Retrieves basic account information
+        """
         return self._do_request(GET, BASE_URL + '/api/me')
 
     def get_account_statuses(self) -> dict:
+        """
+        Retrieves additional account information
+        """
         return self._do_request(GET, BASE_URL + '/api/me/statuses')
 
     def get_addresses(self) -> dict:
+        """
+        Retrieves a list of addresses of the account owner
+        """
         return self._do_request(GET, BASE_URL + '/api/addresses')
 
     def get_balance(self) -> dict:
+        """
+        Retrieves the current balance
+        """
         return self._do_request(GET, BASE_URL + '/api/accounts')
 
     def get_spaces(self) -> dict:
+        """
+        Retrieves a list of all spaces
+        """
         return self._do_request(GET, BASE_URL + '/api/spaces')
 
     def barzahlen_check(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
 
     def get_cards(self):
+        """
+        Retrieves a list of all cards
+        """
         return self._do_request(GET, BASE_URL + '/api/v2/cards')
 
     def get_account_limits(self) -> dict:
+        """
+        Retrieves a list of all active account limits
+        """
         return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
 
     def get_contacts(self):
+        """
+        Retrieves a list of all contacts
+        """
         return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
 
     def get_standing_orders(self) -> dict:
@@ -93,7 +118,7 @@ class Api(object):
             'lastId': last_id
         })
 
-    def get_transactions_limited(self, limit=5) -> dict:
+    def get_transactions_limited(self, limit: int = 5) -> dict:
         import warnings
         warnings.warn(
             "get_transactions_limited is deprecated, use get_transactions(limit=5) instead",
@@ -102,20 +127,38 @@ class Api(object):
         return self.get_transactions(limit=limit)
 
     def get_statements(self) -> dict:
+        """
+        Retrieves a list of all statements
+        """
         return self._do_request(GET, BASE_URL + '/api/statements')
 
-    def block_card(self, card_id) -> dict:
+    def block_card(self, card_id: str) -> dict:
+        """
+        Blocks a card.
+        If the card is already blocked this will have no effect.
+
+        :param card_id: the id of the card to block
+        :return: some info about the card (not including it's blocked state... thanks n26!)
+        """
         return self._do_request(POST, BASE_URL + '/api/cards/%s/block' % card_id)
 
-    def unblock_card(self, card_id) -> dict:
+    def unblock_card(self, card_id: str) -> dict:
+        """
+        Unblocks a card.
+        If the card is already unblocked this will have no effect.
+
+        :param card_id: the id of the card to block
+        :return: some info about the card (not including it's unblocked state... thanks n26!)
+        """
         return self._do_request(POST, BASE_URL + '/api/cards/%s/unblock' % card_id)
 
     def get_savings(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
 
-    def get_statistics(self, from_time=0, to_time=int(time.time()) * 1000) -> dict:
+    def get_statistics(self, from_time: int = 0, to_time: int = int(time.time()) * 1000) -> dict:
         """
         Get statistics in a given time frame
+
         :param from_time: Timestamp - milliseconds since 1970 in CET
         :param to_time: Timestamp - milliseconds since 1970 in CET
         """
@@ -135,6 +178,14 @@ class Api(object):
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> dict:
+        """
+        Executes a http request based on the given parameters
+
+        :param method: the method to use (GET, POST)
+        :param url: the url to use
+        :param params: query parameters that will be appended to the url
+        :return: the response parsed as a json
+        """
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
