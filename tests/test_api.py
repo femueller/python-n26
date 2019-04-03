@@ -1,6 +1,6 @@
 from n26 import api, config
 from n26.api import BASE_URL, POST
-from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests
+from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests, mock_config
 
 
 class ApiTests(N26TestBase):
@@ -28,9 +28,11 @@ class ApiTests(N26TestBase):
         result = self._underTest._refresh_token("bla")
         self.assertEqual(result["access_token"], expected)
 
+    @mock_config
     def test_init_without_config(self):
         api_client = api.Api()
-        self.assertIsNotNone(api_client, config)
+        self.assertIsNotNone(api_client)
+        self.assertIsNotNone(api_client.config)
 
     def test_init_with_config(self):
         conf = config.Config(username='john.doe@example.com',

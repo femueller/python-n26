@@ -7,7 +7,7 @@ from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
 import n26
-from n26 import api
+from n26 import api, config
 from n26.api import GET, POST
 
 
@@ -28,6 +28,31 @@ def read_response_file(file_name: str) -> str:
     with open(file_path, 'r') as myfile:
         api_response_text = myfile.read()
     return json.loads(api_response_text)
+
+
+def mock_config(username: str = "john.doe@example.com", password: str = "$upersecret"):
+    """
+    Decorator to mock the configuration.
+    This decorator should never be used to test the config itself!
+
+    :param username: the username to use
+    :param password: the password to use
+    :return: the decorated method
+    """
+
+    def decorator(function: callable):
+        if not callable(function):
+            raise AttributeError("Unsupported type: {}".format(function))
+
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            with mock.patch('n26.config.get_config') as mock_config:
+                mock_config.return_value = config.Config(username=username, password=password)
+                return function(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 def mock_auth_token(func: callable):
@@ -104,6 +129,7 @@ class N26TestBase(unittest.TestCase):
     # this is the Api client
     _underTest = None
 
+    @mock_config
     def setUp(self):
         """
         This method is called BEFORE each individual test case
