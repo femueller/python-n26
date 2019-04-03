@@ -41,7 +41,7 @@ def _read_from_file(config):
         return config
 
     with open(config_file, 'r') as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+        cfg = yaml.load(ymlfile)
 
         if not cfg:
             raise ValueError("Config file is missing or empty")
