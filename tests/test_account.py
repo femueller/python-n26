@@ -10,7 +10,7 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_account_info()
         self.assertEqual(result["email"], "john.doe@example.com")
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="account_info.json")
     def test_get_account_info_cli(self):
         from n26.cli import info
@@ -27,7 +27,7 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_account_limits()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="account_limits.json")
     def test_limits_cli(self):
         from n26.cli import limits
@@ -46,7 +46,7 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_contacts()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="contacts.json")
     def test_contacts_cli(self):
         from n26.cli import contacts
@@ -63,7 +63,7 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_statements()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="statements.json")
     def test_get_statements_cli(self):
         from n26.cli import statements

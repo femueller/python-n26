@@ -28,7 +28,7 @@ class ApiTests(N26TestBase):
         result = self._underTest._refresh_token("bla")
         self.assertEqual(result["access_token"], expected)
 
-    @mock_config
+    @mock_config()
     def test_init_without_config(self):
         api_client = api.Api()
         self.assertIsNotNone(api_client)

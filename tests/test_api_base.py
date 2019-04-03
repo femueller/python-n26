@@ -6,10 +6,6 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
-import n26
-from n26 import api, config
-from n26.api import GET, POST
-
 
 def read_response_file(file_name: str) -> str:
     """
@@ -47,6 +43,7 @@ def mock_config(username: str = "john.doe@example.com", password: str = "$uperse
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
             with mock.patch('n26.config.get_config') as mock_config:
+                from n26 import config
                 mock_config.return_value = config.Config(username=username, password=password)
                 return function(*args, **kwargs)
 
@@ -76,9 +73,9 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
     """
     Decorator to mock the http response
 
-    :param url_regex: a regex to match the called url against. Only matching urls will be mocked.
-    :param method: the method to decorate
+    :param method: the http method to mock
     :param response_file: the file name of the file containing the json response to use for the mock
+    :param url_regex: a regex to match the called url against. Only matching urls will be mocked.
     :return: the decorated method
     """
 
@@ -106,7 +103,10 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
         @mock_auth_token
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
+            import n26
+            from n26.api import GET, POST
             if method is GET:
+                import n26
                 original = n26.api.requests.get
             elif method is POST:
                 original = n26.api.requests.post
@@ -129,12 +129,14 @@ class N26TestBase(unittest.TestCase):
     # this is the Api client
     _underTest = None
 
-    @mock_config
     def setUp(self):
         """
         This method is called BEFORE each individual test case
         """
-        self._underTest = api.Api()
+        from n26 import api, config
+
+        config = config.Config(username='john.doe@example.com', password='$upersecret')
+        self._underTest = api.Api(config)
 
     def tearDown(self):
         """

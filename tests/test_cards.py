@@ -10,7 +10,7 @@ class CardsTests(N26TestBase):
         result = self._underTest.get_cards()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
     @mock_requests(method=POST, response_file="card_block_single.json")
     def test_block_card_cli_single(self):
@@ -19,7 +19,7 @@ class CardsTests(N26TestBase):
         result = self._run_cli_cmd(card_block, ["--card", card_id])
         self.assertEqual(result.output, "Blocked card: {}\n".format(card_id))
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
     @mock_requests(method=POST, response_file="card_block_single.json")
     def test_block_card_cli_all(self):
@@ -30,7 +30,7 @@ class CardsTests(N26TestBase):
         result = self._run_cli_cmd(card_block)
         self.assertEqual(result.output, "Blocked card: {}\nBlocked card: {}\n".format(card_id_1, card_id_2))
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
     @mock_requests(method=POST, response_file="card_unblock_single.json")
     def test_unblock_card_cli_single(self):
@@ -39,7 +39,7 @@ class CardsTests(N26TestBase):
         result = self._run_cli_cmd(card_unblock, ["--card", card_id])
         self.assertEqual(result.output, "Unblocked card: {}\n".format(card_id))
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
     @mock_requests(method=POST, response_file="card_unblock_single.json")
     def test_unblock_card_cli_all(self):

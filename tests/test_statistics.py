@@ -11,7 +11,7 @@ class StatisticsTests(N26TestBase):
         result = self._underTest.get_statistics()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="statistics.json")
     def test_statistics_cli(self):
         from n26.cli import statistics

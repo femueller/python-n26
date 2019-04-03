@@ -10,7 +10,7 @@ class SpacesTests(N26TestBase):
         result = self._underTest.get_spaces()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="spaces.json")
     def test_spaces_cli(self):
         from n26.cli import spaces

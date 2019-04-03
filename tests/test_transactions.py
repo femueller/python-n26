@@ -11,7 +11,7 @@ class TransactionsTests(N26TestBase):
         result = self._underTest.get_transactions()
         self.assertIsNotNone(result)
 
-    @mock_config
+    @mock_config()
     @mock_requests(method=GET, response_file="transactions.json")
     def test_transactions_cli(self):
         from n26.cli import transactions
