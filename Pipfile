@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 requests = ">=2.20.0"
 click = "*"
-tabulate = "*"
+tabulate = ">=0.8.3"
 PyYAML = "*"
 
 [dev-packages]
