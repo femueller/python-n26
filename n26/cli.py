@@ -73,6 +73,9 @@ def spaces():
 
             line.append("%s %s" % (goal, currency))
             line.append('{:.2%}'.format(percentage))
+        else:
+            line.append("-")
+            line.append("-")
 
         lines.append(line)
 
