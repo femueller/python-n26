@@ -10,9 +10,6 @@ from tests.test_api_base import N26TestBase
 class ConfigTests(N26TestBase):
     """Config tests"""
 
-    PATH = os.path.dirname(os.path.abspath(__file__))
-    CONFIG_FILE = os.path.join(PATH, "test_creds.yml")
-
     EXPECTED_FILE_CONF = config.Config(
         username='john.doe@example.com',
         password='$upersecret')

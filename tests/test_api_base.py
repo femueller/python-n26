@@ -1,5 +1,6 @@
 import functools
 import json
+import os
 import re
 import unittest
 from copy import deepcopy
@@ -126,6 +127,9 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
 class N26TestBase(unittest.TestCase):
     """Base class for N26 api tests"""
 
+    PATH = os.path.dirname(os.path.abspath(__file__))
+    CONFIG_FILE = os.path.join(PATH, "test_creds.yml")
+
     # this is the Api client
     _underTest = None
 
@@ -135,8 +139,10 @@ class N26TestBase(unittest.TestCase):
         """
         from n26 import api, config
 
-        config = config.Config(username='john.doe@example.com', password='$upersecret')
-        self._underTest = api.Api(config)
+        # use test file path instead of real one
+        config.CONFIG_FILE_PATH = self.CONFIG_FILE
+
+        self._underTest = api.Api()
 
     def tearDown(self):
         """
