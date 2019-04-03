@@ -105,9 +105,15 @@ class N26TestBase(unittest.TestCase):
     _underTest = None
 
     def setUp(self):
+        """
+        This method is called BEFORE each individual test case
+        """
         self._underTest = api.Api()
 
     def tearDown(self):
+        """
+        This method is called AFTER each individual test case
+        """
         pass
 
     @staticmethod
