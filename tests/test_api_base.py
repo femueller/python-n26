@@ -116,16 +116,10 @@ class N26TestBase(unittest.TestCase):
         Read an api response from a file
 
         :param filename: the file in the "api_responses" subfolder to read
-        :return: the hypothetical api response dict to use as a replacement for the "send_request" method
+        :return: the api response dict
         """
 
-        import os
-        directory = os.path.dirname(__file__)
-        file_path = os.path.join(directory, 'api_responses', filename)
-
-        with open(file_path, 'r') as myfile:
-            api_response_text = myfile.read()
-        return json.loads(api_response_text)
+        return json.loads(read_response_file(filename))
 
     @staticmethod
     def _run_cli_cmd(command: callable, args: list = None, ignore_exceptions: bool = False) -> any:
