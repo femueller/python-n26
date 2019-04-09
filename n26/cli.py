@@ -137,11 +137,11 @@ def contacts():
 
     lines = []
     for contact in contacts_data:
-        contact_id = contact["id"]
-        contact_name = contact["name"]
-        contact_subtitle = contact["subtitle"]
+        id = contact["id"]
+        name = contact["name"]
+        subtitle = contact["subtitle"]
 
-        lines.append([contact_id, contact_name, contact_subtitle])
+        lines.append([id, name, subtitle])
 
     headers = ['Id', 'Name', 'Subtitle']
     text = tabulate(lines, headers, numalign='right')
@@ -154,11 +154,17 @@ def statements():
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
 
+    lines = []
+    for statement in statements_data:
+        id = statement["id"]
+        url = statement["url"]
+        visible_ts = statement["visibleTS"]
+        month = statement["month"]
+        year = statement["year"]
+
+        lines.append([id, url, visible_ts, month, year])
+
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
-    lines = [
-        list(x.values())
-        for x in statements_data
-    ]
     text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
