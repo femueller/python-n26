@@ -116,16 +116,9 @@ def limits():
     """ Show n26 account limits  """
     limits_data = API_CLIENT.get_account_limits()
 
-    lines = []
-    for limit in limits_data:
-        name = limit["limit"]
-        amount = limit["amount"]
-        countries = limit["countryList"]
-
-        lines.append([name, amount, countries])
-
     headers = ['Name', 'Amount', 'Country List']
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['limit', 'amount', 'countryList']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=limits_data, numalign='right')
 
     click.echo(text)
 
@@ -135,16 +128,9 @@ def contacts():
     """ Show your n26 contacts  """
     contacts_data = API_CLIENT.get_contacts()
 
-    lines = []
-    for contact in contacts_data:
-        id = contact["id"]
-        name = contact["name"]
-        subtitle = contact["subtitle"]
-
-        lines.append([id, name, subtitle])
-
     headers = ['Id', 'Name', 'Subtitle']
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['id', 'name', 'subtitle']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=contacts_data, numalign='right')
 
     click.echo(text.strip())
 
@@ -154,18 +140,9 @@ def statements():
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
 
-    lines = []
-    for statement in statements_data:
-        id = statement["id"]
-        url = statement["url"]
-        visible_ts = statement["visibleTS"]
-        month = statement["month"]
-        year = statement["year"]
-
-        lines.append([id, url, visible_ts, month, year])
-
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['id', 'url', 'visibleTS', 'month', 'year']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
 
@@ -246,7 +223,6 @@ def statistics(param_from: int, to: int):
 
     income_items = statements_data["incomeItems"]
     expense_items = statements_data["expenseItems"]
-    items = statements_data["items"]
 
     lines.append([total, total_income, total_expense, len(income_items), len(expense_items)])
 
@@ -255,11 +231,16 @@ def statistics(param_from: int, to: int):
 
     text += "\n\n"
 
+    items = statements_data["items"]
+    for item in items:
+        category = item["id"]
+        income = item["income"]
+        expense = item["expense"]
+        total = item["total"]
+
+        lines.append([category, income, expense, total])
+
     headers = ['Category', 'Income', 'Expense', 'Total']
-    lines = [
-        list(x.values())
-        for x in items
-    ]
     text += tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
@@ -269,6 +250,32 @@ def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
     """Convert millisecond timestamp to datetime."""
     if epoch_ms:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
+
+
+def _create_table_from_dict(headers, keys, data: list, **tabulate_args) -> str:
+    """
+    Helper function to turn list of dictionaries into a table.
+
+    Note: This method does NOT work with nested dictionaries and will only inspect top-level keys
+
+    :param headers: the headers to use for the columns
+    :param keys: the keys to extract the data from the dict
+    :param data: a list of dictionaries containing the data
+    :return: a table
+    """
+
+    if len(headers) != len(keys):
+        raise AttributeError("Number of headers does not match number of keys!")
+
+    lines = []
+    if isinstance(data, list):
+        for dictionary in data:
+            line = []
+            for key in keys:
+                line.append(dictionary.get(key))
+            lines.append(line)
+
+    return tabulate(tabular_data=lines, headers=headers, **tabulate_args)
 
 
 def _insert_newlines(text: str, n=40):
