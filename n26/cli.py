@@ -252,9 +252,9 @@ def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
 
 
-def _create_table_from_dict(headers, keys, data: list, **tabulate_args) -> str:
+def _create_table_from_dict(headers: list, keys: list, data: list, **tabulate_args) -> str:
     """
-    Helper function to turn list of dictionaries into a table.
+    Helper function to turn a list of dictionaries into a table.
 
     Note: This method does NOT work with nested dictionaries and will only inspect top-level keys
 
