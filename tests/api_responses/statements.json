@@ -1,0 +1,219 @@
+[
+  {
+    "id": "statement-2019-04",
+    "url": "/api/statements/statement-2019-04",
+    "visibleTS": 1554076800000,
+    "month": 4,
+    "year": 2019
+  },
+  {
+    "id": "statement-2019-03",
+    "url": "/api/statements/statement-2019-03",
+    "visibleTS": 1551398400000,
+    "month": 3,
+    "year": 2019
+  },
+  {
+    "id": "statement-2019-02",
+    "url": "/api/statements/statement-2019-02",
+    "visibleTS": 1548979200000,
+    "month": 2,
+    "year": 2019
+  },
+  {
+    "id": "statement-2019-01",
+    "url": "/api/statements/statement-2019-01",
+    "visibleTS": 1546300800000,
+    "month": 1,
+    "year": 2019
+  },
+  {
+    "id": "statement-2018-12",
+    "url": "/api/statements/statement-2018-12",
+    "visibleTS": 1543622400000,
+    "month": 12,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-11",
+    "url": "/api/statements/statement-2018-11",
+    "visibleTS": 1541030400000,
+    "month": 11,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-10",
+    "url": "/api/statements/statement-2018-10",
+    "visibleTS": 1538352000000,
+    "month": 10,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-09",
+    "url": "/api/statements/statement-2018-09",
+    "visibleTS": 1535760000000,
+    "month": 9,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-08",
+    "url": "/api/statements/statement-2018-08",
+    "visibleTS": 1533081600000,
+    "month": 8,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-07",
+    "url": "/api/statements/statement-2018-07",
+    "visibleTS": 1530403200000,
+    "month": 7,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-06",
+    "url": "/api/statements/statement-2018-06",
+    "visibleTS": 1527811200000,
+    "month": 6,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-05",
+    "url": "/api/statements/statement-2018-05",
+    "visibleTS": 1525132800000,
+    "month": 5,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-04",
+    "url": "/api/statements/statement-2018-04",
+    "visibleTS": 1522540800000,
+    "month": 4,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-03",
+    "url": "/api/statements/statement-2018-03",
+    "visibleTS": 1519862400000,
+    "month": 3,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-02",
+    "url": "/api/statements/statement-2018-02",
+    "visibleTS": 1517443200000,
+    "month": 2,
+    "year": 2018
+  },
+  {
+    "id": "statement-2018-01",
+    "url": "/api/statements/statement-2018-01",
+    "visibleTS": 1514764800000,
+    "month": 1,
+    "year": 2018
+  },
+  {
+    "id": "statement-2017-12",
+    "url": "/api/statements/statement-2017-12",
+    "visibleTS": 1512086400000,
+    "month": 12,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-11",
+    "url": "/api/statements/statement-2017-11",
+    "visibleTS": 1509494400000,
+    "month": 11,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-10",
+    "url": "/api/statements/statement-2017-10",
+    "visibleTS": 1506816000000,
+    "month": 10,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-09",
+    "url": "/api/statements/statement-2017-09",
+    "visibleTS": 1504224000000,
+    "month": 9,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-08",
+    "url": "/api/statements/statement-2017-08",
+    "visibleTS": 1501545600000,
+    "month": 8,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-07",
+    "url": "/api/statements/statement-2017-07",
+    "visibleTS": 1498867200000,
+    "month": 7,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-06",
+    "url": "/api/statements/statement-2017-06",
+    "visibleTS": 1496275200000,
+    "month": 6,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-05",
+    "url": "/api/statements/statement-2017-05",
+    "visibleTS": 1493596800000,
+    "month": 5,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-04",
+    "url": "/api/statements/statement-2017-04",
+    "visibleTS": 1491004800000,
+    "month": 4,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-03",
+    "url": "/api/statements/statement-2017-03",
+    "visibleTS": 1488326400000,
+    "month": 3,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-02",
+    "url": "/api/statements/statement-2017-02",
+    "visibleTS": 1485907200000,
+    "month": 2,
+    "year": 2017
+  },
+  {
+    "id": "statement-2017-01",
+    "url": "/api/statements/statement-2017-01",
+    "visibleTS": 1483228800000,
+    "month": 1,
+    "year": 2017
+  },
+  {
+    "id": "statement-2016-12",
+    "url": "/api/statements/statement-2016-12",
+    "visibleTS": 1480550400000,
+    "month": 12,
+    "year": 2016
+  },
+  {
+    "id": "statement-2016-11",
+    "url": "/api/statements/statement-2016-11",
+    "visibleTS": 1477958400000,
+    "month": 11,
+    "year": 2016
+  },
+  {
+    "id": "Wirecard-2016-11",
+    "url": "/api/statements/Wirecard-2016-11",
+    "visibleTS": 1477958400000,
+    "month": 11,
+    "year": 2016
+  }
+]

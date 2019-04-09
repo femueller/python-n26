@@ -1,65 +1,46 @@
-import functools
-
-import mock
-import pytest
-
 from n26 import api, config
-
-conf = config.Config(username='john.doe@example.com',
-                     password='$upersecret')
-
-
-# decorator for patching get_token
-def patch_token(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        with mock.patch('n26.api.Api.get_token') as mock_token:
-            mock_token.return_value = 'some token'
-            return func(*args, **kwargs)
-
-    return wrapper
+from n26.api import BASE_URL, POST, GET
+from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests, mock_config
 
 
-@pytest.fixture
-def api_object():
-    new_api = api.Api(conf)
-    return new_api
+class ApiTests(N26TestBase):
+    """Common Api tests"""
 
+    def test_create_request_url(self):
+        expected = "https://api.tech26.de?bar=baz&foo=bar"
+        result = self._underTest._create_request_url(BASE_URL, {
+            "foo": "bar",
+            "bar": "baz"
+        })
+        self.assertEqual(result, expected)
 
-# test __init__
-@mock.patch('n26.api.config.get_config')
-def test_init_implicit(patched_config):
-    patched_config.return_value = conf
-    new_api = api.Api()
-    assert new_api.config == conf
+    @mock_requests(method=GET, response_file="refresh_token.json")
+    def test_do_request(self):
+        result = self._underTest._do_request(GET, "/something")
+        self.assertIsNotNone(result)
 
+    @mock_auth_token
+    def test_get_token(self):
+        expected = '12345678-1234-1234-1234-123456789012'
+        result = self._underTest.get_token()
+        self.assertEqual(result, expected)
 
-def test_init_explicit():
-    new_api = api.Api(conf)
-    assert new_api.config == conf
+    @mock_requests(url_regex=".*/token", method=POST, response_file="refresh_token.json")
+    def test_refresh_token(self):
+        expected = "12345678-1234-abcd-abcd-1234567890ab"
+        result = self._underTest.get_token()
+        self.assertIsNot(result, expected)
+        result = self._underTest._refresh_token("bla")
+        self.assertEqual(result["access_token"], expected)
 
+    @mock_config()
+    def test_init_without_config(self):
+        api_client = api.Api()
+        self.assertIsNotNone(api_client.config)
 
-# test token
-def test_get_token():
-    expected = '12345678-1234-1234-1234-123456789012'
-    with mock.patch('n26.api.requests.post') as mock_post:
-        mock_post.return_value.json.return_value = {
-            'access_token': expected,
-            'token_type': 'bearer',
-            'refresh_token': '12345678-1234-1234-1234-123456789012',
-            'expires_in': 1798,
-            'scope': 'trust',
-            'host_url': 'https://api.tech26.de'
-        }
-        new_api = api.Api(conf)
-        token = new_api.get_token()
-    assert token == expected
-
-
-# test rest
-@patch_token
-def test_get_account_info(api_object):
-    with mock.patch('n26.api.requests.get') as mock_get:
-        mock_get.return_value.json.return_value = {'email': 'john.doe@example.com'}
-        info = api_object.get_account_info()
-    assert info == {'email': 'john.doe@example.com'}
+    def test_init_with_config(self):
+        conf = config.Config(username='john.doe@example.com',
+                             password='$upersecret')
+        api_client = api.Api(conf)
+        self.assertIsNotNone(api_client.config)
+        self.assertEqual(api_client.config, conf)

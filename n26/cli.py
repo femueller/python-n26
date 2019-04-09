@@ -5,6 +5,7 @@ import click
 from tabulate import tabulate
 
 import n26.api as api
+from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW
 
 API_CLIENT = api.Api()
 
@@ -87,7 +88,7 @@ def spaces():
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to block. Omitting this will block all cards.')
-def card_block(card):
+def card_block(card: str):
     """ Blocks the card/s """
     if card:
         card_ids = [card]
@@ -101,7 +102,7 @@ def card_block(card):
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to unblock. Omitting this will unblock all cards.')
-def card_unblock(card):
+def card_unblock(card: str):
     """ Unblocks the card/s """
     if card:
         card_ids = [card]
@@ -118,16 +119,9 @@ def limits():
     """ Show n26 account limits  """
     limits_data = API_CLIENT.get_account_limits()
 
-    lines = []
-    for limit in limits_data:
-        name = limit["limit"]
-        amount = limit["amount"]
-        countries = limit["countryList"]
-
-        lines.append([name, amount, countries])
-
     headers = ['Name', 'Amount', 'Country List']
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['limit', 'amount', 'countryList']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=limits_data, numalign='right')
 
     click.echo(text)
 
@@ -135,15 +129,11 @@ def limits():
 @cli.command()
 def contacts():
     """ Show your n26 contacts  """
-
     contacts_data = API_CLIENT.get_contacts()
 
     headers = ['Id', 'Name', 'Subtitle']
-    lines = [
-        list(x.values())[1:-1]
-        for x in contacts_data
-    ]
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['id', 'name', 'subtitle']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=contacts_data, numalign='right')
 
     click.echo(text.strip())
 
@@ -154,37 +144,65 @@ def statements():
     statements_data = API_CLIENT.get_statements()
 
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
-    lines = [
-        list(x.values())
-        for x in statements_data
-    ]
-    text = tabulate(lines, headers, numalign='right')
+    keys = ['id', 'url', 'visibleTS', 'month', 'year']
+    text = _create_table_from_dict(headers=headers, keys=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
 
 
 @cli.command()
-@click.option('--limit', default=5, type=click.IntRange(1, 10000), help='Limit transaction output.')
-def transactions(limit):
+@click.option('--categories', default=None, type=str,
+              help='Comma separated list of category IDs.')
+@click.option('--pending', default=None, type=bool,
+              help='Whether to show only pending transactions.')
+@click.option('--from', 'param_from', default=None, type=int,
+              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--to', default=None, type=int,
+              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--text-filter', default=None, type=str, help='Text filter.')
+@click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
+def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
     """ Show transactions (default: 5) """
-    transactions_data = API_CLIENT.get_transactions(limit=limit)
+    if not pending and not limit:
+        limit = 5
+        click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
 
-    text = "Transactions:\n"
-    text += "-------------\n"
+    transactions_data = API_CLIENT.get_transactions(from_time=param_from, to_time=to, limit=limit, pending=pending,
+                                                    text_filter=text_filter, categories=categories)
 
     lines = []
-    for i, val in enumerate(transactions_data):
-        try:
-            if val['merchantName'] in val.values():
-                lines.append([i, str(val['amount']), val['merchantName']])
-        except KeyError:
-            if val['referenceText'] in val.values():
-                lines.append([i, str(val['amount']), val['referenceText']])
-            else:
-                lines.append([i, str(val['amount']), 'no details available'])
+    for i, transaction in enumerate(transactions_data):
+        amount = transaction.get(AMOUNT, 0)
+        currency = transaction.get(CURRENCY, None)
 
-    headers = ['index', 'amount', 'details']
-    text += tabulate(lines, headers, numalign='right')
+        if amount < 0:
+            sender_name = "You"
+            sender_iban = ""
+            recipient_name = transaction.get('merchantName', transaction.get('partnerName', ''))
+            recipient_iban = transaction.get('partnerIban', '')
+        else:
+            sender_name = transaction.get('partnerName', '')
+            sender_iban = transaction.get('partnerIban', '')
+            recipient_name = "You"
+            recipient_iban = ""
+
+        recurring = transaction.get('recurring', '')
+
+        if transaction['type'] == ATM_WITHDRAW:
+            message = "ATM Withdrawal"
+        else:
+            message = transaction.get(REFERENCE_TEXT)
+
+        lines.append([
+            "{} {}".format(amount, currency),
+            "{}\n{}".format(sender_name, sender_iban),
+            "{}\n{}".format(recipient_name, recipient_iban),
+            _insert_newlines(message),
+            recurring
+        ])
+
+    headers = ['Amount', 'From', 'To', 'Message', 'Recurring']
+    text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
 
@@ -194,7 +212,7 @@ def transactions(limit):
               help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
 @click.option('--to', default=None, type=int,
               help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-def statistics(param_from, to):
+def statistics(param_from: int, to: int):
     """Show your n26 statistics"""
     statements_data = API_CLIENT.get_statistics(from_time=param_from, to_time=to)
 
@@ -208,7 +226,6 @@ def statistics(param_from, to):
 
     income_items = statements_data["incomeItems"]
     expense_items = statements_data["expenseItems"]
-    items = statements_data["items"]
 
     lines.append([total, total_income, total_expense, len(income_items), len(expense_items)])
 
@@ -217,20 +234,67 @@ def statistics(param_from, to):
 
     text += "\n\n"
 
+    items = statements_data["items"]
+    for item in items:
+        category = item["id"]
+        income = item["income"]
+        expense = item["expense"]
+        total = item["total"]
+
+        lines.append([category, income, expense, total])
+
     headers = ['Category', 'Income', 'Expense', 'Total']
-    lines = [
-        list(x.values())
-        for x in items
-    ]
     text += tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
 
 
-def _timestamp_ms_to_date(epoch_ms) -> datetime or None:
+def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
     """Convert millisecond timestamp to datetime."""
     if epoch_ms:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
+
+
+def _create_table_from_dict(headers: list, keys: list, data: list, **tabulate_args) -> str:
+    """
+    Helper function to turn a list of dictionaries into a table.
+
+    Note: This method does NOT work with nested dictionaries and will only inspect top-level keys
+
+    :param headers: the headers to use for the columns
+    :param keys: the keys to extract the data from the dict
+    :param data: a list of dictionaries containing the data
+    :return: a table
+    """
+
+    if len(headers) != len(keys):
+        raise AttributeError("Number of headers does not match number of keys!")
+
+    lines = []
+    if isinstance(data, list):
+        for dictionary in data:
+            line = []
+            for key in keys:
+                line.append(dictionary.get(key))
+            lines.append(line)
+
+    return tabulate(tabular_data=lines, headers=headers, **tabulate_args)
+
+
+def _insert_newlines(text: str, n=40):
+    """
+    Inserts a newline into the given text every n characters.
+    :param text: the text to break
+    :param n:
+    :return:
+    """
+    if not text:
+        return ""
+
+    lines = []
+    for i in range(0, len(text), n):
+        lines.append(text[i:i + n])
+    return '\n'.join(lines)
 
 
 if __name__ == '__main__':

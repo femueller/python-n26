@@ -1,0 +1,68 @@
+{
+  "totalBalance": 5000.12,
+  "visibleBalance": 5000.12,
+  "spaces": [
+    {
+      "id": "12345678-1234-abcd-abcd-1234567890ab",
+      "accountId": "12345678-1234-abcd-abcd-1234567890ab",
+      "name": "Main Account",
+      "imageUrl": "https://cdn.number26.de/spaces/default-images/account_cards.jpg?version=1",
+      "backgroundImageUrl": "https://cdn.number26.de/spaces/background-images/account_cards_background.jpg?version=1",
+      "balance": {
+        "availableBalance": 4850.12,
+        "currency": "EUR",
+        "overdraftAmount": 500.0
+      },
+      "isPrimary": true,
+      "isHiddenFromBalance": false,
+      "isCardAttached": true,
+      "goal": {
+        "id": "12345678-1234-abcd-abcd-1234567890ab",
+        "amount": 2000.0
+      },
+      "isLocked": false
+    },
+    {
+      "id": "22345678-1234-abcd-abcd-1234567890ab",
+      "accountId": "12345678-1234-abcd-abcd-1234567890ab",
+      "name": "Vacation",
+      "imageUrl": "https://cdn.number26.de/spaces/default-images/social_wine.jpg?version=1",
+      "backgroundImageUrl": "https://cdn.number26.de/spaces/background-images/social_wine_background.jpg?version=1",
+      "balance": {
+        "availableBalance": 0.0,
+        "currency": "EUR"
+      },
+      "isPrimary": false,
+      "isHiddenFromBalance": false,
+      "isCardAttached": false,
+      "goal": {
+        "id": "22345678-1234-abcd-abcd-1234567890ab",
+        "amount": 150.0
+      },
+      "isLocked": false
+    },
+    {
+      "id": "32345678-1234-abcd-abcd-1234567890ab",
+      "accountId": "12345678-1234-abcd-abcd-1234567890ab",
+      "name": "Tech",
+      "imageUrl": "https://cdn.number26.de/spaces/default-images/invest_calculator.jpg?version=1",
+      "backgroundImageUrl": "https://cdn.number26.de/spaces/background-images/invest_calculator_background.jpg?version=1",
+      "balance": {
+        "availableBalance": 150.0,
+        "currency": "EUR"
+      },
+      "isPrimary": false,
+      "isHiddenFromBalance": false,
+      "isCardAttached": false,
+      "goal": {
+        "id": "32345678-1234-abcd-abcd-1234567890ab",
+        "amount": 500.0
+      },
+      "isLocked": false
+    }
+  ],
+  "userFeatures": {
+    "availableSpaces": 0,
+    "canUpgrade": true
+  }
+}
