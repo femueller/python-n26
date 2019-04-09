@@ -1,4 +1,5 @@
 # N26 Python CLI/API
+[![Build Status](https://travis-ci.org/femueller/python-n26.svg?branch=master)](https://travis-ci.org/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 
 The idea is to have a convenient command line interface for [n26](https://n26.com/) to:
