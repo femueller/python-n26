@@ -9,7 +9,7 @@ python:
   - "nightly" # currently points to 3.7-dev
 # command to install dependencies
 install:
-  - pip install pipenv
+  - pip install pipenv pathlib2
   - pipenv install --dev
 # command to run tests
 script:
