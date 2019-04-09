@@ -1,5 +1,5 @@
 from n26 import api, config
-from n26.api import BASE_URL, POST
+from n26.api import BASE_URL, POST, GET
 from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests, mock_config
 
 
@@ -13,6 +13,11 @@ class ApiTests(N26TestBase):
             "bar": "baz"
         })
         self.assertEqual(result, expected)
+
+    @mock_requests(method=GET, response_file="refresh_token.json")
+    def test_do_request(self):
+        result = self._underTest._do_request(GET, "/something")
+        self.assertIsNotNone(result)
 
     @mock_auth_token
     def test_get_token(self):
@@ -31,12 +36,11 @@ class ApiTests(N26TestBase):
     @mock_config()
     def test_init_without_config(self):
         api_client = api.Api()
-        self.assertIsNotNone(api_client)
         self.assertIsNotNone(api_client.config)
 
     def test_init_with_config(self):
         conf = config.Config(username='john.doe@example.com',
                              password='$upersecret')
         api_client = api.Api(conf)
-        self.assertIsNotNone(api_client, config)
+        self.assertIsNotNone(api_client.config)
         self.assertEqual(api_client.config, conf)

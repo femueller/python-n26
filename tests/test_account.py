@@ -5,11 +5,6 @@ from tests.test_api_base import N26TestBase, mock_requests, mock_config
 class AccountTests(N26TestBase):
     """Account tests"""
 
-    @mock_requests(method=GET, response_file="account_info.json")
-    def test_get_account_info(self):
-        result = self._underTest.get_account_info()
-        self.assertEqual(result["email"], "john.doe@example.com")
-
     @mock_config()
     @mock_requests(method=GET, response_file="account_info.json")
     def test_get_account_info_cli(self):
@@ -20,11 +15,6 @@ class AccountTests(N26TestBase):
     @mock_requests(method=GET, response_file="account_statuses.json")
     def test_get_account_statuses(self):
         result = self._underTest.get_account_statuses()
-        self.assertIsNotNone(result)
-
-    @mock_requests(method=GET, response_file="account_limits.json")
-    def test_get_account_limits(self):
-        result = self._underTest.get_account_limits()
         self.assertIsNotNone(result)
 
     @mock_config()
@@ -57,11 +47,6 @@ class AccountTests(N26TestBase):
         self.assertIn("ELV", result.output)
         self.assertIn("Mindfactory", result.output)
         self.assertIn("Seegel", result.output)
-
-    @mock_requests(method=GET, response_file="statements.json")
-    def test_get_statements(self):
-        result = self._underTest.get_statements()
-        self.assertIsNotNone(result)
 
     @mock_config()
     @mock_requests(method=GET, response_file="statements.json")
