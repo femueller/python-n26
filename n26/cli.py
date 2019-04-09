@@ -133,14 +133,17 @@ def limits():
 @cli.command()
 def contacts():
     """ Show your n26 contacts  """
-
     contacts_data = API_CLIENT.get_contacts()
 
+    lines = []
+    for contact in contacts_data:
+        contact_id = contact["id"]
+        contact_name = contact["name"]
+        contact_subtitle = contact["subtitle"]
+
+        lines.append([contact_id, contact_name, contact_subtitle])
+
     headers = ['Id', 'Name', 'Subtitle']
-    lines = [
-        list(x.values())[1:-1]
-        for x in contacts_data
-    ]
     text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
@@ -174,7 +177,6 @@ def statements():
 @click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
 def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
     """ Show transactions (default: 5) """
-
     if not pending and not limit:
         limit = 5
         click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
