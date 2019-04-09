@@ -7,7 +7,7 @@ class ApiTests(N26TestBase):
     """Common Api tests"""
 
     def test_create_request_url(self):
-        expected = "https://api.tech26.de?foo=bar&bar=baz"
+        expected = "https://api.tech26.de?bar=baz&foo=bar"
         result = self._underTest._create_request_url(BASE_URL, {
             "foo": "bar",
             "bar": "baz"

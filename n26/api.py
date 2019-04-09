@@ -213,7 +213,7 @@ class Api(object):
 
         if params:
             first_param = True
-            for k, v in params.items():
+            for k, v in sorted(params.items(), key=lambda entry: entry[0]):
                 if not v:
                     # skip None values
                     continue
