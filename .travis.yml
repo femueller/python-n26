@@ -6,6 +6,7 @@ install:
 - pipenv install --dev
 script:
 - pytest
+- flake8 --max-line-length 120
 after_success:
 - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
 - chmod +x send.sh

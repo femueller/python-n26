@@ -1,7 +1,6 @@
 import os
 import inspect
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 
 __location__ = os.path.join(os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe())))
 

@@ -107,7 +107,6 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
             import n26
             from n26.api import GET, POST
             if method is GET:
-                import n26
                 original = n26.api.requests.get
             elif method is POST:
                 original = n26.api.requests.post
