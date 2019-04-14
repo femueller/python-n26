@@ -31,6 +31,16 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_addresses()
         self.assertIsNotNone(result)
 
+    @mock_config()
+    @mock_requests(method=GET, response_file="addresses.json")
+    def test_addresses_cli(self):
+        from n26.cli import addresses
+        result = self._run_cli_cmd(addresses)
+        self.assertIn("Einbahnstraße", result.output)
+        self.assertIn("SHIPPING", result.output)
+        self.assertIn("PASSPORT", result.output)
+        self.assertIn("LEGAL", result.output)
+
     @mock_requests(method=GET, response_file="contacts.json")
     def test_get_contacts(self):
         result = self._underTest.get_contacts()
