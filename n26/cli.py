@@ -233,18 +233,12 @@ def statistics(param_from: int, to: int):
     text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
     text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
 
-    lines = []
-    total = statements_data["total"]
-    total_income = statements_data["totalIncome"]
-    total_expense = statements_data["totalExpense"]
-
-    income_items = statements_data["incomeItems"]
-    expense_items = statements_data["expenseItems"]
-
-    lines.append([total, total_income, total_expense, len(income_items), len(expense_items)])
-
     headers = ['Total', 'Income', 'Expense', '#IncomeCategories', '#ExpenseCategories']
-    text += tabulate(lines, headers)
+    values = ['total', 'totalIncome', 'totalExpense',
+              lambda x: len(x.get('incomeItems')),
+              lambda x: len(x.get('expenseItems'))]
+
+    text += _create_table_from_dict(headers, value_functions=values, data=[statements_data])
 
     text += "\n\n"
 
