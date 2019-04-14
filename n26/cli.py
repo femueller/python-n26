@@ -27,10 +27,11 @@ def info():
     account_info = API_CLIENT.get_account_info()
 
     lines = [
-        ["Name:", "%s %s" % (account_info['firstName'], account_info['lastName'])],
-        ["Email:", account_info['email']],
-        ["Nationality:", account_info['nationality']],
-        ["Phone:", account_info['mobilePhoneNumber']]
+        ["Name:", "%s %s" % (account_info.get('firstName'), account_info.get('lastName'))],
+        ["Email:", account_info.get('email')],
+        ["Gender:", account_info.get('gender')],
+        ["Nationality:", account_info.get('nationality')],
+        ["Phone:", account_info.get('mobilePhoneNumber')]
     ]
 
     text = tabulate(lines, [], tablefmt="plain", colalign=["right", "left"])
