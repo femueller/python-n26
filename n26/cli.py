@@ -26,8 +26,9 @@ def addresses():
     """ Show account addresses """
     addresses_data = API_CLIENT.get_addresses().get('data')
 
-    headers = ['Type', 'Country', 'City', 'Zip code', 'Street', 'Number', 'Address line 1', 'Address line 2', 'Created',
-               'Updated']
+    headers = ['Type', 'Country', 'City', 'Zip code', 'Street', 'Number',
+               'Address line 1', 'Address line 2',
+               'Created', 'Updated']
     keys = ['type', 'countryName', 'cityName', 'zipCode', 'streetName', 'houseNumberBlock',
             'addressLine1', 'addressLine2',
             _datetime_extractor('created'), _datetime_extractor('updated')]
