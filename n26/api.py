@@ -72,7 +72,7 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL + '/api/v2/cards')
 
-    def get_account_limits(self) -> dict:
+    def get_account_limits(self) -> list:
         """
         Retrieves a list of all active account limits
         """
