@@ -126,7 +126,7 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
-    def get_statements(self) -> dict:
+    def get_statements(self) -> list:
         """
         Retrieves a list of all statements
         """
@@ -177,7 +177,7 @@ class Api(object):
     def get_invitations(self) -> dict:
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
-    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> dict:
+    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> list or dict:
         """
         Executes a http request based on the given parameters
 
