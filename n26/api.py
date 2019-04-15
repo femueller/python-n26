@@ -84,7 +84,7 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
 
-    def get_standing_orders(self) -> list:
+    def get_standing_orders(self) -> dict:
         """
         Get a list of standing orders
         """
