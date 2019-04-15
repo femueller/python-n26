@@ -27,10 +27,44 @@ def info():
     account_info = API_CLIENT.get_account_info()
 
     lines = [
-        ["Name:", "%s %s" % (account_info['firstName'], account_info['lastName'])],
-        ["Email:", account_info['email']],
-        ["Nationality:", account_info['nationality']],
-        ["Phone:", account_info['mobilePhoneNumber']]
+        ["Name:", "%s %s" % (account_info.get('firstName'), account_info.get('lastName'))],
+        ["Email:", account_info.get('email')],
+        ["Gender:", account_info.get('gender')],
+        ["Nationality:", account_info.get('nationality')],
+        ["Phone:", account_info.get('mobilePhoneNumber')]
+    ]
+
+    text = tabulate(lines, [], tablefmt="plain", colalign=["right", "left"])
+
+    click.echo(text)
+
+
+@cli.command()
+def status():
+    """ Get account statuses """
+    account_statuses = API_CLIENT.get_account_statuses()
+
+    lines = [
+        ["Account created:", _timestamp_ms_to_date(account_statuses.get('created'))],
+        ["Account updated:", _timestamp_ms_to_date(account_statuses.get('updated'))],
+        ["Account closed:", account_statuses.get('accountClosed')],
+        ["Card activation completed:", _timestamp_ms_to_date(account_statuses.get('cardActivationCompleted'))],
+        ["Card issued:", _timestamp_ms_to_date(account_statuses.get('cardIssued'))],
+        ["Core data updated:", _timestamp_ms_to_date(account_statuses.get('coreDataUpdated'))],
+        ["Email validation initiated:", _timestamp_ms_to_date(account_statuses.get('emailValidationInitiated'))],
+        ["Email validation completed:", _timestamp_ms_to_date(account_statuses.get('emailValidationCompleted'))],
+        ["First incoming transaction:", _timestamp_ms_to_date(account_statuses.get('firstIncomingTransaction'))],
+        ["Flex account:", account_statuses.get('flexAccount')],
+        ["Flex account confirmed:", _timestamp_ms_to_date(account_statuses.get('flexAccountConfirmed'))],
+        ["Is deceased:", account_statuses.get('isDeceased')],
+        ["Pairing State:", account_statuses.get('pairingState')],
+        ["Phone pairing initiated:", _timestamp_ms_to_date(account_statuses.get('phonePairingInitiated'))],
+        ["Phone pairing completed:", _timestamp_ms_to_date(account_statuses.get('phonePairingCompleted'))],
+        ["Pin definition completed:", _timestamp_ms_to_date(account_statuses.get('pinDefinitionCompleted'))],
+        ["Product selection completed:", _timestamp_ms_to_date(account_statuses.get('productSelectionCompleted'))],
+        ["Signup step:", account_statuses.get('signupStep')],
+        ["Single step signup:", _timestamp_ms_to_date(account_statuses.get('singleStepSignup'))],
+        ["Unpairing process status:", account_statuses.get('unpairingProcessStatus')],
     ]
 
     text = tabulate(lines, [], tablefmt="plain", colalign=["right", "left"])

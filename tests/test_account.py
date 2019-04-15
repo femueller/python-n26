@@ -12,10 +12,12 @@ class AccountTests(N26TestBase):
         result = self._run_cli_cmd(info)
         self.assertIsNotNone(result.output)
 
+    @mock_config()
     @mock_requests(method=GET, response_file="account_statuses.json")
-    def test_get_account_statuses(self):
-        result = self._underTest.get_account_statuses()
-        self.assertIsNotNone(result)
+    def test_get_account_statuses_cli(self):
+        from n26.cli import status
+        result = self._run_cli_cmd(status)
+        self.assertIn("PAIRED", result.output)
 
     @mock_config()
     @mock_requests(method=GET, response_file="account_limits.json")
