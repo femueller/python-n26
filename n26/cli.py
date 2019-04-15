@@ -241,6 +241,20 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
     click.echo(text.strip())
 
 
+@cli.command("standing-orders")
+def standing_orders():
+    """Show your standing orders"""
+    standing_orders_data = API_CLIENT.get_standing_orders()
+
+    headers = ['To', 'Amount', 'Frequency', 'Until', 'Initial day of month', 'First execution', 'Next execution',
+               'Executions', 'Created', 'Updated']
+    keys = ['partnerName', 'amount', 'executionFrequency', 'stopTS', 'initialDayOfMonth', 'firstExecutingTS',
+            'nextExecutingTS', 'executionCounter', 'created', 'updated']
+    text = _create_table_from_dict(headers, keys, standing_orders_data['data'])
+
+    click.echo(text.strip())
+
+
 @cli.command()
 @click.option('--from', 'param_from', default=None, type=int,
               help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
