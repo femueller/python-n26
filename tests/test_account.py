@@ -28,10 +28,15 @@ class AccountTests(N26TestBase):
         self.assertIn("ATM_DAILY_ACCOUNT", result.output)
         self.assertIn("2500", result.output)
 
+    @mock_config()
     @mock_requests(method=GET, response_file="addresses.json")
-    def test_get_addresses(self):
-        result = self._underTest.get_addresses()
-        self.assertIsNotNone(result)
+    def test_addresses_cli(self):
+        from n26.cli import addresses
+        result = self._run_cli_cmd(addresses)
+        self.assertIn("Einbahnstraße", result.output)
+        self.assertIn("SHIPPING", result.output)
+        self.assertIn("PASSPORT", result.output)
+        self.assertIn("LEGAL", result.output)
 
     @mock_requests(method=GET, response_file="contacts.json")
     def test_get_contacts(self):

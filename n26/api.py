@@ -72,7 +72,7 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL + '/api/v2/cards')
 
-    def get_account_limits(self) -> dict:
+    def get_account_limits(self) -> list:
         """
         Retrieves a list of all active account limits
         """
@@ -126,7 +126,7 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
-    def get_statements(self) -> dict:
+    def get_statements(self) -> list:
         """
         Retrieves a list of all statements
         """
@@ -171,13 +171,13 @@ class Api(object):
 
         return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
 
-    def get_available_categories(self) -> dict:
+    def get_available_categories(self) -> list:
         return self._do_request(GET, BASE_URL + '/api/smrt/categories')
 
-    def get_invitations(self) -> dict:
+    def get_invitations(self) -> list:
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
-    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> dict:
+    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> list or dict:
         """
         Executes a http request based on the given parameters
 
