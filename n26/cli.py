@@ -261,11 +261,25 @@ def standing_orders():
     """Show your standing orders"""
     standing_orders_data = API_CLIENT.get_standing_orders()
 
-    headers = ['To', 'Amount', 'Frequency', 'Until', 'Initial day of month', 'First execution', 'Next execution',
-               'Executions', 'Created', 'Updated']
-    keys = ['partnerName', 'amount', 'executionFrequency', 'stopTS', 'initialDayOfMonth', 'firstExecutingTS',
-            'nextExecutingTS', 'executionCounter', 'created', 'updated']
-    text = _create_table_from_dict(headers, keys, standing_orders_data['data'])
+    headers = ['To',
+               'Amount',
+               'Frequency',
+               'Until',
+               'Initial day of month',
+               'First execution', 'Next execution',
+               'Executions',
+               'Created', 'Updated']
+    values = ['partnerName',
+              'amount',
+              'executionFrequency',
+              _datetime_extractor('stopTS'),
+              'initialDayOfMonth',
+              _datetime_extractor('firstExecutingTS'),
+              _datetime_extractor('nextExecutingTS'),
+              'executionCounter',
+              _datetime_extractor('created'),
+              _datetime_extractor('updated')]
+    text = _create_table_from_dict(headers, value_functions=values, data=standing_orders_data['data'])
 
     click.echo(text.strip())
 
