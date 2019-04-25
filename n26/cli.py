@@ -22,6 +22,21 @@ client = api.Api()
 
 
 @cli.command()
+def addresses():
+    """ Show account addresses """
+    addresses_data = API_CLIENT.get_addresses().get('data')
+
+    headers = ['Type', 'Country', 'City', 'Zip code', 'Street', 'Number',
+               'Address line 1', 'Address line 2',
+               'Created', 'Updated']
+    keys = ['type', 'countryName', 'cityName', 'zipCode', 'streetName', 'houseNumberBlock',
+            'addressLine1', 'addressLine2',
+            _datetime_extractor('created'), _datetime_extractor('updated')]
+    table = _create_table_from_dict(headers, keys, addresses_data, numalign='right')
+    click.echo(table)
+
+
+@cli.command()
 def info():
     """ Get account information """
     account_info = API_CLIENT.get_account_info()
@@ -155,7 +170,7 @@ def limits():
 
     headers = ['Name', 'Amount', 'Country List']
     keys = ['limit', 'amount', 'countryList']
-    text = _create_table_from_dict(headers=headers, keys=keys, data=limits_data, numalign='right')
+    text = _create_table_from_dict(headers=headers, value_functions=keys, data=limits_data, numalign='right')
 
     click.echo(text)
 
@@ -167,7 +182,7 @@ def contacts():
 
     headers = ['Id', 'Name', 'Subtitle']
     keys = ['id', 'name', 'subtitle']
-    text = _create_table_from_dict(headers=headers, keys=keys, data=contacts_data, numalign='right')
+    text = _create_table_from_dict(headers=headers, value_functions=keys, data=contacts_data, numalign='right')
 
     click.echo(text.strip())
 
@@ -179,7 +194,7 @@ def statements():
 
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
     keys = ['id', 'url', 'visibleTS', 'month', 'year']
-    text = _create_table_from_dict(headers=headers, keys=keys, data=statements_data, numalign='right')
+    text = _create_table_from_dict(headers=headers, value_functions=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
 
@@ -267,32 +282,18 @@ def statistics(param_from: int, to: int):
     text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
     text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
 
-    lines = []
-    total = statements_data["total"]
-    total_income = statements_data["totalIncome"]
-    total_expense = statements_data["totalExpense"]
-
-    income_items = statements_data["incomeItems"]
-    expense_items = statements_data["expenseItems"]
-
-    lines.append([total, total_income, total_expense, len(income_items), len(expense_items)])
-
     headers = ['Total', 'Income', 'Expense', '#IncomeCategories', '#ExpenseCategories']
-    text += tabulate(lines, headers)
+    values = ['total', 'totalIncome', 'totalExpense',
+              lambda x: len(x.get('incomeItems')),
+              lambda x: len(x.get('expenseItems'))]
+
+    text += _create_table_from_dict(headers, value_functions=values, data=[statements_data])
 
     text += "\n\n"
 
-    items = statements_data["items"]
-    for item in items:
-        category = item["id"]
-        income = item["income"]
-        expense = item["expense"]
-        total = item["total"]
-
-        lines.append([category, income, expense, total])
-
     headers = ['Category', 'Income', 'Expense', 'Total']
-    text += tabulate(lines, headers, numalign='right')
+    keys = ['id', 'income', 'expense', 'total']
+    text += _create_table_from_dict(headers, keys, statements_data["items"], numalign='right')
 
     click.echo(text.strip())
 
@@ -303,30 +304,46 @@ def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
 
 
-def _create_table_from_dict(headers: list, keys: list, data: list, **tabulate_args) -> str:
+def _create_table_from_dict(headers: list, value_functions: list, data: list, **tabulate_args) -> str:
     """
     Helper function to turn a list of dictionaries into a table.
 
     Note: This method does NOT work with nested dictionaries and will only inspect top-level keys
 
     :param headers: the headers to use for the columns
-    :param keys: the keys to extract the data from the dict
+    :param value_functions: function that extracts the value for a given key. Can also be a simple string that
+                            will be used as dictionary key.
     :param data: a list of dictionaries containing the data
     :return: a table
     """
 
-    if len(headers) != len(keys):
+    if len(headers) != len(value_functions):
         raise AttributeError("Number of headers does not match number of keys!")
 
     lines = []
     if isinstance(data, list):
         for dictionary in data:
             line = []
-            for key in keys:
-                line.append(dictionary.get(key))
+            for value_function in value_functions:
+                if callable(value_function):
+                    value = value_function(dictionary)
+                    line.append(value)
+                else:
+                    # try to use is as a dict key
+                    line.append(dictionary.get(str(value_function)))
+
             lines.append(line)
 
     return tabulate(tabular_data=lines, headers=headers, **tabulate_args)
+
+
+def _datetime_extractor(key: str):
+    """
+    Helper function to extract a datetime value from a dict
+    :param key: the dictionary key used to access the value
+    :return: an extractor function
+    """
+    return lambda x: _timestamp_ms_to_date(x.get(key))
 
 
 def _insert_newlines(text: str, n=40):
