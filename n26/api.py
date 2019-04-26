@@ -85,6 +85,9 @@ class Api(object):
         return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
 
     def get_standing_orders(self) -> dict:
+        """
+        Get a list of standing orders
+        """
         return self._do_request(GET, BASE_URL + '/api/transactions/so')
 
     def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = None, pending: bool = None,

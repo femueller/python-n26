@@ -42,7 +42,7 @@ def info():
     account_info = API_CLIENT.get_account_info()
 
     lines = [
-        ["Name:", "%s %s" % (account_info.get('firstName'), account_info.get('lastName'))],
+        ["Name:", "{} {}".format(account_info.get('firstName'), account_info.get('lastName'))],
         ["Email:", account_info.get('email')],
         ["Gender:", account_info.get('gender')],
         ["Nationality:", account_info.get('nationality')],
@@ -93,7 +93,7 @@ def balance():
     balance_data = API_CLIENT.get_balance()
     amount = balance_data.get('availableBalance')
     currency = balance_data.get('currency')
-    click.echo("%s %s" % (amount, currency))
+    click.echo("{} {}".format(amount, currency))
 
 
 @cli.command()
@@ -115,13 +115,13 @@ def spaces():
         name = space['name']
 
         line.append(name)
-        line.append("%s %s" % (available_balance, currency))
+        line.append("{} {}".format(available_balance, currency))
 
         if 'goal' in space:
             goal = space['goal']['amount']
             percentage = available_balance / goal
 
-            line.append("%s %s" % (goal, currency))
+            line.append("{} {}".format(goal, currency))
             line.append('{:.2%}'.format(percentage))
         else:
             line.append("-")
@@ -252,6 +252,34 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
 
     headers = ['Amount', 'From', 'To', 'Message', 'Recurring']
     text = tabulate(lines, headers, numalign='right')
+
+    click.echo(text.strip())
+
+
+@cli.command("standing-orders")
+def standing_orders():
+    """Show your standing orders"""
+    standing_orders_data = API_CLIENT.get_standing_orders()
+
+    headers = ['To',
+               'Amount',
+               'Frequency',
+               'Until',
+               'Initial day of month',
+               'First execution', 'Next execution',
+               'Executions',
+               'Created', 'Updated']
+    values = ['partnerName',
+              lambda x: "{} {}".format(x.get('amount'), x.get('currencyCode').get('currencyCode')),
+              'executionFrequency',
+              _datetime_extractor('stopTS'),
+              'initialDayOfMonth',
+              _datetime_extractor('firstExecutingTS'),
+              _datetime_extractor('nextExecutingTS'),
+              'executionCounter',
+              _datetime_extractor('created'),
+              _datetime_extractor('updated')]
+    text = _create_table_from_dict(headers, value_functions=values, data=standing_orders_data['data'])
 
     click.echo(text.strip())
 
