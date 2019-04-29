@@ -8,6 +8,7 @@ requests = ">=2.20.0"
 click = "*"
 tabulate = ">=0.8.3"
 PyYAML = "*"
+urllib3 = ">=1.24.2"
 
 [dev-packages]
 pytest = "*"
