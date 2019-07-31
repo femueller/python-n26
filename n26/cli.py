@@ -1,5 +1,5 @@
 import webbrowser
-from datetime import datetime, timezone
+from datetime import datetime
 
 import click
 from tabulate import tabulate
@@ -335,12 +335,13 @@ def statistics(param_from: int, to: int):
 
 def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
     """
-    Convert millisecond timestamp to datetime.
+    Convert millisecond timestamp to UTC datetime.
 
     :param epoch_ms: milliseconds since 1970 in CET
+    :return: a UTC datetime object
     """
     if epoch_ms:
-        return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
+        return datetime.utcfromtimestamp(epoch_ms / 1000)
 
 
 def _create_table_from_dict(headers: list, value_functions: list, data: list, **tabulate_args) -> str:
