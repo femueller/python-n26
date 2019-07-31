@@ -140,9 +140,10 @@ def cards():
     """ Shows a list of cards """
     cards_data = API_CLIENT.get_cards()
 
-    headers = ['Id', 'Type', 'Design', 'Status', 'Activated', 'Pin defined', 'Expires']
+    headers = ['Id', 'Masked Pan', 'Type', 'Design', 'Status', 'Activated', 'Pin defined', 'Expires']
     keys = [
         'id',
+        'maskedPan',
         'cardType',
         'design',
         lambda x: "active" if (x.get('status') == CARD_STATUS_ACTIVE) else x.get('status'),

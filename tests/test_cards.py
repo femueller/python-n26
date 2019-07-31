@@ -5,10 +5,15 @@ from tests.test_api_base import N26TestBase, mock_requests, mock_config
 class CardsTests(N26TestBase):
     """Cards tests"""
 
+    @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
-    def test_get_cards(self):
-        result = self._underTest.get_cards()
-        self.assertIsNotNone(result)
+    def test_cards_cli(self):
+        from n26.cli import cards
+        result = self._run_cli_cmd(cards)
+        self.assertIn('MASTERCARD', result.output)
+        self.assertIn('MAESTRO', result.output)
+        self.assertIn('active', result.output)
+        self.assertIn('123456******1234', result.output)
 
     @mock_config()
     @mock_requests(method=GET, response_file="cards.json")
