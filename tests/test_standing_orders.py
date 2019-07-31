@@ -18,4 +18,4 @@ class StandingOrdersTests(N26TestBase):
         self.assertIn('WEEKLY', result.output)
         self.assertIn('MONTHLY', result.output)
         self.assertIn('YEARLY', result.output)
-        self.assertIn('2019-04-01 00:29:49.461000+00:00', result.output)
+        self.assertIn('10/30/18', result.output)
