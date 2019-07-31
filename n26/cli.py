@@ -268,7 +268,7 @@ def _day_of_month_extractor(key: str):
         elif value == 3:
             return "3rd"
         else:
-            return "{}st".format(value)
+            return "{}th".format(value)
 
     return extractor
 
