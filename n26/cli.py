@@ -1,5 +1,5 @@
 import webbrowser
-from datetime import datetime
+from datetime import datetime, timezone
 
 import click
 from tabulate import tabulate
@@ -341,7 +341,7 @@ def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
     :return: a UTC datetime object
     """
     if epoch_ms:
-        return datetime.utcfromtimestamp(epoch_ms / 1000)
+        return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
 
 
 def _create_table_from_dict(headers: list, value_functions: list, data: list, **tabulate_args) -> str:
