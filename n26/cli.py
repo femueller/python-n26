@@ -261,14 +261,10 @@ def _day_of_month_extractor(key: str):
         value = dictionary.get(key)
         if value is None:
             return None
-        elif value == 1:
-            return "1st"
-        elif value == 2:
-            return "2nd"
-        elif value == 3:
-            return "3rd"
         else:
-            return "{}th".format(value)
+            import inflect
+            engine = inflect.engine()
+            return engine.ordinal(value)
 
     return extractor
 
