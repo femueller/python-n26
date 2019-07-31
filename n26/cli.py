@@ -180,7 +180,7 @@ def contacts():
     """ Show your n26 contacts  """
     contacts_data = API_CLIENT.get_contacts()
 
-    headers = ['Id', 'Name', 'Subtitle']
+    headers = ['Id', 'Name', 'IBAN']
     keys = ['id', 'name', 'subtitle']
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=contacts_data, numalign='right')
 
