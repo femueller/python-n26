@@ -4,6 +4,7 @@ import requests
 
 from n26 import config
 from n26.config import Config
+from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 
 BASE_URL = 'https://api.tech26.de'
 BASIC_AUTH_HEADERS = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
@@ -77,6 +78,25 @@ class Api(object):
         Retrieves a list of all active account limits
         """
         return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
+
+    def set_account_limits(self, daily_withdrawal_limit: int = None, daily_payment_limit: int = None) -> None:
+        """
+        Sets account limits
+
+        :param daily_withdrawal_limit: daily withdrawal limit
+        :param daily_payment_limit: daily payment limit
+        """
+        if daily_withdrawal_limit is not None:
+            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+                "limit": DAILY_WITHDRAWAL_LIMIT,
+                "amount": daily_withdrawal_limit
+            })
+
+        if daily_payment_limit is not None:
+            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+                "limit": DAILY_PAYMENT_LIMIT,
+                "amount": daily_payment_limit
+            })
 
     def get_contacts(self):
         """
@@ -180,13 +200,15 @@ class Api(object):
     def get_invitations(self) -> list:
         return self._do_request(GET, BASE_URL + '/api/aff/invitations')
 
-    def _do_request(self, method: str = GET, url: str = "/", params: dict = None) -> list or dict:
+    def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
+                    json: dict = None) -> list or dict or None:
         """
         Executes a http request based on the given parameters
 
         :param method: the method to use (GET, POST)
         :param url: the url to use
         :param params: query parameters that will be appended to the url
+        :param json: request body
         :return: the response parsed as a json
         """
         access_token = self.get_token()
@@ -195,14 +217,16 @@ class Api(object):
         url = self._create_request_url(url, params)
 
         if method is GET:
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, json=json)
         elif method is POST:
-            response = requests.post(url, headers=headers)
+            response = requests.post(url, headers=headers, json=json)
         else:
             raise ValueError("Unsupported method: {}".format(method))
 
         response.raise_for_status()
-        return response.json()
+        # some responses do not return data so we just ignore the body in that case
+        if len(response.content) > 0:
+            return response.json()
 
     @staticmethod
     def _create_request_url(url: str, params: dict = None):
