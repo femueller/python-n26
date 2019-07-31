@@ -12,3 +12,5 @@ transaction item keys
 CURRENCY = 'currencyCode'
 AMOUNT = 'amount'
 REFERENCE_TEXT = 'referenceText'
+
+CARD_STATUS_ACTIVE = 'M_ACTIVE'
