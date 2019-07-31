@@ -394,7 +394,7 @@ def _datetime_extractor(key: str, date_only: bool = False):
         value = dictionary.get(key)
         time = _timestamp_ms_to_date(value)
         if time is None:
-            return "N/A"
+            return None
         else:
             time = time.astimezone()
             return time.strftime(fmt)
