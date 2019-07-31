@@ -395,6 +395,7 @@ def _datetime_extractor(key: str, date_only: bool = False):
         if time is None:
             return "N/A"
         else:
+            time = time.astimezone()
             return time.strftime(fmt)
 
     return extractor
