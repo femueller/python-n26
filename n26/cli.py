@@ -392,7 +392,10 @@ def _datetime_extractor(key: str, date_only: bool = False):
     def extractor(dictionary: dict):
         value = dictionary.get(key)
         time = _timestamp_ms_to_date(value)
-        return time.strftime(fmt)
+        if time is None:
+            return "N/A"
+        else:
+            return time.strftime(fmt)
 
     return extractor
 
