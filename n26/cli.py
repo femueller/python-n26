@@ -293,10 +293,10 @@ def standing_orders():
     values = ['partnerName',
               lambda x: "{} {}".format(x.get('amount'), x.get('currencyCode').get('currencyCode')),
               'executionFrequency',
-              _datetime_extractor('stopTS'),
+              _datetime_extractor('stopTS', date_only=True),
               'initialDayOfMonth',
-              _datetime_extractor('firstExecutingTS'),
-              _datetime_extractor('nextExecutingTS'),
+              _datetime_extractor('firstExecutingTS', date_only=True),
+              _datetime_extractor('nextExecutingTS', date_only=True),
               'executionCounter',
               _datetime_extractor('created'),
               _datetime_extractor('updated')]
