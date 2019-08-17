@@ -14,6 +14,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 # Cli returns command line requests
 @click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option()
 def cli():
     """Interact with the https://n26.com API via the command line."""
 
@@ -186,7 +187,20 @@ def card_unblock(card: str):
 
 @cli.command()
 def limits():
-    """ Show n26 account limits  """
+    """ Show n26 account limits """
+    _limits()
+
+
+@cli.command()
+@click.option('--withdrawal', default=None, type=int, help='Daily withdrawal limit.')
+@click.option('--payment', default=None, type=str, help='Daily payment limit.')
+def set_limits(withdrawal: int, payment: int):
+    """ Set n26 account limits """
+    API_CLIENT.set_account_limits(withdrawal, payment)
+    _limits()
+
+
+def _limits():
     limits_data = API_CLIENT.get_account_limits()
 
     headers = ['Name', 'Amount', 'Country List']
@@ -198,10 +212,10 @@ def limits():
 
 @cli.command()
 def contacts():
-    """ Show your n26 contacts  """
+    """ Show your n26 contacts """
     contacts_data = API_CLIENT.get_contacts()
 
-    headers = ['Id', 'Name', 'Subtitle']
+    headers = ['Id', 'Name', 'IBAN']
     keys = ['id', 'name', 'subtitle']
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=contacts_data, numalign='right')
 
@@ -277,6 +291,19 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
     click.echo(text.strip())
 
 
+def _day_of_month_extractor(key: str):
+    def extractor(dictionary: dict):
+        value = dictionary.get(key)
+        if value is None:
+            return None
+        else:
+            import inflect
+            engine = inflect.engine()
+            return engine.ordinal(value)
+
+    return extractor
+
+
 @cli.command("standing-orders")
 def standing_orders():
     """Show your standing orders"""
@@ -286,7 +313,7 @@ def standing_orders():
                'Amount',
                'Frequency',
                'Until',
-               'Initial day of month',
+               'Every',
                'First execution', 'Next execution',
                'Executions',
                'Created', 'Updated']
@@ -294,7 +321,7 @@ def standing_orders():
               lambda x: "{} {}".format(x.get('amount'), x.get('currencyCode').get('currencyCode')),
               'executionFrequency',
               _datetime_extractor('stopTS', date_only=True),
-              'initialDayOfMonth',
+              _day_of_month_extractor('initialDayOfMonth'),
               _datetime_extractor('firstExecutingTS', date_only=True),
               _datetime_extractor('nextExecutingTS', date_only=True),
               'executionCounter',
