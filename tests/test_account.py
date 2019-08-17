@@ -1,4 +1,4 @@
-from n26.api import GET
+from n26.api import GET, POST
 from tests.test_api_base import N26TestBase, mock_requests, mock_config
 
 
@@ -24,6 +24,16 @@ class AccountTests(N26TestBase):
     def test_limits_cli(self):
         from n26.cli import limits
         result = self._run_cli_cmd(limits)
+        self.assertIn("POS_DAILY_ACCOUNT", result.output)
+        self.assertIn("ATM_DAILY_ACCOUNT", result.output)
+        self.assertIn("2500", result.output)
+
+    @mock_config()
+    @mock_requests(method=POST, response_file=None)
+    @mock_requests(method=GET, response_file="account_limits.json")
+    def test_set_limits_cli(self):
+        from n26.cli import set_limits
+        result = self._run_cli_cmd(set_limits, ["--withdrawal", 2500, "--payment", 2500])
         self.assertIn("POS_DAILY_ACCOUNT", result.output)
         self.assertIn("ATM_DAILY_ACCOUNT", result.output)
         self.assertIn("2500", result.output)

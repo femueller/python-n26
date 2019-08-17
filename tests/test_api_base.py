@@ -8,12 +8,15 @@ from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
 
-def read_response_file(file_name: str) -> str:
+def read_response_file(file_name: str or None) -> json or None:
     """
     Reads a JSON file and returns it's content as a string
     :param file_name: the name of the file
     :return: file contents
     """
+
+    if file_name is None:
+        return None
 
     import os
     directory = os.path.dirname(__file__)
@@ -70,13 +73,13 @@ def mock_auth_token(func: callable):
     return wrapper
 
 
-def mock_requests(method: str, response_file: str, url_regex: str = None):
+def mock_requests(method: str, response_file: str or None, url_regex: str = None):
     """
     Decorator to mock the http response
 
     :param method: the http method to mock
-    :param response_file: the file name of the file containing the json response to use for the mock
-    :param url_regex: a regex to match the called url against. Only matching urls will be mocked.
+    :param response_file: optional file name of the file containing the json response to use for the mock
+    :param url_regex: optional regex to match the called url against. Only matching urls will be mocked.
     :return: the decorated method
     """
 
@@ -98,6 +101,9 @@ def mock_requests(method: str, response_file: str, url_regex: str = None):
                     return original(*args, **kwargs)
 
             mock_request.side_effect = side_effect
+
+            response = read_response_file(response_file)
+            mock_request.return_value.content = "" if response is None else str(response)
             mock_request.return_value.json.return_value = read_response_file(response_file)
             return new_mock
 
@@ -150,15 +156,18 @@ class N26TestBase(unittest.TestCase):
         pass
 
     @staticmethod
-    def get_api_response(filename: str) -> dict:
+    def get_api_response(filename: str) -> dict or None:
         """
         Read an api response from a file
 
         :param filename: the file in the "api_responses" subfolder to read
         :return: the api response dict
         """
-
-        return json.loads(read_response_file(filename))
+        file = read_response_file(filename)
+        if file is None:
+            return None
+        else:
+            return json.loads(file)
 
     @staticmethod
     def _run_cli_cmd(command: callable, args: list = None, ignore_exceptions: bool = False) -> any:

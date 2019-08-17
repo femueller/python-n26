@@ -166,7 +166,20 @@ def card_unblock(card: str):
 
 @cli.command()
 def limits():
-    """ Show n26 account limits  """
+    """ Show n26 account limits """
+    _limits()
+
+
+@cli.command()
+@click.option('--withdrawal', default=None, type=int, help='Daily withdrawal limit.')
+@click.option('--payment', default=None, type=str, help='Daily payment limit.')
+def set_limits(withdrawal: int, payment: int):
+    """ Set n26 account limits """
+    API_CLIENT.set_account_limits(withdrawal, payment)
+    _limits()
+
+
+def _limits():
     limits_data = API_CLIENT.get_account_limits()
 
     headers = ['Name', 'Amount', 'Country List']
@@ -178,7 +191,7 @@ def limits():
 
 @cli.command()
 def contacts():
-    """ Show your n26 contacts  """
+    """ Show your n26 contacts """
     contacts_data = API_CLIENT.get_contacts()
 
     headers = ['Id', 'Name', 'IBAN']

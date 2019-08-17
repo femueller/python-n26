@@ -12,3 +12,6 @@ transaction item keys
 CURRENCY = 'currencyCode'
 AMOUNT = 'amount'
 REFERENCE_TEXT = 'referenceText'
+
+DAILY_WITHDRAWAL_LIMIT = 'ATM_DAILY_ACCOUNT'
+DAILY_PAYMENT_LIMIT = 'POS_DAILY_ACCOUNT'
