@@ -270,6 +270,19 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
     click.echo(text.strip())
 
 
+def _day_of_month_extractor(key: str):
+    def extractor(dictionary: dict):
+        value = dictionary.get(key)
+        if value is None:
+            return None
+        else:
+            import inflect
+            engine = inflect.engine()
+            return engine.ordinal(value)
+
+    return extractor
+
+
 @cli.command("standing-orders")
 def standing_orders():
     """Show your standing orders"""
@@ -279,7 +292,7 @@ def standing_orders():
                'Amount',
                'Frequency',
                'Until',
-               'Initial day of month',
+               'Every',
                'First execution', 'Next execution',
                'Executions',
                'Created', 'Updated']
@@ -287,7 +300,7 @@ def standing_orders():
               lambda x: "{} {}".format(x.get('amount'), x.get('currencyCode').get('currencyCode')),
               'executionFrequency',
               _datetime_extractor('stopTS'),
-              'initialDayOfMonth',
+              _day_of_month_extractor('initialDayOfMonth'),
               _datetime_extractor('firstExecutingTS'),
               _datetime_extractor('nextExecutingTS'),
               'executionCounter',

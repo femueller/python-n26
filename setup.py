@@ -1,5 +1,6 @@
-import os
 import inspect
+import os
+
 from setuptools import setup
 
 __location__ = os.path.join(os.getcwd(), os.path.dirname(inspect.getfile(inspect.currentframe())))
@@ -31,7 +32,7 @@ setup(
     url='https://github.com/femueller/python-n26',
     download_url='https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
     version=VERSION,
-    install_requires=['requests', 'pyyaml', 'click', 'tabulate'],
+    install_requires=['requests', 'pyyaml', 'click', 'tabulate', 'inflect'],
     test_requires=['mock', 'pytest'],
     packages=[
         'n26'
