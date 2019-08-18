@@ -4,17 +4,19 @@
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
 [![Join Discord](https://img.shields.io/badge/Discord-Join-7289DA.svg)](https://discord.gg/u7fEzS)
 
-- [N26 Python CLI/API](#n26-python-cliapi)
-  - [About](#about)
-  - [Install](#install)
-  - [Configuration](#configuration)
-  - [Usage](#usage)
-    - [CLI example](#cli-example)
-    - [API example](#api-example)
-  - [Projects using python-n26](#projects-using-python-n26)
-  - [Contribute](#contribute)
-    - [Run locally](#run-locally)
-  - [Credits](#credits)
+- [N26 Python CLI/API](#N26-Python-CLIAPI)
+  - [About](#About)
+  - [Install](#Install)
+  - [Configuration](#Configuration)
+  - [Usage](#Usage)
+    - [CLI example](#CLI-example)
+    - [API example](#API-example)
+  - [Projects using python-n26](#Projects-using-python-n26)
+  - [Contribute](#Contribute)
+    - [Run locally](#Run-locally)
+  - [Maintainers](#Maintainers)
+  - [Credits](#Credits)
+  - [Disclaimer](#Disclaimer)
   
 [![asciicast](https://asciinema.org/a/260083.svg)](https://asciinema.org/a/260083)
 
@@ -103,6 +105,13 @@ pipenv install
 python3 -m n26 balance
 ```
 
+## Maintainers
+* [Markus Ressel](https://github.com/markusressel)
+* [Felix Mueller](https://github.com/femueller)
+
 ## Credits
 * [Nick Jüttner](https://github.com/njuettner) for providing [the API authentication flow](https://github.com/njuettner/alexa/blob/master/n26/app.py)
 * [Pierrick Paul](https://github.com/PierrickP/) for providing [the API endpoints](https://github.com/PierrickP/n26/blob/develop/lib/api.js)
+
+## Disclaimer
+This project is not affiliated with N26 GmbH/N26 Inc. if you want to learn more about it, visit https://n26.com/.
