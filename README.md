@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.org/femueller/python-n26.svg?branch=master)](https://travis-ci.org/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
-[![Join Discord](https://img.shields.io/badge/Discord-Join-7289DA.svg)](https://discord.gg/u7fEzS)
 
 - [N26 Python CLI/API](#N26-Python-CLIAPI)
   - [About](#About)
