@@ -5,7 +5,7 @@ import click
 from tabulate import tabulate
 
 import n26.api as api
-from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW
+from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE
 
 API_CLIENT = api.Api()
 
@@ -134,6 +134,27 @@ def spaces():
     text = tabulate(lines, headers, colalign=['left', 'right', 'right', 'right'], numalign='right')
 
     click.echo(text)
+
+
+@cli.command()
+def cards():
+    """ Shows a list of cards """
+    cards_data = API_CLIENT.get_cards()
+
+    headers = ['Id', 'Masked Pan', 'Type', 'Design', 'Status', 'Activated', 'Pin defined', 'Expires']
+    keys = [
+        'id',
+        'maskedPan',
+        'cardType',
+        'design',
+        lambda x: "active" if (x.get('status') == CARD_STATUS_ACTIVE) else x.get('status'),
+        _datetime_extractor('cardActivated'),
+        _datetime_extractor('pinDefined'),
+        _datetime_extractor('expirationDate', date_only=True),
+    ]
+    text = _create_table_from_dict(headers=headers, value_functions=keys, data=cards_data, numalign='right')
+
+    click.echo(text.strip())
 
 
 @cli.command()
@@ -299,10 +320,10 @@ def standing_orders():
     values = ['partnerName',
               lambda x: "{} {}".format(x.get('amount'), x.get('currencyCode').get('currencyCode')),
               'executionFrequency',
-              _datetime_extractor('stopTS'),
+              _datetime_extractor('stopTS', date_only=True),
               _day_of_month_extractor('initialDayOfMonth'),
-              _datetime_extractor('firstExecutingTS'),
-              _datetime_extractor('nextExecutingTS'),
+              _datetime_extractor('firstExecutingTS', date_only=True),
+              _datetime_extractor('nextExecutingTS', date_only=True),
               'executionCounter',
               _datetime_extractor('created'),
               _datetime_extractor('updated')]
@@ -340,7 +361,12 @@ def statistics(param_from: int, to: int):
 
 
 def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
-    """Convert millisecond timestamp to datetime."""
+    """
+    Convert millisecond timestamp to UTC datetime.
+
+    :param epoch_ms: milliseconds since 1970 in CET
+    :return: a UTC datetime object
+    """
     if epoch_ms:
         return datetime.fromtimestamp(epoch_ms / 1000, timezone.utc)
 
@@ -378,13 +404,29 @@ def _create_table_from_dict(headers: list, value_functions: list, data: list, **
     return tabulate(tabular_data=lines, headers=headers, **tabulate_args)
 
 
-def _datetime_extractor(key: str):
+def _datetime_extractor(key: str, date_only: bool = False):
     """
     Helper function to extract a datetime value from a dict
     :param key: the dictionary key used to access the value
+    :param date_only: removes the time from the output
     :return: an extractor function
     """
-    return lambda x: _timestamp_ms_to_date(x.get(key))
+
+    if date_only:
+        fmt = "%x"
+    else:
+        fmt = "%x %X"
+
+    def extractor(dictionary: dict):
+        value = dictionary.get(key)
+        time = _timestamp_ms_to_date(value)
+        if time is None:
+            return None
+        else:
+            time = time.astimezone()
+            return time.strftime(fmt)
+
+    return extractor
 
 
 def _insert_newlines(text: str, n=40):
