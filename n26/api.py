@@ -110,7 +110,7 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL + '/api/transactions/so')
 
-    def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = None, pending: bool = None,
+    def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = 20, pending: bool = None,
                          categories: str = None, text_filter: str = None, last_id: str = None) -> dict:
         """
         Get a list of transactions.
@@ -120,7 +120,8 @@ class Api(object):
 
         :param from_time: earliest transaction time as a Timestamp - milliseconds since 1970 in CET
         :param to_time: latest transaction time as a Timestamp - milliseconds since 1970 in CET
-        :param limit: Limit the number of transactions to return to the given amount
+        :param limit: Limit the number of transactions to return to the given amount - default 20 as the n26 API returns
+        only the last 20 transactions by default
         :param pending: show only pending transactions
         :param categories: Comma separated list of category IDs
         :param text_filter: Query string to search for
