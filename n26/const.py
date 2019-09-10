@@ -17,3 +17,11 @@ CARD_STATUS_ACTIVE = 'M_ACTIVE'
 
 DAILY_WITHDRAWAL_LIMIT = 'ATM_DAILY_ACCOUNT'
 DAILY_PAYMENT_LIMIT = 'POS_DAILY_ACCOUNT'
+
+DATETIME_FORMATS = [
+    '%Y-%m-%d',
+    '%Y-%m-%dT%H:%M:%S',
+    '%Y-%m-%d %H:%M:%S',
+    '%d.%m.%Y',
+    '%d.%m.%Y %H:%M:%S'
+]

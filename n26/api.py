@@ -118,8 +118,8 @@ class Api(object):
         Note that some parameters can not be combined in a single request (like text_filter and pending) and
         will result in a bad request (400) error.
 
-        :param from_time: earliest transaction time as a Timestamp - milliseconds since 1970 in CET
-        :param to_time: latest transaction time as a Timestamp - milliseconds since 1970 in CET
+        :param from_time: earliest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
+        :param to_time: latest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
         :param limit: Limit the number of transactions to return to the given amount - default 20 as the n26 API returns
         only the last 20 transactions by default
         :param pending: show only pending transactions

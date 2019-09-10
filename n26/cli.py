@@ -5,7 +5,7 @@ import click
 from tabulate import tabulate
 
 import n26.api as api
-from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE
+from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE, DATETIME_FORMATS
 
 API_CLIENT = api.Api()
 
@@ -239,20 +239,35 @@ def statements():
               help='Comma separated list of category IDs.')
 @click.option('--pending', default=None, type=bool,
               help='Whether to show only pending transactions.')
-@click.option('--from', 'param_from', default=None, type=int,
-              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-@click.option('--to', default=None, type=int,
-              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='Start time limit for statistics.')
+@click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='End time limit for statistics.')
 @click.option('--text-filter', default=None, type=str, help='Text filter.')
 @click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
-def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
+def transactions(categories: str, pending: bool, param_from: datetime, param_to: datetime, text_filter: str,
+                 limit: int):
     """ Show transactions (default: 5) """
-    if not pending and not limit:
+    if not pending and not param_from and not limit:
         limit = 5
         click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
 
-    transactions_data = API_CLIENT.get_transactions(from_time=param_from, to_time=to, limit=limit, pending=pending,
-                                                    text_filter=text_filter, categories=categories)
+    from_timestamp = None
+    to_timestamp = None
+    if param_from is not None:
+        from_timestamp = int(param_from.timestamp() * 1000)
+        if param_to is None:
+            # if --from is set, --to must also be set
+            param_to = datetime.utcnow()
+    if param_to is not None:
+        if param_from is None:
+            # if --to is set, --from must also be set
+            from_timestamp = 1
+        to_timestamp = int(param_to.timestamp() * 1000)
+
+    transactions_data = API_CLIENT.get_transactions(from_time=from_timestamp, to_time=to_timestamp,
+                                                    limit=limit, pending=pending, text_filter=text_filter,
+                                                    categories=categories)
 
     lines = []
     for i, transaction in enumerate(transactions_data):
@@ -278,6 +293,7 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
             message = transaction.get(REFERENCE_TEXT)
 
         lines.append([
+            _datetime_extractor('visibleTS')(transaction),
             "{} {}".format(amount, currency),
             "{}\n{}".format(sender_name, sender_iban),
             "{}\n{}".format(recipient_name, recipient_iban),
@@ -285,7 +301,7 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
             recurring
         ])
 
-    headers = ['Amount', 'From', 'To', 'Message', 'Recurring']
+    headers = ['Date', 'Amount', 'From', 'To', 'Message', 'Recurring']
     text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
