@@ -19,6 +19,8 @@ DAILY_WITHDRAWAL_LIMIT = 'ATM_DAILY_ACCOUNT'
 DAILY_PAYMENT_LIMIT = 'POS_DAILY_ACCOUNT'
 
 DATETIME_FORMATS = [
+    '%m/%d/%Y %H:%M:%S',
+    '%m/%d/%Y',
     '%Y-%m-%d',
     '%Y-%m-%dT%H:%M:%S',
     '%Y-%m-%d %H:%M:%S',
