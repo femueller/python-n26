@@ -1,13 +1,20 @@
+import json
+import os
 import time
 
 import requests
+from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26 import config
 from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
+from n26.util import create_request_url
 
 BASE_URL = 'https://api.tech26.de'
-BASIC_AUTH_HEADERS = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
+BASIC_AUTH_HEADERS = {"Authorization": "Basic bXktdHJ1c3RlZC13ZHBDbGllbnQ6c2VjcmV0"}
+USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) "
+              "AppleWebKit/537.36 (KHTML, like Gecko) "
+              "Chrome/59.0.3071.86 Safari/537.36")
 
 GET = "get"
 POST = "post"
@@ -215,7 +222,7 @@ class Api(object):
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
-        url = self._create_request_url(url, params)
+        url = create_request_url(url, params)
 
         if method is GET:
             response = requests.get(url, headers=headers, json=json)
@@ -230,31 +237,20 @@ class Api(object):
             return response.json()
 
     @staticmethod
-    def _create_request_url(url: str, params: dict = None):
+    def read_token_file() -> dict:
         """
-        Adds query params to the given url
-
-        :param url: the url to extend
-        :param params: query params as a keyed dictionary
-        :return: the url including the given query params
+        :return: the stored token data or an empty dict
         """
+        if not os.path.exists("token_data"):
+            return {}
 
-        if params:
-            first_param = True
-            for k, v in sorted(params.items(), key=lambda entry: entry[0]):
-                if not v:
-                    # skip None values
-                    continue
+        with open("token_data", "r") as file:
+            return json.loads(file.read())
 
-                if first_param:
-                    url += '?'
-                    first_param = False
-                else:
-                    url += '&'
-
-                url += "%s=%s" % (k, v)
-
-        return url
+    @staticmethod
+    def write_token_file(token_data: dict):
+        with open("token_data", "w") as file:
+            file.write(json.dumps(token_data))
 
     def get_token(self):
         """
@@ -265,6 +261,7 @@ class Api(object):
 
         :return: the access token
         """
+        self._token_data = self.read_token_file()
         if not self._validate_token(self._token_data):
             if REFRESH_TOKEN_KEY in self._token_data:
                 refresh_token = self._token_data[REFRESH_TOKEN_KEY]
@@ -274,6 +271,7 @@ class Api(object):
 
             # add expiration time to expiration in _validate_token()
             self._token_data[EXPIRATION_TIME_KEY] = time.time() + self._token_data["expires_in"]
+            self.write_token_file(self._token_data)
 
         # if it's still not valid, raise an exception
         if not self._validate_token(self._token_data):
@@ -288,14 +286,52 @@ class Api(object):
         :return: the token or None if the response did not contain a token
         """
         values_token = {
-            'grant_type': 'password',
-            'username': username,
-            'password': password
+            "grant_type": "password",
+            "username": username,
+            "password": password
         }
 
-        response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
-        response.raise_for_status()
-        return response.json()
+        def initiate_authentication_flow() -> str:
+            # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
+            response = requests.post(BASE_URL + "/oauth/token", data=values_token, headers=BASIC_AUTH_HEADERS)
+            if response.status_code != 403:
+                raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
+
+            response_data = response.json()
+            if response_data.get("error", "") == "mfa_required":
+                return response_data["mfaToken"]
+            else:
+                raise ValueError("Unexpected response data")
+
+        @retry(wait=wait_fixed(5), stop=stop_after_delay(60))
+        def complete_authentication_flow(mfa_token: str) -> dict:
+            mfa_response_data = {
+                "grant_type": "mfa_oob",
+                "mfaToken": mfa_token
+            }
+            response = requests.post(BASE_URL + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
+            response.raise_for_status()
+            tokens = response.json()
+            return tokens
+
+        def request_mfa_approval(mfa_token: str):
+            mfa_data = {
+                "challengeType": "oob",
+                "mfaToken": mfa_token
+            }
+            response = requests.post(
+                BASE_URL + "/api/mfa/challenge",
+                json=mfa_data,
+                headers={
+                    **BASIC_AUTH_HEADERS,
+                    "User-Agent": USER_AGENT,
+                    "Content-Type": "application/json"
+                })
+            response.raise_for_status()
+
+        mfa_token = initiate_authentication_flow()
+        request_mfa_approval(mfa_token)
+        return complete_authentication_flow(mfa_token)
 
     @staticmethod
     def _refresh_token(refresh_token: str):
