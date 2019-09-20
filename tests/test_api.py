@@ -7,8 +7,9 @@ class ApiTests(N26TestBase):
     """Common Api tests"""
 
     def test_create_request_url(self):
+        from n26.util import create_request_url
         expected = "https://api.tech26.de?bar=baz&foo=bar"
-        result = self._underTest._create_request_url(BASE_URL, {
+        result = create_request_url(BASE_URL, {
             "foo": "bar",
             "bar": "baz"
         })
@@ -30,7 +31,6 @@ class ApiTests(N26TestBase):
         expected = "12345678-1234-abcd-abcd-1234567890ab"
         result = self._underTest.get_token()
         self.assertIsNot(result, expected)
-        result = self._underTest._refresh_token("bla")
         self.assertEqual(result["access_token"], expected)
 
     @mock_config()
