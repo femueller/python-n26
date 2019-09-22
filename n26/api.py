@@ -10,7 +10,8 @@ from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
 
-BASE_URL = 'https://api.tech26.de'
+BASE_URL_DE = 'https://api.tech26.de'
+BASE_URL_GLOBAL = 'https://api.tech26.global'
 BASIC_AUTH_HEADERS = {"Authorization": "Basic bXktdHJ1c3RlZC13ZHBDbGllbnQ6c2VjcmV0"}
 USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) "
               "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -22,6 +23,9 @@ POST = "post"
 EXPIRATION_TIME_KEY = "expiration_time"
 ACCESS_TOKEN_KEY = "access_token"
 REFRESH_TOKEN_KEY = "refresh_token"
+
+GRANT_TYPE_PASSWORD = "password"
+GRANT_TYPE_REFRESH_TOKEN = "refresh_token"
 
 
 class Api(object):
@@ -45,46 +49,46 @@ class Api(object):
         """
         Retrieves basic account information
         """
-        return self._do_request(GET, BASE_URL + '/api/me')
+        return self._do_request(GET, BASE_URL_DE + '/api/me')
 
     def get_account_statuses(self) -> dict:
         """
         Retrieves additional account information
         """
-        return self._do_request(GET, BASE_URL + '/api/me/statuses')
+        return self._do_request(GET, BASE_URL_DE + '/api/me/statuses')
 
     def get_addresses(self) -> dict:
         """
         Retrieves a list of addresses of the account owner
         """
-        return self._do_request(GET, BASE_URL + '/api/addresses')
+        return self._do_request(GET, BASE_URL_DE + '/api/addresses')
 
     def get_balance(self) -> dict:
         """
         Retrieves the current balance
         """
-        return self._do_request(GET, BASE_URL + '/api/accounts')
+        return self._do_request(GET, BASE_URL_DE + '/api/accounts')
 
     def get_spaces(self) -> dict:
         """
         Retrieves a list of all spaces
         """
-        return self._do_request(GET, BASE_URL + '/api/spaces')
+        return self._do_request(GET, BASE_URL_DE + '/api/spaces')
 
     def barzahlen_check(self) -> dict:
-        return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
+        return self._do_request(GET, BASE_URL_DE + '/api/barzahlen/check')
 
     def get_cards(self):
         """
         Retrieves a list of all cards
         """
-        return self._do_request(GET, BASE_URL + '/api/v2/cards')
+        return self._do_request(GET, BASE_URL_DE + '/api/v2/cards')
 
     def get_account_limits(self) -> list:
         """
         Retrieves a list of all active account limits
         """
-        return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
+        return self._do_request(GET, BASE_URL_DE + '/api/settings/account/limits')
 
     def set_account_limits(self, daily_withdrawal_limit: int = None, daily_payment_limit: int = None) -> None:
         """
@@ -94,13 +98,13 @@ class Api(object):
         :param daily_payment_limit: daily payment limit
         """
         if daily_withdrawal_limit is not None:
-            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+            self._do_request(POST, BASE_URL_DE + '/api/settings/account/limits', json={
                 "limit": DAILY_WITHDRAWAL_LIMIT,
                 "amount": daily_withdrawal_limit
             })
 
         if daily_payment_limit is not None:
-            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+            self._do_request(POST, BASE_URL_DE + '/api/settings/account/limits', json={
                 "limit": DAILY_PAYMENT_LIMIT,
                 "amount": daily_payment_limit
             })
@@ -109,13 +113,13 @@ class Api(object):
         """
         Retrieves a list of all contacts
         """
-        return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/contacts')
 
     def get_standing_orders(self) -> dict:
         """
         Get a list of standing orders
         """
-        return self._do_request(GET, BASE_URL + '/api/transactions/so')
+        return self._do_request(GET, BASE_URL_DE + '/api/transactions/so')
 
     def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = 20, pending: bool = None,
                          categories: str = None, text_filter: str = None, last_id: str = None) -> dict:
@@ -139,7 +143,7 @@ class Api(object):
             # pending does not support limit
             limit = None
 
-        return self._do_request(GET, BASE_URL + '/api/smrt/transactions', {
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/transactions', {
             'from': from_time,
             'to': to_time,
             'limit': limit,
@@ -161,7 +165,7 @@ class Api(object):
         """
         Retrieves a list of all statements
         """
-        return self._do_request(GET, BASE_URL + '/api/statements')
+        return self._do_request(GET, BASE_URL_DE + '/api/statements')
 
     def block_card(self, card_id: str) -> dict:
         """
@@ -171,7 +175,7 @@ class Api(object):
         :param card_id: the id of the card to block
         :return: some info about the card (not including it's blocked state... thanks n26!)
         """
-        return self._do_request(POST, BASE_URL + '/api/cards/%s/block' % card_id)
+        return self._do_request(POST, BASE_URL_DE + '/api/cards/%s/block' % card_id)
 
     def unblock_card(self, card_id: str) -> dict:
         """
@@ -181,10 +185,10 @@ class Api(object):
         :param card_id: the id of the card to block
         :return: some info about the card (not including it's unblocked state... thanks n26!)
         """
-        return self._do_request(POST, BASE_URL + '/api/cards/%s/unblock' % card_id)
+        return self._do_request(POST, BASE_URL_DE + '/api/cards/%s/unblock' % card_id)
 
     def get_savings(self) -> dict:
-        return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
+        return self._do_request(GET, BASE_URL_DE + '/api/hub/savings/accounts')
 
     def get_statistics(self, from_time: int = 0, to_time: int = int(time.time()) * 1000) -> dict:
         """
@@ -200,13 +204,13 @@ class Api(object):
         if not to_time:
             to_time = int(time.time()) * 1000
 
-        return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
 
     def get_available_categories(self) -> list:
-        return self._do_request(GET, BASE_URL + '/api/smrt/categories')
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/categories')
 
     def get_invitations(self) -> list:
-        return self._do_request(GET, BASE_URL + '/api/aff/invitations')
+        return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
                     json: dict = None) -> list or dict or None:
@@ -279,59 +283,32 @@ class Api(object):
 
         return self._token_data[ACCESS_TOKEN_KEY]
 
-    @staticmethod
-    def _request_token(username: str, password: str):
+    def _request_token(self, username: str, password: str):
         """
         Request an authentication token from the server
         :return: the token or None if the response did not contain a token
         """
+        mfa_token = self._initiate_authentication_flow(username, password)
+        self._request_mfa_approval(mfa_token)
+        return self._complete_authentication_flow(mfa_token)
+
+    @staticmethod
+    def _initiate_authentication_flow(username: str, password: str) -> str:
         values_token = {
-            "grant_type": "password",
+            "grant_type": GRANT_TYPE_PASSWORD,
             "username": username,
             "password": password
         }
+        # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
+        response = requests.post(BASE_URL_GLOBAL + "/oauth/token", data=values_token, headers=BASIC_AUTH_HEADERS)
+        if response.status_code != 403:
+            raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
 
-        def initiate_authentication_flow() -> str:
-            # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
-            response = requests.post(BASE_URL + "/oauth/token", data=values_token, headers=BASIC_AUTH_HEADERS)
-            if response.status_code != 403:
-                raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
-
-            response_data = response.json()
-            if response_data.get("error", "") == "mfa_required":
-                return response_data["mfaToken"]
-            else:
-                raise ValueError("Unexpected response data")
-
-        @retry(wait=wait_fixed(5), stop=stop_after_delay(60))
-        def complete_authentication_flow(mfa_token: str) -> dict:
-            mfa_response_data = {
-                "grant_type": "mfa_oob",
-                "mfaToken": mfa_token
-            }
-            response = requests.post(BASE_URL + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
-            response.raise_for_status()
-            tokens = response.json()
-            return tokens
-
-        def request_mfa_approval(mfa_token: str):
-            mfa_data = {
-                "challengeType": "oob",
-                "mfaToken": mfa_token
-            }
-            response = requests.post(
-                BASE_URL + "/api/mfa/challenge",
-                json=mfa_data,
-                headers={
-                    **BASIC_AUTH_HEADERS,
-                    "User-Agent": USER_AGENT,
-                    "Content-Type": "application/json"
-                })
-            response.raise_for_status()
-
-        mfa_token = initiate_authentication_flow()
-        request_mfa_approval(mfa_token)
-        return complete_authentication_flow(mfa_token)
+        response_data = response.json()
+        if response_data.get("error", "") == "mfa_required":
+            return response_data["mfaToken"]
+        else:
+            raise ValueError("Unexpected response data")
 
     @staticmethod
     def _refresh_token(refresh_token: str):
@@ -341,13 +318,40 @@ class Api(object):
         :return: the refreshed token data
         """
         values_token = {
-            'grant_type': REFRESH_TOKEN_KEY,
-            'refresh_token': refresh_token
+            'grant_type': GRANT_TYPE_REFRESH_TOKEN,
+            'refresh_token': refresh_token,
         }
 
-        response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(BASE_URL_GLOBAL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         return response.json()
+
+    @staticmethod
+    def _request_mfa_approval(mfa_token: str):
+        mfa_data = {
+            "challengeType": "oob",
+            "mfaToken": mfa_token
+        }
+        response = requests.post(
+            BASE_URL_DE + "/api/mfa/challenge",
+            json=mfa_data,
+            headers={
+                **BASIC_AUTH_HEADERS,
+                "User-Agent": USER_AGENT,
+                "Content-Type": "application/json"
+            })
+        response.raise_for_status()
+
+    @retry(wait=wait_fixed(5), stop=stop_after_delay(60))
+    def _complete_authentication_flow(self, mfa_token: str) -> dict:
+        mfa_response_data = {
+            "grant_type": "mfa_oob",
+            "mfaToken": mfa_token
+        }
+        response = requests.post(BASE_URL_DE + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
+        response.raise_for_status()
+        tokens = response.json()
+        return tokens
 
     @staticmethod
     def _validate_token(token_data: dict):

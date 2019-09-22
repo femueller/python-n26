@@ -1,5 +1,5 @@
 from n26 import api, config
-from n26.api import BASE_URL, POST, GET
+from n26.api import BASE_URL_DE, POST, GET
 from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests, mock_config
 
 
@@ -9,7 +9,7 @@ class ApiTests(N26TestBase):
     def test_create_request_url(self):
         from n26.util import create_request_url
         expected = "https://api.tech26.de?bar=baz&foo=bar"
-        result = create_request_url(BASE_URL, {
+        result = create_request_url(BASE_URL_DE, {
             "foo": "bar",
             "bar": "baz"
         })
