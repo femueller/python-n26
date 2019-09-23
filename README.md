@@ -48,7 +48,7 @@ or use environment variables:
 
 - `N26_USER`: username
 - `N26_PASSWORD`: password
-- `N26_LOGIN_DATA_STORE_PATH`: optional path to store login data (recommended for cli usage)
+- `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
 
