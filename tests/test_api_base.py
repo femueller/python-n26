@@ -1,5 +1,6 @@
 import functools
 import json
+import logging
 import os
 import re
 import unittest
@@ -150,6 +151,14 @@ class N26TestBase(unittest.TestCase):
         config.CONFIG_FILE_PATH = self.CONFIG_FILE
 
         self._underTest = api.Api()
+
+        logger = logging.getLogger("n26")
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
 
     def tearDown(self):
         """

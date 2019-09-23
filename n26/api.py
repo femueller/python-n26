@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from pathlib import Path
 
@@ -9,6 +10,8 @@ from n26 import config
 from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
+
+LOGGER = logging.getLogger(__name__)
 
 BASE_URL_DE = 'https://api.tech26.de'
 BASE_URL_GLOBAL = 'https://api.tech26.global'
@@ -63,6 +66,7 @@ class Api(object):
         """
         :return: the stored token data or an empty dict
         """
+        LOGGER.debug("Reading token data from {}".format(path))
         path = Path(path).expanduser().resolve()
         if not path.exists():
             return {}
@@ -72,6 +76,7 @@ class Api(object):
 
     @staticmethod
     def _write_token_file(token_data: dict, path: str):
+        LOGGER.debug("Writing token data to {}".format(path))
         path = Path(path).expanduser().resolve()
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w") as file:
@@ -285,9 +290,15 @@ class Api(object):
         token_data = self.token_data
         if not self._validate_token(token_data):
             if REFRESH_TOKEN_KEY in token_data:
+                LOGGER.debug("Trying to refresh existing token")
                 refresh_token = token_data[REFRESH_TOKEN_KEY]
-                token_data = self._refresh_token(refresh_token)
+                try:
+                    token_data = self._refresh_token(refresh_token)
+                except:
+                    LOGGER.debug("Couldn't refresh token, requesting new token")
+                    token_data = self._request_token(self.config.username, self.config.password)
             else:
+                LOGGER.debug("No valid token data found, requesting new token")
                 token_data = self._request_token(self.config.username, self.config.password)
 
             # add expiration time to expiration in _validate_token()
@@ -312,6 +323,7 @@ class Api(object):
 
     @staticmethod
     def _initiate_authentication_flow(username: str, password: str) -> str:
+        LOGGER.debug("Requesting authentication flow for user {}".format(username))
         values_token = {
             "grant_type": GRANT_TYPE_PASSWORD,
             "username": username,
@@ -335,6 +347,7 @@ class Api(object):
         :param refresh_token: the refresh token issued by the server when requesting a token
         :return: the refreshed token data
         """
+        LOGGER.debug("Requesting token refresh using refresh_token {}".format(refresh_token))
         values_token = {
             'grant_type': GRANT_TYPE_REFRESH_TOKEN,
             'refresh_token': refresh_token,
@@ -346,6 +359,7 @@ class Api(object):
 
     @staticmethod
     def _request_mfa_approval(mfa_token: str):
+        LOGGER.debug("Requesting MFA approval using mfa_token {}".format(mfa_token))
         mfa_data = {
             "challengeType": "oob",
             "mfaToken": mfa_token
@@ -362,6 +376,7 @@ class Api(object):
 
     @retry(wait=wait_fixed(5), stop=stop_after_delay(60))
     def _complete_authentication_flow(self, mfa_token: str) -> dict:
+        LOGGER.debug("Completing authentication flow for mfa_token {}".format(mfa_token))
         mfa_response_data = {
             "grant_type": "mfa_oob",
             "mfaToken": mfa_token
@@ -378,7 +393,6 @@ class Api(object):
         :param token_data: the token data to check
         :return: true if valid, false otherwise
         """
-
         if EXPIRATION_TIME_KEY not in token_data:
             # there was a problem adding the expiration_time property
             return False
