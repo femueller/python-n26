@@ -48,7 +48,7 @@ or use environment variables:
 
 - `N26_USER`: username
 - `N26_PASSWORD`: password
-- `ENV_PARAM_LOGIN_DATA_STORE_PATH`: optional path to store login data
+- `N26_LOGIN_DATA_STORE_PATH`: optional path to store login data (recommended for cli usage)
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
 
@@ -57,7 +57,9 @@ Note that **when specifying both** environment variables as well as a config fil
 Since 14th of September 2019 N26 requires a login confirmation 
 (2 factor authentication) from the paired phone N26 app to login on devices that 
 are not paired. This means you will receive a notification on your phone 
-when you start using this library to request data.
+when you start using this library to request data. python-n26 checks 
+for your login confirmation every 5 seconds. If you fail to approve the 
+login request within 60 seconds an exception is raised.
 
 If you do not specify a `login_data_store_path` this login information 
 is only stored in memory. In order to avoid that every CLI command 
