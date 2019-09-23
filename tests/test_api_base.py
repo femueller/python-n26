@@ -48,7 +48,9 @@ def mock_config(username: str = "john.doe@example.com", password: str = "$uperse
         def wrapper(*args, **kwargs):
             with mock.patch('n26.config.get_config') as mock_config:
                 from n26 import config
-                mock_config.return_value = config.Config(username=username, password=password)
+                mock_config.return_value = config.Config(
+                    username=username, password=password,
+                    login_data_store_path=None)
                 return function(*args, **kwargs)
 
         return wrapper

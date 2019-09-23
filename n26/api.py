@@ -1,6 +1,6 @@
 import json
-import os
 import time
+from pathlib import Path
 
 import requests
 from tenacity import retry, stop_after_delay, wait_fixed
@@ -43,6 +43,39 @@ class Api(object):
             cfg = config.get_config()
         self.config = cfg
         self._token_data = {}
+
+    @property
+    def token_data(self) -> dict:
+        if self.config.login_data_store_path is None:
+            return self._token_data
+        else:
+            return self._read_token_file(self.config.login_data_store_path)
+
+    @token_data.setter
+    def token_data(self, data: dict):
+        if self.config.login_data_store_path is None:
+            self._token_data = data
+        else:
+            self._write_token_file(data, self.config.login_data_store_path)
+
+    @staticmethod
+    def _read_token_file(path: str) -> dict:
+        """
+        :return: the stored token data or an empty dict
+        """
+        path = Path(path).expanduser().resolve()
+        if not path.exists():
+            return {}
+
+        with open(path, "r") as file:
+            return json.loads(file.read())
+
+    @staticmethod
+    def _write_token_file(token_data: dict, path: str):
+        path = Path(path).expanduser().resolve()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as file:
+            file.write(json.dumps(token_data))
 
     # IDEA: @get_token decorator
     def get_account_info(self) -> dict:
@@ -240,22 +273,6 @@ class Api(object):
         if len(response.content) > 0:
             return response.json()
 
-    @staticmethod
-    def read_token_file() -> dict:
-        """
-        :return: the stored token data or an empty dict
-        """
-        if not os.path.exists("token_data"):
-            return {}
-
-        with open("token_data", "r") as file:
-            return json.loads(file.read())
-
-    @staticmethod
-    def write_token_file(token_data: dict):
-        with open("token_data", "w") as file:
-            file.write(json.dumps(token_data))
-
     def get_token(self):
         """
         Returns the access token to use for api authentication.
@@ -265,23 +282,24 @@ class Api(object):
 
         :return: the access token
         """
-        self._token_data = self.read_token_file()
-        if not self._validate_token(self._token_data):
-            if REFRESH_TOKEN_KEY in self._token_data:
-                refresh_token = self._token_data[REFRESH_TOKEN_KEY]
-                self._token_data = self._refresh_token(refresh_token)
+        token_data = self.token_data
+        if not self._validate_token(token_data):
+            if REFRESH_TOKEN_KEY in token_data:
+                refresh_token = token_data[REFRESH_TOKEN_KEY]
+                token_data = self._refresh_token(refresh_token)
             else:
-                self._token_data = self._request_token(self.config.username, self.config.password)
+                token_data = self._request_token(self.config.username, self.config.password)
 
             # add expiration time to expiration in _validate_token()
-            self._token_data[EXPIRATION_TIME_KEY] = time.time() + self._token_data["expires_in"]
-            self.write_token_file(self._token_data)
+            token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]
 
         # if it's still not valid, raise an exception
-        if not self._validate_token(self._token_data):
+        if not self._validate_token(token_data):
             raise PermissionError("Unable to request authentication token")
 
-        return self._token_data[ACCESS_TOKEN_KEY]
+        # save token data
+        self.token_data = token_data
+        return token_data[ACCESS_TOKEN_KEY]
 
     def _request_token(self, username: str, password: str):
         """
