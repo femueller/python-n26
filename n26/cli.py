@@ -1,11 +1,12 @@
 import webbrowser
 from datetime import datetime, timezone
+from typing import Tuple
 
 import click
 from tabulate import tabulate
 
 import n26.api as api
-from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE
+from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE, DATETIME_FORMATS
 
 API_CLIENT = api.Api()
 
@@ -239,20 +240,23 @@ def statements():
               help='Comma separated list of category IDs.')
 @click.option('--pending', default=None, type=bool,
               help='Whether to show only pending transactions.')
-@click.option('--from', 'param_from', default=None, type=int,
-              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-@click.option('--to', default=None, type=int,
-              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
+@click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='Start time limit for statistics.')
+@click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='End time limit for statistics.')
 @click.option('--text-filter', default=None, type=str, help='Text filter.')
 @click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
-def transactions(categories: str, pending: bool, param_from: int, to: int, text_filter: str, limit: int):
+def transactions(categories: str, pending: bool, param_from: datetime or None, param_to: datetime or None,
+                 text_filter: str, limit: int):
     """ Show transactions (default: 5) """
-    if not pending and not limit:
+    if not pending and not param_from and not limit:
         limit = 5
         click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
 
-    transactions_data = API_CLIENT.get_transactions(from_time=param_from, to_time=to, limit=limit, pending=pending,
-                                                    text_filter=text_filter, categories=categories)
+    from_timestamp, to_timestamp = _parse_from_to_timestamps(param_from, param_to)
+    transactions_data = API_CLIENT.get_transactions(from_time=from_timestamp, to_time=to_timestamp,
+                                                    limit=limit, pending=pending, text_filter=text_filter,
+                                                    categories=categories)
 
     lines = []
     for i, transaction in enumerate(transactions_data):
@@ -278,6 +282,7 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
             message = transaction.get(REFERENCE_TEXT)
 
         lines.append([
+            _datetime_extractor('visibleTS')(transaction),
             "{} {}".format(amount, currency),
             "{}\n{}".format(sender_name, sender_iban),
             "{}\n{}".format(recipient_name, recipient_iban),
@@ -285,23 +290,10 @@ def transactions(categories: str, pending: bool, param_from: int, to: int, text_
             recurring
         ])
 
-    headers = ['Amount', 'From', 'To', 'Message', 'Recurring']
+    headers = ['Date', 'Amount', 'From', 'To', 'Message', 'Recurring']
     text = tabulate(lines, headers, numalign='right')
 
     click.echo(text.strip())
-
-
-def _day_of_month_extractor(key: str):
-    def extractor(dictionary: dict):
-        value = dictionary.get(key)
-        if value is None:
-            return None
-        else:
-            import inflect
-            engine = inflect.engine()
-            return engine.ordinal(value)
-
-    return extractor
 
 
 @cli.command("standing-orders")
@@ -333,13 +325,15 @@ def standing_orders():
 
 
 @cli.command()
-@click.option('--from', 'param_from', default=None, type=int,
-              help='Start time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-@click.option('--to', default=None, type=int,
-              help='End time limit for statistics. Timestamp - milliseconds since 1970 in CET')
-def statistics(param_from: int, to: int):
+@click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='Start time limit for statistics.')
+@click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='End time limit for statistics.')
+def statistics(param_from: datetime or None, param_to: datetime or None):
     """Show your n26 statistics"""
-    statements_data = API_CLIENT.get_statistics(from_time=param_from, to_time=to)
+
+    from_timestamp, to_timestamp = _parse_from_to_timestamps(param_from, param_to)
+    statements_data = API_CLIENT.get_statistics(from_time=from_timestamp, to_time=to_timestamp)
 
     text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
     text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
@@ -358,6 +352,29 @@ def statistics(param_from: int, to: int):
     text += _create_table_from_dict(headers, keys, statements_data["items"], numalign='right')
 
     click.echo(text.strip())
+
+
+def _parse_from_to_timestamps(param_from: datetime or None, param_to: datetime or None) -> Tuple[int, int]:
+    """
+    Parses cli datetime inputs for "from" and "to" parameters
+    :param param_from: "from" input
+    :param param_to: "to" input
+    :return: timestamps ready to be used by the api
+    """
+    from_timestamp = None
+    to_timestamp = None
+    if param_from is not None:
+        from_timestamp = int(param_from.timestamp() * 1000)
+        if param_to is None:
+            # if --from is set, --to must also be set
+            param_to = datetime.utcnow()
+    if param_to is not None:
+        if param_from is None:
+            # if --to is set, --from must also be set
+            from_timestamp = 1
+        to_timestamp = int(param_to.timestamp() * 1000)
+
+    return from_timestamp, to_timestamp
 
 
 def _timestamp_ms_to_date(epoch_ms: int) -> datetime or None:
@@ -425,6 +442,19 @@ def _datetime_extractor(key: str, date_only: bool = False):
         else:
             time = time.astimezone()
             return time.strftime(fmt)
+
+    return extractor
+
+
+def _day_of_month_extractor(key: str):
+    def extractor(dictionary: dict):
+        value = dictionary.get(key)
+        if value is None:
+            return None
+        else:
+            import inflect
+            engine = inflect.engine()
+            return engine.ordinal(value)
 
     return extractor
 
