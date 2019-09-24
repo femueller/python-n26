@@ -194,7 +194,7 @@ def limits():
 
 @cli.command()
 @click.option('--withdrawal', default=None, type=int, help='Daily withdrawal limit.')
-@click.option('--payment', default=None, type=str, help='Daily payment limit.')
+@click.option('--payment', default=None, type=int, help='Daily payment limit.')
 def set_limits(withdrawal: int, payment: int):
     """ Set n26 account limits """
     API_CLIENT.set_account_limits(withdrawal, payment)
