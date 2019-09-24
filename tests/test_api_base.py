@@ -1,5 +1,6 @@
 import functools
 import json
+import logging
 import os
 import re
 import unittest
@@ -48,7 +49,9 @@ def mock_config(username: str = "john.doe@example.com", password: str = "$uperse
         def wrapper(*args, **kwargs):
             with mock.patch('n26.config.get_config') as mock_config:
                 from n26 import config
-                mock_config.return_value = config.Config(username=username, password=password)
+                mock_config.return_value = config.Config(
+                    username=username, password=password,
+                    login_data_store_path=None)
                 return function(*args, **kwargs)
 
         return wrapper
@@ -148,6 +151,14 @@ class N26TestBase(unittest.TestCase):
         config.CONFIG_FILE_PATH = self.CONFIG_FILE
 
         self._underTest = api.Api()
+
+        logger = logging.getLogger("n26")
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
 
     def tearDown(self):
         """

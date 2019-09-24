@@ -1,13 +1,25 @@
+import json
+import logging
 import time
+from pathlib import Path
 
 import requests
+from requests import HTTPError
+from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26 import config
 from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
+from n26.util import create_request_url
 
-BASE_URL = 'https://api.tech26.de'
-BASIC_AUTH_HEADERS = {'Authorization': 'Basic YW5kcm9pZDpzZWNyZXQ='}
+LOGGER = logging.getLogger(__name__)
+
+BASE_URL_DE = 'https://api.tech26.de'
+BASE_URL_GLOBAL = 'https://api.tech26.global'
+BASIC_AUTH_HEADERS = {"Authorization": "Basic bXktdHJ1c3RlZC13ZHBDbGllbnQ6c2VjcmV0"}
+USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) "
+              "AppleWebKit/537.36 (KHTML, like Gecko) "
+              "Chrome/59.0.3071.86 Safari/537.36")
 
 GET = "get"
 POST = "post"
@@ -15,6 +27,9 @@ POST = "post"
 EXPIRATION_TIME_KEY = "expiration_time"
 ACCESS_TOKEN_KEY = "access_token"
 REFRESH_TOKEN_KEY = "refresh_token"
+
+GRANT_TYPE_PASSWORD = "password"
+GRANT_TYPE_REFRESH_TOKEN = "refresh_token"
 
 
 class Api(object):
@@ -33,51 +48,86 @@ class Api(object):
         self.config = cfg
         self._token_data = {}
 
+    @property
+    def token_data(self) -> dict:
+        if self.config.login_data_store_path is None:
+            return self._token_data
+        else:
+            return self._read_token_file(self.config.login_data_store_path)
+
+    @token_data.setter
+    def token_data(self, data: dict):
+        if self.config.login_data_store_path is None:
+            self._token_data = data
+        else:
+            self._write_token_file(data, self.config.login_data_store_path)
+
+    @staticmethod
+    def _read_token_file(path: str) -> dict:
+        """
+        :return: the stored token data or an empty dict
+        """
+        LOGGER.debug("Reading token data from {}".format(path))
+        path = Path(path).expanduser().resolve()
+        if not path.exists():
+            return {}
+
+        with open(path, "r") as file:
+            return json.loads(file.read())
+
+    @staticmethod
+    def _write_token_file(token_data: dict, path: str):
+        LOGGER.debug("Writing token data to {}".format(path))
+        path = Path(path).expanduser().resolve()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as file:
+            file.write(json.dumps(token_data))
+
     # IDEA: @get_token decorator
     def get_account_info(self) -> dict:
         """
         Retrieves basic account information
         """
-        return self._do_request(GET, BASE_URL + '/api/me')
+        return self._do_request(GET, BASE_URL_DE + '/api/me')
 
     def get_account_statuses(self) -> dict:
         """
         Retrieves additional account information
         """
-        return self._do_request(GET, BASE_URL + '/api/me/statuses')
+        return self._do_request(GET, BASE_URL_DE + '/api/me/statuses')
 
     def get_addresses(self) -> dict:
         """
         Retrieves a list of addresses of the account owner
         """
-        return self._do_request(GET, BASE_URL + '/api/addresses')
+        return self._do_request(GET, BASE_URL_DE + '/api/addresses')
 
     def get_balance(self) -> dict:
         """
         Retrieves the current balance
         """
-        return self._do_request(GET, BASE_URL + '/api/accounts')
+        return self._do_request(GET, BASE_URL_DE + '/api/accounts')
 
     def get_spaces(self) -> dict:
         """
         Retrieves a list of all spaces
         """
-        return self._do_request(GET, BASE_URL + '/api/spaces')
+        return self._do_request(GET, BASE_URL_DE + '/api/spaces')
 
     def barzahlen_check(self) -> dict:
-        return self._do_request(GET, BASE_URL + '/api/barzahlen/check')
+        return self._do_request(GET, BASE_URL_DE + '/api/barzahlen/check')
 
     def get_cards(self):
         """
         Retrieves a list of all cards
         """
-        return self._do_request(GET, BASE_URL + '/api/v2/cards')
+        return self._do_request(GET, BASE_URL_DE + '/api/v2/cards')
 
     def get_account_limits(self) -> list:
         """
         Retrieves a list of all active account limits
         """
-        return self._do_request(GET, BASE_URL + '/api/settings/account/limits')
+        return self._do_request(GET, BASE_URL_DE + '/api/settings/account/limits')
 
     def set_account_limits(self, daily_withdrawal_limit: int = None, daily_payment_limit: int = None) -> None:
         """
@@ -87,13 +137,13 @@ class Api(object):
         :param daily_payment_limit: daily payment limit
         """
         if daily_withdrawal_limit is not None:
-            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+            self._do_request(POST, BASE_URL_DE + '/api/settings/account/limits', json={
                 "limit": DAILY_WITHDRAWAL_LIMIT,
                 "amount": daily_withdrawal_limit
             })
 
         if daily_payment_limit is not None:
-            self._do_request(POST, BASE_URL + '/api/settings/account/limits', json={
+            self._do_request(POST, BASE_URL_DE + '/api/settings/account/limits', json={
                 "limit": DAILY_PAYMENT_LIMIT,
                 "amount": daily_payment_limit
             })
@@ -102,13 +152,13 @@ class Api(object):
         """
         Retrieves a list of all contacts
         """
-        return self._do_request(GET, BASE_URL + '/api/smrt/contacts')
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/contacts')
 
     def get_standing_orders(self) -> dict:
         """
         Get a list of standing orders
         """
-        return self._do_request(GET, BASE_URL + '/api/transactions/so')
+        return self._do_request(GET, BASE_URL_DE + '/api/transactions/so')
 
     def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = 20, pending: bool = None,
                          categories: str = None, text_filter: str = None, last_id: str = None) -> dict:
@@ -132,7 +182,7 @@ class Api(object):
             # pending does not support limit
             limit = None
 
-        return self._do_request(GET, BASE_URL + '/api/smrt/transactions', {
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/transactions', {
             'from': from_time,
             'to': to_time,
             'limit': limit,
@@ -154,7 +204,7 @@ class Api(object):
         """
         Retrieves a list of all statements
         """
-        return self._do_request(GET, BASE_URL + '/api/statements')
+        return self._do_request(GET, BASE_URL_DE + '/api/statements')
 
     def block_card(self, card_id: str) -> dict:
         """
@@ -164,7 +214,7 @@ class Api(object):
         :param card_id: the id of the card to block
         :return: some info about the card (not including it's blocked state... thanks n26!)
         """
-        return self._do_request(POST, BASE_URL + '/api/cards/%s/block' % card_id)
+        return self._do_request(POST, BASE_URL_DE + '/api/cards/%s/block' % card_id)
 
     def unblock_card(self, card_id: str) -> dict:
         """
@@ -174,10 +224,10 @@ class Api(object):
         :param card_id: the id of the card to block
         :return: some info about the card (not including it's unblocked state... thanks n26!)
         """
-        return self._do_request(POST, BASE_URL + '/api/cards/%s/unblock' % card_id)
+        return self._do_request(POST, BASE_URL_DE + '/api/cards/%s/unblock' % card_id)
 
     def get_savings(self) -> dict:
-        return self._do_request(GET, BASE_URL + '/api/hub/savings/accounts')
+        return self._do_request(GET, BASE_URL_DE + '/api/hub/savings/accounts')
 
     def get_statistics(self, from_time: int = 0, to_time: int = int(time.time()) * 1000) -> dict:
         """
@@ -193,13 +243,13 @@ class Api(object):
         if not to_time:
             to_time = int(time.time()) * 1000
 
-        return self._do_request(GET, BASE_URL + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/statistics/categories/%s/%s' % (from_time, to_time))
 
     def get_available_categories(self) -> list:
-        return self._do_request(GET, BASE_URL + '/api/smrt/categories')
+        return self._do_request(GET, BASE_URL_DE + '/api/smrt/categories')
 
     def get_invitations(self) -> list:
-        return self._do_request(GET, BASE_URL + '/api/aff/invitations')
+        return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
                     json: dict = None) -> list or dict or None:
@@ -215,7 +265,7 @@ class Api(object):
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
-        url = self._create_request_url(url, params)
+        url = create_request_url(url, params)
 
         if method is GET:
             response = requests.get(url, headers=headers, json=json)
@@ -229,33 +279,6 @@ class Api(object):
         if len(response.content) > 0:
             return response.json()
 
-    @staticmethod
-    def _create_request_url(url: str, params: dict = None):
-        """
-        Adds query params to the given url
-
-        :param url: the url to extend
-        :param params: query params as a keyed dictionary
-        :return: the url including the given query params
-        """
-
-        if params:
-            first_param = True
-            for k, v in sorted(params.items(), key=lambda entry: entry[0]):
-                if not v:
-                    # skip None values
-                    continue
-
-                if first_param:
-                    url += '?'
-                    first_param = False
-                else:
-                    url += '&'
-
-                url += "%s=%s" % (k, v)
-
-        return url
-
     def get_token(self):
         """
         Returns the access token to use for api authentication.
@@ -265,37 +288,59 @@ class Api(object):
 
         :return: the access token
         """
-        if not self._validate_token(self._token_data):
-            if REFRESH_TOKEN_KEY in self._token_data:
-                refresh_token = self._token_data[REFRESH_TOKEN_KEY]
-                self._token_data = self._refresh_token(refresh_token)
+        token_data = self.token_data
+        if not self._validate_token(token_data):
+            if REFRESH_TOKEN_KEY in token_data:
+                LOGGER.debug("Trying to refresh existing token")
+                refresh_token = token_data[REFRESH_TOKEN_KEY]
+                try:
+                    token_data = self._refresh_token(refresh_token)
+                except HTTPError as ex:
+                    logging.exception(ex)
+                    LOGGER.debug("Couldn't refresh token, requesting new token")
+                    token_data = self._request_token(self.config.username, self.config.password)
             else:
-                self._token_data = self._request_token(self.config.username, self.config.password)
+                LOGGER.debug("No valid token data found, requesting new token")
+                token_data = self._request_token(self.config.username, self.config.password)
 
             # add expiration time to expiration in _validate_token()
-            self._token_data[EXPIRATION_TIME_KEY] = time.time() + self._token_data["expires_in"]
+            token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]
 
         # if it's still not valid, raise an exception
-        if not self._validate_token(self._token_data):
+        if not self._validate_token(token_data):
             raise PermissionError("Unable to request authentication token")
 
-        return self._token_data[ACCESS_TOKEN_KEY]
+        # save token data
+        self.token_data = token_data
+        return token_data[ACCESS_TOKEN_KEY]
 
-    @staticmethod
-    def _request_token(username: str, password: str):
+    def _request_token(self, username: str, password: str):
         """
         Request an authentication token from the server
         :return: the token or None if the response did not contain a token
         """
-        values_token = {
-            'grant_type': 'password',
-            'username': username,
-            'password': password
-        }
+        mfa_token = self._initiate_authentication_flow(username, password)
+        self._request_mfa_approval(mfa_token)
+        return self._complete_authentication_flow(mfa_token)
 
-        response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
-        response.raise_for_status()
-        return response.json()
+    @staticmethod
+    def _initiate_authentication_flow(username: str, password: str) -> str:
+        LOGGER.debug("Requesting authentication flow for user {}".format(username))
+        values_token = {
+            "grant_type": GRANT_TYPE_PASSWORD,
+            "username": username,
+            "password": password
+        }
+        # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
+        response = requests.post(BASE_URL_GLOBAL + "/oauth/token", data=values_token, headers=BASIC_AUTH_HEADERS)
+        if response.status_code != 403:
+            raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
+
+        response_data = response.json()
+        if response_data.get("error", "") == "mfa_required":
+            return response_data["mfaToken"]
+        else:
+            raise ValueError("Unexpected response data")
 
     @staticmethod
     def _refresh_token(refresh_token: str):
@@ -304,14 +349,44 @@ class Api(object):
         :param refresh_token: the refresh token issued by the server when requesting a token
         :return: the refreshed token data
         """
+        LOGGER.debug("Requesting token refresh using refresh_token {}".format(refresh_token))
         values_token = {
-            'grant_type': REFRESH_TOKEN_KEY,
-            'refresh_token': refresh_token
+            'grant_type': GRANT_TYPE_REFRESH_TOKEN,
+            'refresh_token': refresh_token,
         }
 
-        response = requests.post(BASE_URL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(BASE_URL_GLOBAL + '/oauth/token', data=values_token, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         return response.json()
+
+    @staticmethod
+    def _request_mfa_approval(mfa_token: str):
+        LOGGER.debug("Requesting MFA approval using mfa_token {}".format(mfa_token))
+        mfa_data = {
+            "challengeType": "oob",
+            "mfaToken": mfa_token
+        }
+        response = requests.post(
+            BASE_URL_DE + "/api/mfa/challenge",
+            json=mfa_data,
+            headers={
+                **BASIC_AUTH_HEADERS,
+                "User-Agent": USER_AGENT,
+                "Content-Type": "application/json"
+            })
+        response.raise_for_status()
+
+    @retry(wait=wait_fixed(5), stop=stop_after_delay(60))
+    def _complete_authentication_flow(self, mfa_token: str) -> dict:
+        LOGGER.debug("Completing authentication flow for mfa_token {}".format(mfa_token))
+        mfa_response_data = {
+            "grant_type": "mfa_oob",
+            "mfaToken": mfa_token
+        }
+        response = requests.post(BASE_URL_DE + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
+        response.raise_for_status()
+        tokens = response.json()
+        return tokens
 
     @staticmethod
     def _validate_token(token_data: dict):
@@ -320,7 +395,6 @@ class Api(object):
         :param token_data: the token data to check
         :return: true if valid, false otherwise
         """
-
         if EXPIRATION_TIME_KEY not in token_data:
             # there was a problem adding the expiration_time property
             return False

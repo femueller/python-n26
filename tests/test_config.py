@@ -12,11 +12,13 @@ class ConfigTests(N26TestBase):
 
     EXPECTED_FILE_CONF = config.Config(
         username='john.doe@example.com',
-        password='$upersecret')
+        password='$upersecret',
+        login_data_store_path=None)
 
     EXPECTED_ENV_CONF = config.Config(
         username='john.doe@env.com',
-        password='env!?')
+        password='env!?',
+        login_data_store_path=None)
 
     def test_preconditions(self):
         assert os.path.exists(self.CONFIG_FILE)

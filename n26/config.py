@@ -5,9 +5,16 @@ import yaml
 
 ENV_PARAM_USER = "N26_USER"
 ENV_PARAM_PASSWORD = "N26_PASSWORD"
+ENV_PARAM_LOGIN_DATA_STORE_PATH = "N26_LOGIN_DATA_STORE_PATH"
 
-CONFIG_FILE_PATH = "~/.config/n26.yml"
-Config = namedtuple('Config', ['username', 'password'])
+CONFIG_DIRECTORY = "~/.config"
+CONFIG_FILE_NAME = "n26.yml"
+CONFIG_FILE_PATH = os.path.join(CONFIG_DIRECTORY, CONFIG_FILE_NAME)
+Config = namedtuple('Config', [
+    'username',
+    'password',
+    'login_data_store_path'
+])
 
 
 def get_config():
@@ -26,9 +33,10 @@ def _read_from_env():
     Try to get values from ENV
     :return: Config object that may contain None values
     """
-    username, password = [os.environ.get(e)
-                          for e in [ENV_PARAM_USER, ENV_PARAM_PASSWORD]]
-    return Config(username, password)
+    username, password, login_data_store_path = [
+        os.environ.get(e) for e in [ENV_PARAM_USER, ENV_PARAM_PASSWORD, ENV_PARAM_LOGIN_DATA_STORE_PATH]
+    ]
+    return Config(username, password, login_data_store_path)
 
 
 def _read_from_file(config):
@@ -59,6 +67,9 @@ def _read_from_file(config):
                 config = config._replace(username=root_node.get('username', config.username))
             if not config.password:
                 config = config._replace(password=root_node.get('password', config.password))
+            if not config.login_data_store_path:
+                config = config._replace(
+                    login_data_store_path=root_node.get('login_data_store_path', config.login_data_store_path))
 
     return config
 

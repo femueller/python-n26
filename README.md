@@ -41,14 +41,33 @@ You can use a YAML configuration file in `~/.config/n26.yml`:
 n26:
   username: "john.doe@example.com"
   password: "$upersecret"
+  login_data_store_path: "~/.config/n26/token_data"
 ```
 
 or use environment variables:
 
 - `N26_USER`: username
 - `N26_PASSWORD`: password
+- `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
+
+## Authentication
+
+Since 14th of September 2019 N26 requires a login confirmation 
+(2 factor authentication) from the paired phone N26 app to login on devices that 
+are not paired. This means you will receive a notification on your phone 
+when you start using this library to request data. python-n26 checks 
+for your login confirmation every 5 seconds. If you fail to approve the 
+login request within 60 seconds an exception is raised.
+
+If you do not specify a `login_data_store_path` this login information 
+is only stored in memory. In order to avoid that every CLI command 
+requires a new confirmation, the login data retrieved in the above 
+process can be stored on the file system. Please note that **this 
+information must be protected** from the eyes of third parties **at all 
+costs**. You can specify the location to store this data in the 
+[Configuration](#Configuration).
 
 ## Usage
 
@@ -78,7 +97,7 @@ This is going to use the same mechanism to load configuration as the CLI tool, t
 ```python
 from n26 import api
 from n26 import config
-conf = config.Config('username', 'passwd')
+conf = config.Config('username', 'passwd', '~/.config/n26/token_data')
 client = api.Api(conf)
 print(client.get_balance())
 ```
