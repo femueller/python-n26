@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 import requests
+from requests import HTTPError
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26 import config
@@ -294,7 +295,8 @@ class Api(object):
                 refresh_token = token_data[REFRESH_TOKEN_KEY]
                 try:
                     token_data = self._refresh_token(refresh_token)
-                except:
+                except HTTPError as ex:
+                    logging.exception(ex)
                     LOGGER.debug("Couldn't refresh token, requesting new token")
                     token_data = self._request_token(self.config.username, self.config.password)
             else:
