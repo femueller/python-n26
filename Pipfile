@@ -11,6 +11,7 @@ PyYAML = "*"
 inflect = "*"
 urllib3 = ">=1.24.2"
 tenacity = ">=5.1.1"
+pdftotext = ">=2.1.2"
 
 [dev-packages]
 pytest = "*"

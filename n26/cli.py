@@ -225,7 +225,7 @@ def contacts():
 
 @cli.command()
 def statements():
-    """ Show your n26 statements  """
+    """ Show your n26 statements """
     statements_data = API_CLIENT.get_statements()
 
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
@@ -233,6 +233,18 @@ def statements():
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
+
+
+@cli.command()
+@click.option('--id', "statement_id", type=str, help='Statement ID')
+def statement(statement_id: str):
+    """ Show statement details """
+    import pdftotext
+    import io
+    statement = API_CLIENT.get_statement(statement_id)
+    pdf = pdftotext.PDF(io.BytesIO(statement))
+    text = "\n\n".join(pdf)
+    click.echo(text)
 
 
 @cli.command()
@@ -333,23 +345,23 @@ def statistics(param_from: datetime or None, param_to: datetime or None):
     """Show your n26 statistics"""
 
     from_timestamp, to_timestamp = _parse_from_to_timestamps(param_from, param_to)
-    statements_data = API_CLIENT.get_statistics(from_time=from_timestamp, to_time=to_timestamp)
+    statistics_data = API_CLIENT.get_statistics(from_time=from_timestamp, to_time=to_timestamp)
 
-    text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
-    text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
+    text = "From: %s\n" % (_timestamp_ms_to_date(statistics_data["from"]))
+    text += "To:   %s\n\n" % (_timestamp_ms_to_date(statistics_data["to"]))
 
     headers = ['Total', 'Income', 'Expense', '#IncomeCategories', '#ExpenseCategories']
     values = ['total', 'totalIncome', 'totalExpense',
               lambda x: len(x.get('incomeItems')),
               lambda x: len(x.get('expenseItems'))]
 
-    text += _create_table_from_dict(headers, value_functions=values, data=[statements_data])
+    text += _create_table_from_dict(headers, value_functions=values, data=[statistics_data])
 
     text += "\n\n"
 
     headers = ['Category', 'Income', 'Expense', 'Total']
     keys = ['id', 'income', 'expense', 'total']
-    text += _create_table_from_dict(headers, keys, statements_data["items"], numalign='right')
+    text += _create_table_from_dict(headers, keys, statistics_data["items"], numalign='right')
 
     click.echo(text.strip())
 

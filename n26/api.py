@@ -206,6 +206,22 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL_DE + '/api/statements')
 
+    def get_statement(self, statement_id: str) -> bytes:
+        """
+        Retrieves a specific statement
+        :return: The statement as PDF bytes object
+        :raises: ValueError if no statement could be found for the given id
+        """
+        statements_data = self.get_statements()
+        statement = list(filter(lambda x: x['id'] == statement_id, statements_data))
+        if len(statement) <= 0:
+            raise ValueError("No statement found for id: {}".format(statement_id))
+
+        statement = statement[0]
+        statement_url = statement['url']
+
+        return self._do_request(GET, BASE_URL_DE + statement_url)
+
     def block_card(self, card_id: str) -> dict:
         """
         Blocks a card.
@@ -277,7 +293,10 @@ class Api(object):
         response.raise_for_status()
         # some responses do not return data so we just ignore the body in that case
         if len(response.content) > 0:
-            return response.json()
+            if "application/json" in response.headers.get("Content-Type", ""):
+                return response.json()
+            else:
+                return response.content
 
     def get_token(self):
         """

@@ -32,7 +32,7 @@ setup(
     url='https://github.com/femueller/python-n26',
     download_url='https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
     version=VERSION,
-    install_requires=['requests', 'pyyaml', 'click', 'tabulate', 'inflect', 'tenacity'],
+    install_requires=['requests', 'pyyaml', 'click', 'tabulate', 'inflect', 'tenacity', 'pdftotext'],
     test_requires=['mock', 'pytest'],
     packages=[
         'n26'
