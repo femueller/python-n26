@@ -10,7 +10,6 @@ from tenacity import retry, stop_after_delay, wait_fixed
 from n26 import config
 from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
-from n26.util import create_request_url
 
 LOGGER = logging.getLogger(__name__)
 
@@ -265,12 +264,10 @@ class Api(object):
         access_token = self.get_token()
         headers = {'Authorization': 'bearer' + str(access_token)}
 
-        url = create_request_url(url, params)
-
         if method is GET:
-            response = requests.get(url, headers=headers, json=json)
+            response = requests.get(url, params=params, headers=headers, json=json)
         elif method is POST:
-            response = requests.post(url, headers=headers, json=json)
+            response = requests.post(url, params=params, headers=headers, json=json)
         else:
             raise ValueError("Unsupported method: {}".format(method))
 
