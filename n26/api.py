@@ -72,6 +72,13 @@ class Api(object):
         if not path.exists():
             return {}
 
+        if not path.is_file():
+            raise IsADirectoryError("File path exists and is not a file: {}".format(path))
+
+        if path.stat().st_size <= 0:
+            # file is empty
+            return {}
+
         with open(path, "r") as file:
             return json.loads(file.read())
 
