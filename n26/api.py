@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from pathlib import Path
 
@@ -86,8 +87,13 @@ class Api(object):
     def _write_token_file(token_data: dict, path: str):
         LOGGER.debug("Writing token data to {}".format(path))
         path = Path(path).expanduser().resolve()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w") as file:
+
+        # delete existing file if permissions don't match
+        if path.exists() and path.stat().st_mode != 0o100600:
+            path.unlink()
+
+        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT, 0o600), 'w') as file:
             file.write(json.dumps(token_data))
 
     # IDEA: @get_token decorator
