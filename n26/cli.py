@@ -284,7 +284,7 @@ def statements():
 def transactions(categories: str, pending: bool, param_from: datetime or None, param_to: datetime or None,
                  text_filter: str, limit: int):
     """ Show transactions (default: 5) """
-    if not pending and not param_from and not limit:
+    if not JSON_OUTPUT and not pending and not param_from and not limit:
         limit = 5
         click.echo(click.style("Output is limited to {} entries.".format(limit), fg="yellow"))
 
