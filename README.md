@@ -85,6 +85,37 @@ Or if using environment variables:
 123.45 EUR
 ```
 
+### JSON output
+If you would like to work with the raw `JSON` rather than the pretty table 
+layout you can use the global `-json` parameter:
+
+```bash 
+> n26 -json balance
+{
+  "id": "12345678-1234-1234-1234-123456789012",
+  "physicalBalance": null,
+  "availableBalance": 123.45,
+  "usableBalance": 123.45,
+  "bankBalance": 123.45,
+  "iban": "DE12345678901234567890",
+  "bic": "NTSBDEB1XXX",
+  "bankName": "N26 Bank",
+  "seized": false,
+  "currency": "EUR",
+  "legalEntity": "EU",
+  "users": [
+    {
+      "userId": "12345678-1234-1234-1234-123456789012",
+      "userRole": "OWNER"
+    }
+  ],
+  "externalId": {
+    "iban": "DE12345678901234567890"
+  }
+}
+```
+
+
 ### API example
 ```python
 from n26 import api
