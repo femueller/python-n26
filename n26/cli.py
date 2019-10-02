@@ -10,14 +10,18 @@ from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATU
 
 API_CLIENT = api.Api()
 
+JSON_OUTPUT = False
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 # Cli returns command line requests
 @click.group(context_settings=CONTEXT_SETTINGS)
+@click.option("-json", default=False, type=bool, is_flag=True)
 @click.version_option()
-def cli():
+def cli(json: bool):
     """Interact with the https://n26.com API via the command line."""
+    global JSON_OUTPUT
+    JSON_OUTPUT = json
 
 
 client = api.Api()
@@ -27,6 +31,9 @@ client = api.Api()
 def addresses():
     """ Show account addresses """
     addresses_data = API_CLIENT.get_addresses().get('data')
+    if JSON_OUTPUT:
+        _print_json(addresses_data)
+        return
 
     headers = ['Type', 'Country', 'City', 'Zip code', 'Street', 'Number',
                'Address line 1', 'Address line 2',
@@ -42,6 +49,9 @@ def addresses():
 def info():
     """ Get account information """
     account_info = API_CLIENT.get_account_info()
+    if JSON_OUTPUT:
+        _print_json(account_info)
+        return
 
     lines = [
         ["Name:", "{} {}".format(account_info.get('firstName'), account_info.get('lastName'))],
@@ -60,6 +70,9 @@ def info():
 def status():
     """ Get account statuses """
     account_statuses = API_CLIENT.get_account_statuses()
+    if JSON_OUTPUT:
+        _print_json(account_statuses)
+        return
 
     lines = [
         ["Account created:", _timestamp_ms_to_date(account_statuses.get('created'))],
@@ -93,6 +106,10 @@ def status():
 def balance():
     """ Show account balance """
     balance_data = API_CLIENT.get_balance()
+    if JSON_OUTPUT:
+        _print_json(balance_data)
+        return
+
     amount = balance_data.get('availableBalance')
     currency = balance_data.get('currency')
     click.echo("{} {}".format(amount, currency))
@@ -108,6 +125,9 @@ def browse():
 def spaces():
     """ Show spaces """
     spaces_data = API_CLIENT.get_spaces()["spaces"]
+    if JSON_OUTPUT:
+        _print_json(spaces_data)
+        return
 
     lines = []
     for i, space in enumerate(spaces_data):
@@ -141,6 +161,9 @@ def spaces():
 def cards():
     """ Shows a list of cards """
     cards_data = API_CLIENT.get_cards()
+    if JSON_OUTPUT:
+        _print_json(cards_data)
+        return
 
     headers = ['Id', 'Masked Pan', 'Type', 'Design', 'Status', 'Activated', 'Pin defined', 'Expires']
     keys = [
@@ -204,6 +227,10 @@ def set_limits(withdrawal: int, payment: int):
 def _limits():
     limits_data = API_CLIENT.get_account_limits()
 
+    if JSON_OUTPUT:
+        _print_json(limits_data)
+        return
+
     headers = ['Name', 'Amount', 'Country List']
     keys = ['limit', 'amount', 'countryList']
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=limits_data, numalign='right')
@@ -216,6 +243,10 @@ def contacts():
     """ Show your n26 contacts """
     contacts_data = API_CLIENT.get_contacts()
 
+    if JSON_OUTPUT:
+        _print_json(contacts_data)
+        return
+
     headers = ['Id', 'Name', 'IBAN']
     keys = ['id', 'name', 'subtitle']
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=contacts_data, numalign='right')
@@ -227,6 +258,10 @@ def contacts():
 def statements():
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
+
+    if JSON_OUTPUT:
+        _print_json(statements_data)
+        return
 
     headers = ['Id', 'Url', 'Visible TS', 'Month', 'Year']
     keys = ['id', 'url', 'visibleTS', 'month', 'year']
@@ -257,6 +292,10 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
     transactions_data = API_CLIENT.get_transactions(from_time=from_timestamp, to_time=to_timestamp,
                                                     limit=limit, pending=pending, text_filter=text_filter,
                                                     categories=categories)
+
+    if JSON_OUTPUT:
+        _print_json(transactions_data)
+        return
 
     lines = []
     for i, transaction in enumerate(transactions_data):
@@ -301,6 +340,10 @@ def standing_orders():
     """Show your standing orders"""
     standing_orders_data = API_CLIENT.get_standing_orders()
 
+    if JSON_OUTPUT:
+        _print_json(standing_orders_data)
+        return
+
     headers = ['To',
                'Amount',
                'Frequency',
@@ -335,6 +378,10 @@ def statistics(param_from: datetime or None, param_to: datetime or None):
     from_timestamp, to_timestamp = _parse_from_to_timestamps(param_from, param_to)
     statements_data = API_CLIENT.get_statistics(from_time=from_timestamp, to_time=to_timestamp)
 
+    if JSON_OUTPUT:
+        _print_json(statements_data)
+        return
+
     text = "From: %s\n" % (_timestamp_ms_to_date(statements_data["from"]))
     text += "To:   %s\n\n" % (_timestamp_ms_to_date(statements_data["to"]))
 
@@ -352,6 +399,16 @@ def statistics(param_from: datetime or None, param_to: datetime or None):
     text += _create_table_from_dict(headers, keys, statements_data["items"], numalign='right')
 
     click.echo(text.strip())
+
+
+def _print_json(data: dict or list):
+    """
+    Pretty-Prints the given object to the  console
+    :param data: data to print
+    """
+    import json
+    json_data = json.dumps(data, indent=2)
+    click.echo(json_data)
 
 
 def _parse_from_to_timestamps(param_from: datetime or None, param_to: datetime or None) -> Tuple[int, int]:
