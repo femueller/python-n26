@@ -1,16 +1,53 @@
+import functools
+import logging
 import webbrowser
 from datetime import datetime, timezone
 from typing import Tuple
 
 import click
+from requests import HTTPError
 from tabulate import tabulate
 
 import n26.api as api
 from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE, DATETIME_FORMATS
 
+LOGGER = logging.getLogger(__name__)
+
 API_CLIENT = api.Api()
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+def auth_decorator(func: callable):
+    """
+    Decorator ensuring authentication before making api requests
+    :param func: function to patch
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        new_auth = False
+        try:
+            API_CLIENT.refresh_authentication()
+        except HTTPError as http_error:
+            if http_error.response.status_code != 401:
+                raise http_error
+            new_auth = True
+        except AssertionError:
+            new_auth = True
+
+        if new_auth:
+            hint = click.style("Initiating authentication flow, please check your phone to approve login.", fg="yellow")
+            click.echo(hint)
+
+            API_CLIENT.authenticate()
+
+            success = click.style("Authentication successful :)", fg="green")
+            click.echo(success)
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 # Cli returns command line requests
@@ -20,10 +57,8 @@ def cli():
     """Interact with the https://n26.com API via the command line."""
 
 
-client = api.Api()
-
-
 @cli.command()
+@auth_decorator
 def addresses():
     """ Show account addresses """
     addresses_data = API_CLIENT.get_addresses().get('data')
@@ -39,6 +74,7 @@ def addresses():
 
 
 @cli.command()
+@auth_decorator
 def info():
     """ Get account information """
     account_info = API_CLIENT.get_account_info()
@@ -57,6 +93,7 @@ def info():
 
 
 @cli.command()
+@auth_decorator
 def status():
     """ Get account statuses """
     account_statuses = API_CLIENT.get_account_statuses()
@@ -90,6 +127,7 @@ def status():
 
 
 @cli.command()
+@auth_decorator
 def balance():
     """ Show account balance """
     balance_data = API_CLIENT.get_balance()
@@ -105,6 +143,7 @@ def browse():
 
 
 @cli.command()
+@auth_decorator
 def spaces():
     """ Show spaces """
     spaces_data = API_CLIENT.get_spaces()["spaces"]
@@ -138,6 +177,7 @@ def spaces():
 
 
 @cli.command()
+@auth_decorator
 def cards():
     """ Shows a list of cards """
     cards_data = API_CLIENT.get_cards()
@@ -160,6 +200,7 @@ def cards():
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to block. Omitting this will block all cards.')
+@auth_decorator
 def card_block(card: str):
     """ Blocks the card/s """
     if card:
@@ -174,6 +215,7 @@ def card_block(card: str):
 
 @cli.command()
 @click.option('--card', default=None, type=str, help='ID of the card to unblock. Omitting this will unblock all cards.')
+@auth_decorator
 def card_unblock(card: str):
     """ Unblocks the card/s """
     if card:
@@ -187,6 +229,7 @@ def card_unblock(card: str):
 
 
 @cli.command()
+@auth_decorator
 def limits():
     """ Show n26 account limits """
     _limits()
@@ -195,6 +238,7 @@ def limits():
 @cli.command()
 @click.option('--withdrawal', default=None, type=int, help='Daily withdrawal limit.')
 @click.option('--payment', default=None, type=int, help='Daily payment limit.')
+@auth_decorator
 def set_limits(withdrawal: int, payment: int):
     """ Set n26 account limits """
     API_CLIENT.set_account_limits(withdrawal, payment)
@@ -212,6 +256,7 @@ def _limits():
 
 
 @cli.command()
+@auth_decorator
 def contacts():
     """ Show your n26 contacts """
     contacts_data = API_CLIENT.get_contacts()
@@ -224,6 +269,7 @@ def contacts():
 
 
 @cli.command()
+@auth_decorator
 def statements():
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
@@ -246,6 +292,7 @@ def statements():
               help='End time limit for statistics.')
 @click.option('--text-filter', default=None, type=str, help='Text filter.')
 @click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
+@auth_decorator
 def transactions(categories: str, pending: bool, param_from: datetime or None, param_to: datetime or None,
                  text_filter: str, limit: int):
     """ Show transactions (default: 5) """
@@ -297,6 +344,7 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
 
 
 @cli.command("standing-orders")
+@auth_decorator
 def standing_orders():
     """Show your standing orders"""
     standing_orders_data = API_CLIENT.get_standing_orders()
@@ -329,6 +377,7 @@ def standing_orders():
               help='Start time limit for statistics.')
 @click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
               help='End time limit for statistics.')
+@auth_decorator
 def statistics(param_from: datetime or None, param_to: datetime or None):
     """Show your n26 statistics"""
 
