@@ -88,8 +88,8 @@ class Api(object):
         LOGGER.debug("Writing token data to {}".format(path))
         path = Path(path).expanduser().resolve()
 
-        # delete existing file if permissions don't match
-        if path.exists() and path.stat().st_mode != 0o100600:
+        # delete existing file if permissions don't match or file size is abnormally small
+        if path.exists() and (path.stat().st_mode != 0o100600 or path.stat().st_size < 10):
             path.unlink()
 
         path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
