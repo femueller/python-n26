@@ -69,9 +69,11 @@ def mock_auth_token(func: callable):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        with mock.patch('n26.api.Api._request_token') as mock_token:
-            mock_token.return_value = read_response_file("auth_token.json")
-            return func(*args, **kwargs)
+        with mock.patch('n26.api.Api._request_token') as request_token:
+            request_token.return_value = read_response_file("auth_token.json")
+            with mock.patch('n26.api.Api._refresh_token') as refresh_token:
+                refresh_token.return_value = read_response_file("refresh_token.json")
+                return func(*args, **kwargs)
 
     return wrapper
 
