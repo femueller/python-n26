@@ -94,7 +94,9 @@ class Api(object):
 
         path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT, 0o600), 'w') as file:
+            file.seek(0)
             file.write(json.dumps(token_data, indent=2))
+            file.truncate()
 
     # IDEA: @get_token decorator
     def get_account_info(self) -> dict:
