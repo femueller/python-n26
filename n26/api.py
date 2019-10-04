@@ -88,13 +88,13 @@ class Api(object):
         LOGGER.debug("Writing token data to {}".format(path))
         path = Path(path).expanduser().resolve()
 
-        # delete existing file if permissions don't match
-        if path.exists() and path.stat().st_mode != 0o100600:
+        # delete existing file if permissions don't match or file size is abnormally small
+        if path.exists() and (path.stat().st_mode != 0o100600 or path.stat().st_size < 10):
             path.unlink()
 
         path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT, 0o600), 'w') as file:
-            file.write(json.dumps(token_data))
+            file.write(json.dumps(token_data, indent=2))
 
     # IDEA: @get_token decorator
     def get_account_info(self) -> dict:
@@ -292,6 +292,61 @@ class Api(object):
         if len(response.content) > 0:
             return response.json()
 
+    def is_authenticated(self) -> bool:
+        """
+        :return: whether valid token data exists
+        """
+        return self._validate_token(self.token_data)
+
+    def authenticate(self):
+        """
+        Starts a new authentication flow with the N26 servers.
+
+        This method requires user interaction to approve a 2FA request.
+        Therefore you should make sure if you can bypass this
+        by refreshing or reusing an existing token by calling is_authenticated()
+        and refresh_authentication() respectively.
+
+        :raises PermissionError: if the token is invalid even after the refresh
+        """
+        LOGGER.debug("Requesting token for username: {}".format(self.config.username))
+        token_data = self._request_token(self.config.username, self.config.password)
+
+        # add expiration time to expiration in _validate_token()
+        token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]
+
+        # if it's still not valid, raise an exception
+        if not self._validate_token(token_data):
+            raise PermissionError("Unable to request authentication token")
+
+        # save token data
+        self.token_data = token_data
+
+    def refresh_authentication(self):
+        """
+        Refreshes an existing authentication using a (possibly expired) token.
+        :raises AssertionError: if no existing token data was found
+        :raises PermissionError: if the token is invalid even after the refresh
+        """
+        token_data = self.token_data
+        if REFRESH_TOKEN_KEY in token_data:
+            LOGGER.debug("Trying to refresh existing token")
+            refresh_token = token_data[REFRESH_TOKEN_KEY]
+            token_data = self._refresh_token(refresh_token)
+        else:
+            raise AssertionError("Cant refresh token since no existing token data was found. "
+                                 "Please initiate a new authentication instead.")
+
+        # add expiration time to expiration in _validate_token()
+        token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]
+
+        # if it's still not valid, raise an exception
+        if not self._validate_token(token_data):
+            raise PermissionError("Unable to refresh authentication token")
+
+        # save token data
+        self.token_data = token_data
+
     def get_token(self):
         """
         Returns the access token to use for api authentication.
@@ -301,31 +356,21 @@ class Api(object):
 
         :return: the access token
         """
-        token_data = self.token_data
-        if not self._validate_token(token_data):
-            if REFRESH_TOKEN_KEY in token_data:
-                LOGGER.debug("Trying to refresh existing token")
-                refresh_token = token_data[REFRESH_TOKEN_KEY]
-                try:
-                    token_data = self._refresh_token(refresh_token)
-                except HTTPError as ex:
-                    logging.exception(ex)
-                    LOGGER.debug("Couldn't refresh token, requesting new token")
-                    token_data = self._request_token(self.config.username, self.config.password)
-            else:
-                LOGGER.debug("No valid token data found, requesting new token")
-                token_data = self._request_token(self.config.username, self.config.password)
+        new_auth = False
+        if not self._validate_token(self.token_data):
+            try:
+                self.refresh_authentication()
+            except HTTPError as http_error:
+                if http_error.response.status_code != 401:
+                    raise http_error
+                new_auth = True
+            except AssertionError:
+                new_auth = True
 
-            # add expiration time to expiration in _validate_token()
-            token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]
+        if new_auth:
+            self.authenticate()
 
-        # if it's still not valid, raise an exception
-        if not self._validate_token(token_data):
-            raise PermissionError("Unable to request authentication token")
-
-        # save token data
-        self.token_data = token_data
-        return token_data[ACCESS_TOKEN_KEY]
+        return self.token_data[ACCESS_TOKEN_KEY]
 
     def _request_token(self, username: str, password: str):
         """
