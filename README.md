@@ -1,5 +1,6 @@
 # N26 Python CLI/API
 [![Build Status](https://travis-ci.org/femueller/python-n26.svg?branch=master)](https://travis-ci.org/femueller/python-n26)
+[![PyPI version](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
 
@@ -20,7 +21,7 @@
 [![asciicast](https://asciinema.org/a/260083.svg)](https://asciinema.org/a/260083)
 
 ## About
-[python-n26](https://github.com/femueller/python-n26) is a Command Line Interface to request information from n26 bank accounts and a Python 3 module that can be used in Python projects.
+[python-n26](https://github.com/femueller/python-n26) is a Python 3.6+ library and Command Line Interface to request information from n26 bank accounts. You can use it to check your balance from the terminal or include it in your own Python projects.
 
 **Disclaimer:** This is an unofficial community project which is not affiliated with N26 GmbH/N26 Inc.
 
