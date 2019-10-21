@@ -278,7 +278,7 @@ class Api(object):
         :return: the response parsed as a json
         """
         access_token = self.get_token()
-        headers = {'Authorization': 'bearer' + str(access_token)}
+        headers = {'Authorization': 'bearer %s'.format(access_token)}
 
         url = create_request_url(url, params)
 
