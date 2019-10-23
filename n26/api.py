@@ -380,7 +380,7 @@ class Api(object):
         :return: the token or None if the response did not contain a token
         """
         mfa_token = self._initiate_authentication_flow(username, password)
-        self._request_mfa_approval(mfa_token)
+        self._request_mfa_approval(self, mfa_token)
         return self._complete_authentication_flow(mfa_token)
 
     @staticmethod
@@ -420,12 +420,17 @@ class Api(object):
         return response.json()
 
     @staticmethod
-    def _request_mfa_approval(mfa_token: str):
+    def _request_mfa_approval(self, mfa_token: str):
         LOGGER.debug("Requesting MFA approval using mfa_token {}".format(mfa_token))
         mfa_data = {
-            "challengeType": "oob",
             "mfaToken": mfa_token
         }
+
+        if self.config.mfa_type == "otp":
+            mfa_data['challengeType'] = "otp"
+        else:
+            mfa_data['challengeType'] = "oob"
+
         response = requests.post(
             BASE_URL_DE + "/api/mfa/challenge",
             json=mfa_data,
@@ -440,9 +445,15 @@ class Api(object):
     def _complete_authentication_flow(self, mfa_token: str) -> dict:
         LOGGER.debug("Completing authentication flow for mfa_token {}".format(mfa_token))
         mfa_response_data = {
-            "grant_type": "mfa_oob",
             "mfaToken": mfa_token
         }
+
+        if self.config.mfa_type == "otp":
+            mfa_response_data['grant_type'] = "mfa_otp"
+            mfa_response_data['otp'] = input('Enter the 6 digit SMS OTP code: ')
+        else:
+            mfa_response_data['grant_type'] = "mfa_oob"
+
         response = requests.post(BASE_URL_DE + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         tokens = response.json()
