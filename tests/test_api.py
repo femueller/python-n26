@@ -41,7 +41,8 @@ class ApiTests(N26TestBase):
     def test_init_with_config(self):
         conf = config.Config(username='john.doe@example.com',
                              password='$upersecret',
-                             login_data_store_path=None)
+                             login_data_store_path=None,
+                             mfa_type='oob')
         api_client = api.Api(conf)
         self.assertIsNotNone(api_client.config)
         self.assertEqual(api_client.config, conf)

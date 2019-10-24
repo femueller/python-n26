@@ -1,3 +1,4 @@
 n26:
   username: john.doe@example.com
   password: $upersecret
+  mfa_type: oob
