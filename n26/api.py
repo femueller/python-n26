@@ -380,7 +380,7 @@ class Api(object):
         :return: the token or None if the response did not contain a token
         """
         mfa_token = self._initiate_authentication_flow(username, password)
-        self._request_mfa_approval(self, mfa_token)
+        self._request_mfa_approval(mfa_token)
         return self._complete_authentication_flow(mfa_token)
 
     @staticmethod
@@ -419,7 +419,6 @@ class Api(object):
         response.raise_for_status()
         return response.json()
 
-    @staticmethod
     def _request_mfa_approval(self, mfa_token: str):
         LOGGER.debug("Requesting MFA approval using mfa_token {}".format(mfa_token))
         mfa_data = {
