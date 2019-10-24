@@ -43,7 +43,7 @@ n26:
   username: "john.doe@example.com"
   password: "$upersecret"
   login_data_store_path: "~/.config/n26/token_data"
-  mfa_type: "oob"
+  mfa_type: "app"
 ```
 
 or use environment variables:
@@ -51,7 +51,7 @@ or use environment variables:
 - `N26_USER`: username
 - `N26_PASSWORD`: password
 - `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
-- `N26_MFA_TYPE`: `oob` will use the paired app as 2 factor authentication, `otp` will use SMS to the registered number.
+- `N26_MFA_TYPE`: `app` will use the paired app as 2 factor authentication, `sms` will use SMS to the registered number.
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
 
@@ -63,13 +63,13 @@ Since 14th of September 2019 N26 requires a login confirmation
 There are two options here:
 
 1. Using the paired phone N26 app to approve login on devices that are not 
-paired. This can be configured by setting `oob` as the `mfa_type`. You will 
+paired. This can be configured by setting `app` as the `mfa_type`. You will 
 receive a notification on your phone when you start using this library to
 request data. python-n26 checks for your login confirmation every 5 seconds. If
 you fail to approve the login request within 60 seconds an exception is raised.
 
 2. Using a code delivered via SMS to your registered phone number as 2 factor 
-authentication. This can be configured by setting `otp` as the `mfa_type`.
+authentication. This can be configured by setting `sms` as the `mfa_type`.
 
 If you do not specify a `login_data_store_path` this login information 
 is only stored in memory. In order to avoid that every CLI command 
@@ -91,7 +91,7 @@ costs**. You can specify the location to store this data in the
 Or if using environment variables:
 
 ```bash
-> N26_USER=user N26_PASSWORD=passwd N26_MFA_TYPE=oob n26 balance
+> N26_USER=user N26_PASSWORD=passwd N26_MFA_TYPE=app n26 balance
 123.45 EUR
 ```
 
@@ -138,7 +138,7 @@ This is going to use the same mechanism to load configuration as the CLI tool, t
 ```python
 from n26 import api
 from n26 import config
-conf = config.Config('username', 'passwd', '~/.config/n26/token_data', 'oob')
+conf = config.Config('username', 'passwd', '~/.config/n26/token_data', 'app')
 client = api.Api(conf)
 print(client.get_balance())
 ```

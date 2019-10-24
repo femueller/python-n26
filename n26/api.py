@@ -1,16 +1,16 @@
-import click
 import json
 import logging
 import os
 import time
 from pathlib import Path
 
+import click
 import requests
 from requests import HTTPError
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26 import config
-from n26.config import Config
+from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
 
@@ -426,7 +426,7 @@ class Api(object):
             "mfaToken": mfa_token
         }
 
-        if self.config.mfa_type == "otp":
+        if self.config.mfa_type == MFA_TYPE_SMS:
             mfa_data['challengeType'] = "otp"
         else:
             mfa_data['challengeType'] = "oob"
@@ -448,7 +448,7 @@ class Api(object):
             "mfaToken": mfa_token
         }
 
-        if self.config.mfa_type == "otp":
+        if self.config.mfa_type == MFA_TYPE_SMS:
             mfa_response_data['grant_type'] = "mfa_otp"
 
             hint = click.style("Enter the 6 digit SMS OTP code", fg="yellow")

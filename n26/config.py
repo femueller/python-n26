@@ -11,6 +11,10 @@ ENV_PARAM_MFA_TYPE = "N26_MFA_TYPE"
 CONFIG_DIRECTORY = "~/.config"
 CONFIG_FILE_NAME = "n26.yml"
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIRECTORY, CONFIG_FILE_NAME)
+
+MFA_TYPE_APP = "app"
+MFA_TYPE_SMS = "sms"
+
 Config = namedtuple('Config', [
     'username',
     'password',
@@ -90,3 +94,7 @@ def _validate_config(config):
         raise ValueError('Missing config param: password')
     if not config.mfa_type:
         raise ValueError('Missing config param: mfa_type')
+    else:
+        if config.mfa_type not in [MFA_TYPE_APP, MFA_TYPE_SMS]:
+            raise ValueError('Unexpected value {}. Use one of: {}'.format(
+                config.mfa_type, [MFA_TYPE_APP, MFA_TYPE_SMS]))
