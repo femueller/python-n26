@@ -1,3 +1,4 @@
+import click
 import json
 import logging
 import os
@@ -449,7 +450,9 @@ class Api(object):
 
         if self.config.mfa_type == "otp":
             mfa_response_data['grant_type'] = "mfa_otp"
-            mfa_response_data['otp'] = input('Enter the 6 digit SMS OTP code: ')
+
+            hint = click.style("Enter the 6 digit SMS OTP code", fg="yellow")
+            mfa_response_data['otp'] = click.prompt(hint, type=int)
         else:
             mfa_response_data['grant_type'] = "mfa_oob"
 
