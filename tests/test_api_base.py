@@ -8,6 +8,8 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
+from n26.config import MFA_TYPE_APP
+
 
 def read_response_file(file_name: str or None) -> json or None:
     """
@@ -31,7 +33,7 @@ def read_response_file(file_name: str or None) -> json or None:
     return json.loads(api_response_text)
 
 
-def mock_config(username: str = "john.doe@example.com", password: str = "$upersecret", mfa_type: str = "oob"):
+def mock_config(username: str = "john.doe@example.com", password: str = "$upersecret", mfa_type: str = MFA_TYPE_APP):
     """
     Decorator to mock the configuration.
     This decorator should never be used to test the config itself!

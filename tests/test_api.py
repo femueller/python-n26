@@ -1,5 +1,6 @@
 from n26 import api, config
 from n26.api import BASE_URL_DE, POST, GET
+from n26.config import MFA_TYPE_APP
 from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests, mock_config
 
 
@@ -42,7 +43,7 @@ class ApiTests(N26TestBase):
         conf = config.Config(username='john.doe@example.com',
                              password='$upersecret',
                              login_data_store_path=None,
-                             mfa_type='oob')
+                             mfa_type=MFA_TYPE_APP)
         api_client = api.Api(conf)
         self.assertIsNotNone(api_client.config)
         self.assertEqual(api_client.config, conf)
