@@ -22,7 +22,7 @@ Config = namedtuple('Config', [
 def get_config():
     config = _read_from_env()
 
-    if not config.username or not config.password:
+    if not config.username or not config.password or not config.mfa_type:
         config = _read_from_file(config)
 
     _validate_config(config)
@@ -37,7 +37,9 @@ def _read_from_env():
     """
     username, password, login_data_store_path, mfa_type = [
         os.environ.get(e) for e in [ENV_PARAM_USER,
-                                        ENV_PARAM_PASSWORD, ENV_PARAM_LOGIN_DATA_STORE_PATH, ENV_PARAM_MFA_TYPE]
+                                    ENV_PARAM_PASSWORD,
+                                    ENV_PARAM_LOGIN_DATA_STORE_PATH,
+                                    ENV_PARAM_MFA_TYPE]
     ]
     return Config(username, password, login_data_store_path, mfa_type)
 
@@ -74,8 +76,7 @@ def _read_from_file(config):
                 config = config._replace(
                     login_data_store_path=root_node.get('login_data_store_path', config.login_data_store_path))
             if not config.mfa_type:
-                config = config._replace(
-                    mfa_type=root_node.get('mfa_type', config.mfa_type))
+                config = config._replace(mfa_type=root_node.get('mfa_type', config.mfa_type))
 
     return config
 
