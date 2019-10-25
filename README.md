@@ -127,10 +127,16 @@ print(balance.get_balance())
 This is going to use the same mechanism to load configuration as the CLI tool, to specify your own configuration you can use it as:
 
 ```python
-from n26 import api
-from n26 import config
-conf = config.Config('username', 'passwd', '~/.config/n26/token_data')
-client = api.Api(conf)
+from n26.api import Api
+from n26.config import Config
+
+conf = Config(write_reference=False, validate=False)
+conf.USERNAME.value = "john.doe@example.com"
+conf.PASSWORD.value = "$upersecret"
+conf.LOGIN_DATA_STORE_PATH.value = None
+conf.validate()
+
+client = Api(conf)
 print(client.get_balance())
 ```
 
