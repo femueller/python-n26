@@ -1,7 +1,6 @@
 import functools
 import json
 import logging
-import os
 import re
 import unittest
 from copy import deepcopy
@@ -29,34 +28,6 @@ def read_response_file(file_name: str or None) -> json or None:
     with open(file_path, 'r') as myfile:
         api_response_text = myfile.read()
     return json.loads(api_response_text)
-
-
-def mock_config(username: str = "john.doe@example.com", password: str = "$upersecret"):
-    """
-    Decorator to mock the configuration.
-    This decorator should never be used to test the config itself!
-
-    :param username: the username to use
-    :param password: the password to use
-    :return: the decorated method
-    """
-
-    def decorator(function: callable):
-        if not callable(function):
-            raise AttributeError("Unsupported type: {}".format(function))
-
-        @functools.wraps(function)
-        def wrapper(*args, **kwargs):
-            with mock.patch('n26.config.get_config') as mock_config:
-                from n26 import config
-                mock_config.return_value = config.Config(
-                    username=username, password=password,
-                    login_data_store_path=None)
-                return function(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 def mock_auth_token(func: callable):
@@ -137,8 +108,17 @@ def mock_requests(method: str, response_file: str or None, url_regex: str = None
 class N26TestBase(unittest.TestCase):
     """Base class for N26 api tests"""
 
-    PATH = os.path.dirname(os.path.abspath(__file__))
-    CONFIG_FILE = os.path.join(PATH, "test_creds.yml")
+    from n26.config import Config
+    from container_app_conf.source.yaml_source import YamlSource
+
+    # create custom config from "test_creds.yml"
+    config = Config(
+        singleton=False,
+        data_sources=[
+            YamlSource("test_creds")
+        ],
+        write_reference=False
+    )
 
     # this is the Api client
     _underTest = None
@@ -147,12 +127,9 @@ class N26TestBase(unittest.TestCase):
         """
         This method is called BEFORE each individual test case
         """
-        from n26 import api, config
+        from n26 import api
 
-        # use test file path instead of real one
-        config.CONFIG_FILE_PATH = self.CONFIG_FILE
-
-        self._underTest = api.Api()
+        self._underTest = api.Api(self.config)
 
         logger = logging.getLogger("n26")
         logger.setLevel(logging.DEBUG)

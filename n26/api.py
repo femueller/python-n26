@@ -8,7 +8,6 @@ import requests
 from requests import HTTPError
 from tenacity import retry, stop_after_delay, wait_fixed
 
-from n26 import config
 from n26.config import Config
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
@@ -45,23 +44,23 @@ class Api(object):
         :param cfg: configuration object
         """
         if not cfg:
-            cfg = config.get_config()
+            cfg = Config()
         self.config = cfg
         self._token_data = {}
 
     @property
     def token_data(self) -> dict:
-        if self.config.login_data_store_path is None:
+        if self.config.LOGIN_DATA_STORE_PATH.value is None:
             return self._token_data
         else:
-            return self._read_token_file(self.config.login_data_store_path)
+            return self._read_token_file(self.config.LOGIN_DATA_STORE_PATH.value)
 
     @token_data.setter
     def token_data(self, data: dict):
-        if self.config.login_data_store_path is None:
+        if self.config.LOGIN_DATA_STORE_PATH.value is None:
             self._token_data = data
         else:
-            self._write_token_file(data, self.config.login_data_store_path)
+            self._write_token_file(data, self.config.LOGIN_DATA_STORE_PATH.value)
 
     @staticmethod
     def _read_token_file(path: str) -> dict:
@@ -311,8 +310,8 @@ class Api(object):
 
         :raises PermissionError: if the token is invalid even after the refresh
         """
-        LOGGER.debug("Requesting token for username: {}".format(self.config.username))
-        token_data = self._request_token(self.config.username, self.config.password)
+        LOGGER.debug("Requesting token for username: {}".format(self.config.USERNAME.value))
+        token_data = self._request_token(self.config.USERNAME.value, self.config.PASSWORD.value)
 
         # add expiration time to expiration in _validate_token()
         token_data[EXPIRATION_TIME_KEY] = time.time() + token_data["expires_in"]

@@ -1,25 +1,22 @@
 from n26.api import GET, POST
-from tests.test_api_base import N26TestBase, mock_requests, mock_config
+from tests.test_api_base import N26TestBase, mock_requests
 
 
 class AccountTests(N26TestBase):
     """Account tests"""
 
-    @mock_config()
     @mock_requests(method=GET, response_file="account_info.json")
     def test_get_account_info_cli(self):
         from n26.cli import info
         result = self._run_cli_cmd(info)
         self.assertIsNotNone(result.output)
 
-    @mock_config()
     @mock_requests(method=GET, response_file="account_statuses.json")
     def test_get_account_statuses_cli(self):
         from n26.cli import status
         result = self._run_cli_cmd(status)
         self.assertIn("PAIRED", result.output)
 
-    @mock_config()
     @mock_requests(method=GET, response_file="account_limits.json")
     def test_limits_cli(self):
         from n26.cli import limits
@@ -28,7 +25,6 @@ class AccountTests(N26TestBase):
         self.assertIn("ATM_DAILY_ACCOUNT", result.output)
         self.assertIn("2500", result.output)
 
-    @mock_config()
     @mock_requests(method=POST, response_file=None)
     @mock_requests(method=GET, response_file="account_limits.json")
     def test_set_limits_cli(self):
@@ -38,7 +34,6 @@ class AccountTests(N26TestBase):
         self.assertIn("ATM_DAILY_ACCOUNT", result.output)
         self.assertIn("2500", result.output)
 
-    @mock_config()
     @mock_requests(method=GET, response_file="addresses.json")
     def test_addresses_cli(self):
         from n26.cli import addresses
@@ -53,7 +48,6 @@ class AccountTests(N26TestBase):
         result = self._underTest.get_contacts()
         self.assertIsNotNone(result)
 
-    @mock_config()
     @mock_requests(method=GET, response_file="contacts.json")
     def test_contacts_cli(self):
         from n26.cli import contacts
@@ -65,7 +59,6 @@ class AccountTests(N26TestBase):
         self.assertIn("Mindfactory", result.output)
         self.assertIn("Seegel", result.output)
 
-    @mock_config()
     @mock_requests(method=GET, response_file="statements.json")
     def test_get_statements_cli(self):
         from n26.cli import statements

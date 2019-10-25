@@ -1,83 +1,56 @@
-import os
-from collections import namedtuple
+from container_app_conf import ConfigBase
+from container_app_conf.entry.file import FileConfigEntry
+from container_app_conf.entry.string import StringConfigEntry
+from container_app_conf.source.env_source import EnvSource
+from container_app_conf.source.yaml_source import YamlSource
 
-import yaml
-
-ENV_PARAM_USER = "N26_USER"
-ENV_PARAM_PASSWORD = "N26_PASSWORD"
-ENV_PARAM_LOGIN_DATA_STORE_PATH = "N26_LOGIN_DATA_STORE_PATH"
-
-CONFIG_DIRECTORY = "~/.config"
-CONFIG_FILE_NAME = "n26.yml"
-CONFIG_FILE_PATH = os.path.join(CONFIG_DIRECTORY, CONFIG_FILE_NAME)
-Config = namedtuple('Config', [
-    'username',
-    'password',
-    'login_data_store_path'
-])
+NODE_ROOT = "n26"
 
 
-def get_config():
-    config = _read_from_env()
+class Config(ConfigBase):
 
-    if not config.username or not config.password:
-        config = _read_from_file(config)
+    def __new__(cls, *args, **kwargs):
+        if "data_sources" not in kwargs.keys():
+            yaml_source = YamlSource("n26")
+            data_sources = [
+                EnvSource(),
+                yaml_source
+            ]
+            kwargs["data_sources"] = data_sources
 
-    _validate_config(config)
+        if "write_reference" not in kwargs.keys():
+            kwargs["write_reference"] = False
 
-    return config
+        return super(Config, cls).__new__(cls, *args, **kwargs)
 
+    USERNAME = StringConfigEntry(
+        description="N26 account username",
+        example="john.doe@example.com",
+        key_path=[
+            NODE_ROOT,
+            "username"
+        ],
+        required=True
+    )
 
-def _read_from_env():
-    """
-    Try to get values from ENV
-    :return: Config object that may contain None values
-    """
-    username, password, login_data_store_path = [
-        os.environ.get(e) for e in [ENV_PARAM_USER, ENV_PARAM_PASSWORD, ENV_PARAM_LOGIN_DATA_STORE_PATH]
-    ]
-    return Config(username, password, login_data_store_path)
+    PASSWORD = StringConfigEntry(
+        description="N26 account password",
+        example="$upersecret",
+        key_path=[
+            NODE_ROOT,
+            "password"
+        ],
+        required=True,
+        secret=True
+    )
 
-
-def _read_from_file(config):
-    """
-    Read config file (if possible) and merge it's content with the given config.
-    If the given config already contains values they will be preserved.
-
-    :param config: a config object that might already contain values
-    :return: Config object with added values from config file (if any)
-    """
-    config_file = os.path.expanduser(CONFIG_FILE_PATH)
-    if not os.path.exists(config_file):
-        # config file doesn't exist
-        return config
-
-    with open(config_file, 'r') as ymlfile:
-        cfg = yaml.load(ymlfile, Loader=yaml.BaseLoader)
-
-        if not cfg:
-            raise ValueError("Config file is missing or empty")
-
-        if 'n26' not in cfg:
-            raise ValueError("Config file is missing 'n26' node")
-
-        root_node = cfg['n26']
-        if root_node:
-            if not config.username:
-                config = config._replace(username=root_node.get('username', config.username))
-            if not config.password:
-                config = config._replace(password=root_node.get('password', config.password))
-            if not config.login_data_store_path:
-                config = config._replace(
-                    login_data_store_path=root_node.get('login_data_store_path', config.login_data_store_path))
-
-    return config
-
-
-def _validate_config(config):
-    if not config:
-        raise ValueError("Config is None!")
-    if not config.username:
-        raise ValueError('Missing config param: username')
-    if not config.password:
-        raise ValueError('Missing config param: password')
+    LOGIN_DATA_STORE_PATH = FileConfigEntry(
+        description="File path to store login data",
+        example="~/.config/n26/token_data",
+        key_path=[
+            NODE_ROOT,
+            "login_data_store_path"
+        ],
+        required=False,
+        default=None
+    )
