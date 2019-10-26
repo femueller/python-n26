@@ -11,7 +11,7 @@ PyYAML = "*"
 inflect = "*"
 urllib3 = ">=1.24.2"
 tenacity = ">=5.1.1"
-container-app-conf = ">=4.2.2"
+container-app-conf = ">=4.2.3"
 
 [dev-packages]
 pytest = "*"

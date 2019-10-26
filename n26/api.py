@@ -425,7 +425,7 @@ class Api(object):
             "mfaToken": mfa_token
         }
 
-        if self.config.mfa_type == MFA_TYPE_SMS:
+        if self.config.mfa_type.value == MFA_TYPE_SMS:
             mfa_data['challengeType'] = "otp"
         else:
             mfa_data['challengeType'] = "oob"
@@ -447,7 +447,7 @@ class Api(object):
             "mfaToken": mfa_token
         }
 
-        if self.config.mfa_type == MFA_TYPE_SMS:
+        if self.config.mfa_type.value == MFA_TYPE_SMS:
             mfa_response_data['grant_type'] = "mfa_otp"
 
             hint = click.style("Enter the 6 digit SMS OTP code", fg="yellow")

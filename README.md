@@ -36,17 +36,10 @@ vim ~/.config/n26.yml
 
 ## Configuration
 
-You can use a YAML configuration file in `~/.config/n26.yml`:
+python-n26 uses [container-app-conf](https://github.com/markusressel/container-app-conf) to provide different options for configuration. supports both the `EnvSource` and the `YamlSource`.
 
-```yaml
-n26:
-  username: "john.doe@example.com"
-  password: "$upersecret"
-  login_data_store_path: "~/.config/n26/token_data"
-  mfa_type: "app"
-```
-
-or use environment variables:
+You can place a YAML (`n26.yaml` or `n26.yml`) or TOML (`n26.toml` or `n26.tml`) configuration file in `./`, `~/` or `~/.config/`. Have a look at the [YAML example](n26.yml.example) and [TOML example](n26.tml.example).
+If you want to use environment variables:
 
 - `N26_USER`: username
 - `N26_PASSWORD`: password
@@ -57,27 +50,14 @@ Note that **when specifying both** environment variables as well as a config fil
 
 ## Authentication
 
-Since 14th of September 2019 N26 requires a login confirmation 
-(2 factor authentication). 
+Since 14th of September 2019 N26 requires a login confirmation (2 factor authentication). 
 
 There are two options here:
 
-1. Using the paired phone N26 app to approve login on devices that are not 
-paired. This can be configured by setting `app` as the `mfa_type`. You will 
-receive a notification on your phone when you start using this library to
-request data. python-n26 checks for your login confirmation every 5 seconds. If
-you fail to approve the login request within 60 seconds an exception is raised.
+1. Using the paired phone N26 app to approve login on devices that are not paired. This can be configured by setting `app` as the `mfa_type`. You will receive a notification on your phone when you start using this library to request data. python-n26 checks for your login confirmation every 5 seconds. If you fail to approve the login request within 60 seconds an exception is raised.
+2. Using a code delivered via SMS to your registered phone number as 2 factor authentication. This can be configured by setting `sms` as the `mfa_type`.
 
-2. Using a code delivered via SMS to your registered phone number as 2 factor 
-authentication. This can be configured by setting `sms` as the `mfa_type`.
-
-If you do not specify a `login_data_store_path` this login information 
-is only stored in memory. In order to avoid that every CLI command 
-requires a new confirmation, the login data retrieved in the above 
-process can be stored on the file system. Please note that **this 
-information must be protected** from the eyes of third parties **at all 
-costs**. You can specify the location to store this data in the 
-[Configuration](#Configuration).
+If you do not specify a `login_data_store_path` this login information is only stored in memory. In order to avoid that every CLI command requires a new confirmation, the login data retrieved in the above process can be stored on the file system. Please note that **this information must be protected** from the eyes of third parties **at all costs**. You can specify the location to store this data in the [Configuration](#Configuration).
 
 ## Usage
 
