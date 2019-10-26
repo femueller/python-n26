@@ -6,21 +6,27 @@ import yaml
 ENV_PARAM_USER = "N26_USER"
 ENV_PARAM_PASSWORD = "N26_PASSWORD"
 ENV_PARAM_LOGIN_DATA_STORE_PATH = "N26_LOGIN_DATA_STORE_PATH"
+ENV_PARAM_MFA_TYPE = "N26_MFA_TYPE"
 
 CONFIG_DIRECTORY = "~/.config"
 CONFIG_FILE_NAME = "n26.yml"
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIRECTORY, CONFIG_FILE_NAME)
+
+MFA_TYPE_APP = "app"
+MFA_TYPE_SMS = "sms"
+
 Config = namedtuple('Config', [
     'username',
     'password',
-    'login_data_store_path'
+    'login_data_store_path',
+    'mfa_type'
 ])
 
 
 def get_config():
     config = _read_from_env()
 
-    if not config.username or not config.password:
+    if not config.username or not config.password or not config.mfa_type:
         config = _read_from_file(config)
 
     _validate_config(config)
@@ -33,10 +39,13 @@ def _read_from_env():
     Try to get values from ENV
     :return: Config object that may contain None values
     """
-    username, password, login_data_store_path = [
-        os.environ.get(e) for e in [ENV_PARAM_USER, ENV_PARAM_PASSWORD, ENV_PARAM_LOGIN_DATA_STORE_PATH]
+    username, password, login_data_store_path, mfa_type = [
+        os.environ.get(e) for e in [ENV_PARAM_USER,
+                                    ENV_PARAM_PASSWORD,
+                                    ENV_PARAM_LOGIN_DATA_STORE_PATH,
+                                    ENV_PARAM_MFA_TYPE]
     ]
-    return Config(username, password, login_data_store_path)
+    return Config(username, password, login_data_store_path, mfa_type)
 
 
 def _read_from_file(config):
@@ -70,6 +79,8 @@ def _read_from_file(config):
             if not config.login_data_store_path:
                 config = config._replace(
                     login_data_store_path=root_node.get('login_data_store_path', config.login_data_store_path))
+            if not config.mfa_type:
+                config = config._replace(mfa_type=root_node.get('mfa_type', config.mfa_type))
 
     return config
 
@@ -81,3 +92,9 @@ def _validate_config(config):
         raise ValueError('Missing config param: username')
     if not config.password:
         raise ValueError('Missing config param: password')
+    if not config.mfa_type:
+        raise ValueError('Missing config param: mfa_type')
+    else:
+        if config.mfa_type not in [MFA_TYPE_APP, MFA_TYPE_SMS]:
+            raise ValueError('Unexpected value {}. Use one of: {}'.format(
+                config.mfa_type, [MFA_TYPE_APP, MFA_TYPE_SMS]))
