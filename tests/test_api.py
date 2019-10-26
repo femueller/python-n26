@@ -1,5 +1,6 @@
 from n26 import api, config
 from n26.api import BASE_URL_DE, POST, GET
+from n26.config import MFA_TYPE_APP
 from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests
 
 

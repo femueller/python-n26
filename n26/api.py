@@ -4,11 +4,12 @@ import os
 import time
 from pathlib import Path
 
+import click
 import requests
 from requests import HTTPError
 from tenacity import retry, stop_after_delay, wait_fixed
 
-from n26.config import Config
+from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
 
@@ -418,13 +419,17 @@ class Api(object):
         response.raise_for_status()
         return response.json()
 
-    @staticmethod
-    def _request_mfa_approval(mfa_token: str):
+    def _request_mfa_approval(self, mfa_token: str):
         LOGGER.debug("Requesting MFA approval using mfa_token {}".format(mfa_token))
         mfa_data = {
-            "challengeType": "oob",
             "mfaToken": mfa_token
         }
+
+        if self.config.mfa_type == MFA_TYPE_SMS:
+            mfa_data['challengeType'] = "otp"
+        else:
+            mfa_data['challengeType'] = "oob"
+
         response = requests.post(
             BASE_URL_DE + "/api/mfa/challenge",
             json=mfa_data,
@@ -439,9 +444,17 @@ class Api(object):
     def _complete_authentication_flow(self, mfa_token: str) -> dict:
         LOGGER.debug("Completing authentication flow for mfa_token {}".format(mfa_token))
         mfa_response_data = {
-            "grant_type": "mfa_oob",
             "mfaToken": mfa_token
         }
+
+        if self.config.mfa_type == MFA_TYPE_SMS:
+            mfa_response_data['grant_type'] = "mfa_otp"
+
+            hint = click.style("Enter the 6 digit SMS OTP code", fg="yellow")
+            mfa_response_data['otp'] = click.prompt(hint, type=int)
+        else:
+            mfa_response_data['grant_type'] = "mfa_oob"
+
         response = requests.post(BASE_URL_DE + "/oauth/token", data=mfa_response_data, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         tokens = response.json()

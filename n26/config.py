@@ -6,6 +6,8 @@ from container_app_conf.source.yaml_source import YamlSource
 
 NODE_ROOT = "n26"
 
+MFA_TYPE_APP = "app"
+MFA_TYPE_SMS = "sms"
 
 class Config(ConfigBase):
 
@@ -53,4 +55,14 @@ class Config(ConfigBase):
         ],
         required=False,
         default=None
+    )
+
+    MFA_TYPE = StringConfigEntry(
+        description="Multi-Factor-Authentication type to use",
+        example=MFA_TYPE_APP
+        key_path=[
+            NODE_ROOT,
+            "mfa_type"
+        ],
+        default=MFA_TYPE_APP
     )
