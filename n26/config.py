@@ -59,7 +59,7 @@ class Config(ConfigBase):
 
     MFA_TYPE = StringConfigEntry(
         description="Multi-Factor-Authentication type to use",
-        example=MFA_TYPE_APP
+        example=MFA_TYPE_APP,
         key_path=[
             NODE_ROOT,
             "mfa_type"
