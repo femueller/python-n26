@@ -9,6 +9,7 @@ NODE_ROOT = "n26"
 MFA_TYPE_APP = "app"
 MFA_TYPE_SMS = "sms"
 
+
 class Config(ConfigBase):
 
     def __new__(cls, *args, **kwargs):
