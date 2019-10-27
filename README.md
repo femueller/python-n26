@@ -36,8 +36,7 @@ vim ~/.config/n26.yml
 
 ## Configuration
 
-python-n26 uses [container-app-conf](https://github.com/markusressel/container-app-conf) to provide different options for configuration. supports both the `EnvSource` and the `YamlSource`.
-
+python-n26 uses [container-app-conf](https://github.com/markusressel/container-app-conf) to provide different options for configuration.
 You can place a YAML (`n26.yaml` or `n26.yml`) or TOML (`n26.toml` or `n26.tml`) configuration file in `./`, `~/` or `~/.config/`. Have a look at the [YAML example](n26.yml.example) and [TOML example](n26.tml.example).
 If you want to use environment variables:
 
