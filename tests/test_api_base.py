@@ -7,8 +7,6 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
-from n26.config import MFA_TYPE_APP
-
 
 def read_response_file(file_name: str or None) -> json or None:
     """
@@ -117,7 +115,7 @@ class N26TestBase(unittest.TestCase):
     config = Config(
         singleton=False,
         data_sources=[
-            YamlSource("test_creds")
+            YamlSource("test_creds", "./tests/")
         ],
         write_reference=False
     )
