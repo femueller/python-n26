@@ -113,7 +113,7 @@ class N26TestBase(unittest.TestCase):
 
     # create custom config from "test_creds.yml"
     config = Config(
-        singleton=False,
+        singleton=True,
         data_sources=[
             YamlSource("test_creds", "./tests/")
         ],

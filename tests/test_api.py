@@ -1,6 +1,5 @@
 from n26 import api, config
 from n26.api import BASE_URL_DE, POST, GET
-from n26.config import MFA_TYPE_APP
 from tests.test_api_base import N26TestBase, mock_auth_token, mock_requests
 
 
@@ -40,7 +39,10 @@ class ApiTests(N26TestBase):
         self.assertIsNotNone(api_client.config)
 
     def test_init_with_config(self):
-        conf = config.Config(singleton=False, write_reference=False)
+        from container_app_conf.source.yaml_source import YamlSource
+        conf = config.Config(singleton=False, write_reference=False, data_sources=[
+            YamlSource("test_creds", "./tests/")
+        ])
         api_client = api.Api(conf)
         self.assertIsNotNone(api_client.config)
         self.assertEqual(api_client.config, conf)
