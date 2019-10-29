@@ -68,6 +68,6 @@ class Config(ConfigBase):
             NODE_ROOT,
             "mfa_type"
         ],
-        regex="[{}|{}]".format(MFA_TYPE_APP, MFA_TYPE_SMS),
+        regex="^({}|{})$".format(MFA_TYPE_APP, MFA_TYPE_SMS),
         default=MFA_TYPE_APP
     )
