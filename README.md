@@ -158,5 +158,10 @@ python3 -m n26 balance
 * [Nick Jüttner](https://github.com/njuettner) for providing [the API authentication flow](https://github.com/njuettner/alexa/blob/master/n26/app.py)
 * [Pierrick Paul](https://github.com/PierrickP/) for providing [the API endpoints](https://github.com/PierrickP/n26/blob/develop/lib/api.js)
 
+## Similar projects
+* Go: https://github.com/guitmz/n26 by [Guilherme Thomazi Bonicontro](https://github.com/guitmz)
+* Go: https://github.com/njuettner/n26 by [Nick Jüttner](https://github.com/njuettner) (unmaintained)
+* Node https://github.com/PierrickP/n26 by [Pierrick Paul](https://github.com/PierrickP/) (unmaintained)
+
 ## Disclaimer
 This project is not affiliated with N26 GmbH/N26 Inc. if you want to learn more about it, visit https://n26.com/.
