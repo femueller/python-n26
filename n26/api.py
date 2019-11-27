@@ -45,7 +45,7 @@ class Api(object):
         :param cfg: configuration object
         """
         if not cfg:
-            cfg = Config(write_reference=False)
+            cfg = Config()
         self.config = cfg
         self._token_data = {}
 

@@ -40,7 +40,7 @@ class ApiTests(N26TestBase):
 
     def test_init_with_config(self):
         from container_app_conf.source.yaml_source import YamlSource
-        conf = config.Config(singleton=False, write_reference=False, data_sources=[
+        conf = config.Config(singleton=False, data_sources=[
             YamlSource("test_creds", "./tests/")
         ])
         api_client = api.Api(conf)
