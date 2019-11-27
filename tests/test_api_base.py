@@ -116,8 +116,7 @@ class N26TestBase(unittest.TestCase):
         singleton=True,
         data_sources=[
             YamlSource("test_creds", "./tests/")
-        ],
-        write_reference=False
+        ]
     )
 
     # this is the Api client

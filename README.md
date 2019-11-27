@@ -118,7 +118,7 @@ This is going to use the same mechanism to load configuration as the CLI tool, t
 from n26.api import Api
 from n26.config import Config
 
-conf = Config(write_reference=False, validate=False)
+conf = Config(validate=False)
 conf.USERNAME.value = "john.doe@example.com"
 conf.PASSWORD.value = "$upersecret"
 conf.LOGIN_DATA_STORE_PATH.value = None

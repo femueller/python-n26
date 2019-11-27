@@ -24,9 +24,6 @@ class Config(ConfigBase):
             ]
             kwargs["data_sources"] = data_sources
 
-        if "write_reference" not in kwargs.keys():
-            kwargs["write_reference"] = False
-
         return super(Config, cls).__new__(cls, *args, **kwargs)
 
     USERNAME = StringConfigEntry(
