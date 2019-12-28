@@ -24,15 +24,19 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install pipenv pathlib2 pytest pytest-azurepipelines
-    pipenv install --dev
+    # pipenv install --dev
   displayName: 'Install dependencies'
 
+- script: python -m pipenv lock -r > requirements-pipenv.txt
+  displayName: 'Create requirements-pipenv.txt from Pipfile'
+  
+- script: pip install -r requirements-pipenv.txt
+  displayName: 'Install requirements-pipenv.txt'
+
 - script: |
-    pipenv shell
     pytest
   displayName: 'pytest'
 
 - script: |
-    pipenv shell
     flake8 --max-line-length 120
   displayName: 'flake'
