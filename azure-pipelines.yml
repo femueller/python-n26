@@ -28,6 +28,14 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
+    pip install pipenv pathlib2
+  displayName: 'Install dependencies #2'
+
+- script: |
+    pipenv install --dev
+  displayName: 'Install pipenv dependencies'
+
+- script: |
     pip install pytest pytest-azurepipelines
     pytest
   displayName: 'pytest'
