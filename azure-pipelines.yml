@@ -24,7 +24,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install pipenv pathlib2 pytest pytest-azurepipelines
-    pipenv runp install --dev
+    pipenv run install --dev
   displayName: 'Install dependencies'
 
 - script: |
