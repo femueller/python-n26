@@ -23,21 +23,11 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install pipenv pathlib2
-    pipenv install --dev
+    pip install pipenv pathlib2 pytest pytest-azurepipelines
+    pipenv runp install --dev
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pipenv pathlib2
-  displayName: 'Install dependencies #2'
-
-- script: |
-    pipenv shell
-    pipenv install --dev
-  displayName: 'Install pipenv dependencies'
-
-- script: |
-    pip install pytest pytest-azurepipelines
     pytest
   displayName: 'pytest'
 
