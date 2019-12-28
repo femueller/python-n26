@@ -107,8 +107,8 @@ layout you can use the global `-json` parameter:
 
 ### API example
 ```python
-from n26 import api
-balance = api.Api()
+from n26.api import Api
+balance = Api()
 print(balance.get_balance())
 ```
 
