@@ -23,11 +23,11 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    pip install pipenv pathlib2 pytest pytest-azurepipelines
+    pip install pipenv pathlib2 pytest flake pytest-azurepipelines
     # pipenv install --dev
   displayName: 'Install dependencies'
 
-- script: python -m pipenv lock -r > requirements-pipenv.txt
+- script: python -m pipenv --dev lock -r > requirements-pipenv.txt
   displayName: 'Create requirements-pipenv.txt from Pipfile'
   
 - script: pip install -r requirements-pipenv.txt
