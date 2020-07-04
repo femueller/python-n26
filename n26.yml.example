@@ -1,5 +1,6 @@
 n26:
     username: john.doe@example.com
     password: $upersecret
+    device_token: 00000000-0000-0000-0000-000000000000
     login_data_store_path: "~/.config/n26/token_data"
     mfa_type: app

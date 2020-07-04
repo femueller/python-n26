@@ -42,12 +42,33 @@ If you want to use environment variables:
 
 - `N26_USER`: username
 - `N26_PASSWORD`: password
+- `N26_DEVICE_TOKEN`: random [uuid](https://de.wikipedia.org/wiki/Universally_Unique_Identifier) to identify the device
 - `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
 - `N26_MFA_TYPE`: `app` will use the paired app as 2 factor authentication, `sms` will use SMS to the registered number.
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
 
 ## Authentication
+
+### Device Token
+
+Since 17th of June 2020 N26 requires a device_token to differentiate clients. This requires you to specify the `DEVICE_TOKEN`
+config option with a UUID of your choice. To generate a UUID you can use f.ex. one of the following options:
+
+Using python:
+```python
+python -c 'import uuid; print(uuid.uuid4())'
+```
+
+Using linux built-in tools:
+```shell
+> uuidgen
+```
+
+Using a website:
+[https://www.uuidgenerator.net/](https://www.uuidgenerator.net/)
+
+### 2FA
 
 Since 14th of September 2019 N26 requires a login confirmation (2 factor authentication). 
 
@@ -70,7 +91,7 @@ If you do not specify a `login_data_store_path` this login information is only s
 Or if using environment variables:
 
 ```bash
-> N26_USER=user N26_PASSWORD=passwd N26_MFA_TYPE=app n26 balance
+> N26_USER=user N26_PASSWORD=passwd N26_DEVICE_TOKEN=00000000-0000-0000-0000-000000000000 N26_MFA_TYPE=app n26 balance
 123.45 EUR
 ```
 
