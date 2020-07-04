@@ -1,4 +1,5 @@
 n26:
   username: john.doe@example.com
   password: $upersecret
+  device_token: 5a136085-abd8-4e71-9402-e0a61dd1dc81
   mfa_type: app
