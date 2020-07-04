@@ -47,6 +47,17 @@ class Config(ConfigBase):
         secret=True
     )
 
+    DEVICE_TOKEN = StringConfigEntry(
+        description="N26 device token",
+        example="00000000-0000-0000-0000-000000000000",
+        key_path=[
+            NODE_ROOT,
+            "device_token"
+        ],
+        required=True,
+        regex="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
+    )
+
     LOGIN_DATA_STORE_PATH = FileConfigEntry(
         description="File path to store login data",
         example="~/.config/n26/token_data",

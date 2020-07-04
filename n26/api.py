@@ -48,6 +48,7 @@ class Api(object):
             cfg = Config()
         self.config = cfg
         self._token_data = {}
+        BASIC_AUTH_HEADERS["device-token"] = self.config.DEVICE_TOKEN.value
 
     @property
     def token_data(self) -> dict:
