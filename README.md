@@ -50,6 +50,26 @@ Note that **when specifying both** environment variables as well as a config fil
 
 ## Authentication
 
+### Device Token
+
+Since 17th of June 2020 N26 requires a device_token to differentiate clients. This requires you to specify the `DEVICE_TOKEN`
+config option with a UUID of your choice. To generate a UUID you can use f.ex. one of the following options:
+
+Using python:
+```python
+python -c 'import uuid; print(uuid.uuid4())'
+```
+
+Using linux built-in tools:
+```shell
+> uuidgen
+```
+
+Using a website:
+[https://www.uuidgenerator.net/](https://www.uuidgenerator.net/)
+
+### 2FA
+
 Since 14th of September 2019 N26 requires a login confirmation (2 factor authentication). 
 
 There are two options here:
