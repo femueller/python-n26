@@ -452,7 +452,9 @@ class Api(object):
             mfa_response_data['grant_type'] = "mfa_otp"
 
             hint = click.style("Enter the 6 digit SMS OTP code", fg="yellow")
-            mfa_response_data['otp'] = click.prompt(hint, type=int)
+
+            # type=str because it can have significant leading zeros
+            mfa_response_data['otp'] = click.prompt(hint, type=str)
         else:
             mfa_response_data['grant_type'] = "mfa_oob"
 
