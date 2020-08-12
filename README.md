@@ -171,6 +171,15 @@ pipenv install
 python3 -m n26 balance
 ```
 
+### Creating a new release (only for maintainers)
+
+```shell
+# Increment version number in n26/__init__.py
+
+# Create a new release using the Makefile
+make git-release
+```
+
 ## Maintainers
 * [Markus Ressel](https://github.com/markusressel)
 * [Felix Mueller](https://github.com/femueller)
