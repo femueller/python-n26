@@ -382,6 +382,15 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
     click.echo(text.strip())
 
 
+@cli.command("make-transfer")
+@auth_decorator
+def transfer():
+    """Create a bank transfer"""
+    API_CLIENT.create_transaction()
+    if JSON_OUTPUT:
+        _print_json(standing_orders_data)
+
+
 @cli.command("standing-orders")
 @auth_decorator
 def standing_orders():

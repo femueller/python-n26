@@ -13,6 +13,15 @@ from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
 
+from Crypto import Random
+from Crypto.Cipher import AES, PKCS1_v1_5
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import SHA512
+from Crypto.PublicKey import RSA
+from Crypto.Util.Padding import pad
+import base64
+import simplejson
+
 LOGGER = logging.getLogger(__name__)
 
 BASE_URL_DE = 'https://api.tech26.de'
@@ -290,6 +299,84 @@ class Api(object):
         else:
             raise ValueError("Unsupported method: {}".format(method))
 
+        response.raise_for_status()
+        # some responses do not return data so we just ignore the body in that case
+        if len(response.content) > 0:
+            return response.json()
+
+    def get_encryption_key(self, public_key: str = None) -> dict:
+        """
+        Receive public encryption key for the JSON containing the encrypted PIN
+        """
+        return self._do_request(GET, BASE_URL_DE + '/api/encryption/key', params={
+            'publicKey': public_key})
+
+    def encrypt_user_pin(self, pin: str):
+        """
+        Encrypts user PIN and prepares to send it in a format specified in the documentation
+
+        :return: base64 encoded JSON containing the encrypted PIN and its encryption key
+        """
+        # generate AES256 key and IV
+        random_password = Random.get_random_bytes(32)
+        salt = Random.get_random_bytes(16)
+        key = PBKDF2(random_password, salt, 32, count=1000000, hmac_hash_module=SHA512)
+        iv = Random.new().read(AES.block_size)
+        key64 = base64.b64encode(key)
+        iv64 = base64.b64encode(iv)
+        # encode the key and iv as a json string
+        aes_secret = {
+        'secretKey': key64,
+        'iv': iv64,
+        }
+        # json string has to be represented in byte form for encryption
+        # simplejson used instead of json since regular json can handle only strings, not base64 encoded data
+        unencrypted_aes_secret = bytes(simplejson.dumps(aes_secret), 'utf-8')
+        # Encrypt the secret JSON with RSA using the provided public key
+        public_key = self.get_encryption_key()
+        public_key_non64 = base64.b64decode(public_key['publicKey'])
+        public_key_object = RSA.importKey(public_key_non64)
+        public_key_cipher = PKCS1_v1_5.new(public_key_object)
+        encrypted_secret = public_key_cipher.encrypt(unencrypted_aes_secret)
+        encrypted_secret64 = base64.b64encode(encrypted_secret)
+        # Encrypt user's pin
+        private_key_cipher = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
+        # the pin has to be padded and transformed into bytes for a correct ecnryption format
+        encrypted_pin = private_key_cipher.encrypt(pad(bytes(pin, 'utf-8'), 16))
+        encrypted_pin64 = base64.b64encode(encrypted_pin)
+
+        return encrypted_secret64, encrypted_pin64
+
+    def create_transaction(self):
+        """
+        Creates a bank transfer order
+
+        All the input should be provided by the user via the command line
+        """
+        # Get all the necessary transfer information from user's input
+        iban = input("Please enter recipient's IBAN (spaces are allowed): ")
+        bic = input("Please enter recipient's BIC: ")
+        name = input("Please enter recipient's bank name: ")
+        reference = input("Please enter transfer reference (optional): ")
+        amount = input("How much would you like to transfer? (only numeric amount, dot separated) ")
+        pin = input("Please enter your pin: ")
+        # Prepare all the data to be transferred to N26
+        encrypted_secret, encrypted_pin = self.encrypt_user_pin(pin)
+        access_token = self.get_token()
+        headers = {'Authorization': 'Bearer {}'.format(access_token),
+                   'encrypted-secret': encrypted_secret,
+                   'encrypted-pin': encrypted_pin}
+        json = {
+            "transaction":{
+                "amount": amount,
+                "partnerBic": bic,
+                "partnerIban": iban,
+                "partnerName": name,
+                "referenceText": reference,
+                "type": "DT"}
+                }
+        url = create_request_url(BASE_URL_DE + '/api/transactions')
+        response = requests.post(url, headers=headers, json=json)
         response.raise_for_status()
         # some responses do not return data so we just ignore the body in that case
         if len(response.content) > 0:
