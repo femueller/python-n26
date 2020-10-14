@@ -382,6 +382,24 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
     click.echo(text.strip())
 
 
+@cli.command("transaction")
+@auth_decorator
+def transaction():
+    """Create a bank transfer"""
+    # Get all the necessary transfer information from user's input
+    iban = click.prompt("Recipient's IBAN (spaces are allowed): ", type=str)
+    bic = click.prompt("Recipient's BIC (optional): ", type=str, default="", show_default=False)
+    name = click.prompt("Recipient's name: ", type=str)
+    reference = click.prompt("Transfer reference (optional): ", type=str, default="", show_default=False)
+    amount = click.prompt("Transfer amount (only numeric value, dot separated): ", type=str)
+    pin = click.prompt("Please enter your PIN (input is hidden): ", hide_input=True, type=str)
+
+    response = API_CLIENT.create_transaction(iban, bic, name, reference, amount, pin)
+
+    if JSON_OUTPUT:
+        _print_json(response)
+
+
 @cli.command("standing-orders")
 @auth_decorator
 def standing_orders():

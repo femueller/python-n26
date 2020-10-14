@@ -13,6 +13,15 @@ from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
 
+from Crypto import Random
+from Crypto.Cipher import AES, PKCS1_v1_5
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import SHA512
+from Crypto.PublicKey import RSA
+from Crypto.Util.Padding import pad
+import base64
+import json
+
 LOGGER = logging.getLogger(__name__)
 
 BASE_URL_DE = 'https://api.tech26.de'
@@ -268,7 +277,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
-                    json: dict = None) -> list or dict or None:
+                    json: dict = None, headers: dict = None) -> list or dict or None:
         """
         Executes a http request based on the given parameters
 
@@ -276,17 +285,20 @@ class Api(object):
         :param url: the url to use
         :param params: query parameters that will be appended to the url
         :param json: request body
+        :param headers: custom headers
         :return: the response parsed as a json
         """
         access_token = self.get_token()
-        headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        _headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        if headers is not None:
+            _headers.update(headers)
 
         url = create_request_url(url, params)
 
         if method is GET:
-            response = requests.get(url, headers=headers, json=json)
+            response = requests.get(url, headers=_headers, json=json)
         elif method is POST:
-            response = requests.post(url, headers=headers, json=json)
+            response = requests.post(url, headers=_headers, json=json)
         else:
             raise ValueError("Unsupported method: {}".format(method))
 
@@ -294,6 +306,82 @@ class Api(object):
         # some responses do not return data so we just ignore the body in that case
         if len(response.content) > 0:
             return response.json()
+
+    def get_encryption_key(self, public_key: str = None) -> dict:
+        """
+        Receive public encryption key for the JSON String containing the PIN encryption key
+        """
+        return self._do_request(GET, BASE_URL_DE + '/api/encryption/key', params={
+            'publicKey': public_key
+        })
+
+    def encrypt_user_pin(self, pin: str):
+        """
+        Encrypts user PIN and prepares it in a format required for a transaction order 
+
+        :return: encrypted and base64 encoded PIN as well as an encrypted and base64 encoded 
+                 JSON containing the PIN encryption key
+        """
+        # generate AES256 key and IV
+        random_password = Random.get_random_bytes(32)
+        salt = Random.get_random_bytes(16)
+        # noinspection PyTypeChecker
+        key = PBKDF2(random_password, salt, 32, count=1000000, hmac_hash_module=SHA512)
+        iv = Random.new().read(AES.block_size)
+        key64 = base64.b64encode(key).decode('utf-8')
+        iv64 = base64.b64encode(iv).decode('utf-8')
+        # encode the key and iv as a json string
+        aes_secret = {
+            'secretKey': key64,
+            'iv': iv64
+        }
+        # json string has to be represented in byte form for encryption
+        unencrypted_aes_secret = bytes(json.dumps(aes_secret), 'utf-8')
+        # Encrypt the secret JSON with RSA using the provided public key
+        public_key = self.get_encryption_key()
+        public_key_non64 = base64.b64decode(public_key['publicKey'])
+        public_key_object = RSA.importKey(public_key_non64)
+        public_key_cipher = PKCS1_v1_5.new(public_key_object)
+        encrypted_secret = public_key_cipher.encrypt(unencrypted_aes_secret)
+        encrypted_secret64 = base64.b64encode(encrypted_secret)
+        # Encrypt user's pin
+        private_key_cipher = AES.new(key=key, mode=AES.MODE_CBC, iv=iv)
+        # the pin has to be padded and transformed into bytes for a correct ecnryption format
+        encrypted_pin = private_key_cipher.encrypt(pad(bytes(pin, 'utf-8'), 16))
+        encrypted_pin64 = base64.b64encode(encrypted_pin)
+
+        return encrypted_secret64, encrypted_pin64
+
+    def create_transaction(self, iban: str, bic: str, name: str, reference: str, amount: float, pin: str):
+        """
+        Creates a bank transfer order
+
+        :param iban: recipient IBAN
+        :param bic: recipient BIC
+        :param name: recipient name
+        :param reference: transaction reference
+        :param amount: money amount
+        :param pin: user PIN required for the transaction approval
+        """
+        encrypted_secret, encrypted_pin = self.encrypt_user_pin(pin)
+        pin_headers = {
+            'encrypted-secret': encrypted_secret,
+            'encrypted-pin': encrypted_pin
+        }
+
+        # Prepare headers as a json for a transaction call
+        data = {
+            "transaction": {
+                "amount": amount,
+                "partnerBic": bic,
+                "partnerIban": iban,
+                "partnerName": name,
+                "referenceText": reference,
+                "type": "DT"
+            }
+        }
+
+        return self._do_request(POST, BASE_URL_DE + '/api/transactions', json=data, headers=pin_headers)
 
     def is_authenticated(self) -> bool:
         """
