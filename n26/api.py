@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -6,21 +7,18 @@ from pathlib import Path
 
 import click
 import requests
+from Crypto import Random
+from Crypto.Cipher import AES, PKCS1_v1_5
+from Crypto.Hash import SHA512
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.PublicKey import RSA
+from Crypto.Util.Padding import pad
 from requests import HTTPError
 from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
 from n26.util import create_request_url
-
-from Crypto import Random
-from Crypto.Cipher import AES, PKCS1_v1_5
-from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Hash import SHA512
-from Crypto.PublicKey import RSA
-from Crypto.Util.Padding import pad
-import base64
-import json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -317,10 +315,10 @@ class Api(object):
 
     def encrypt_user_pin(self, pin: str):
         """
-        Encrypts user PIN and prepares it in a format required for a transaction order 
+        Encrypts user PIN and prepares it in a format required for a transaction order
 
-        :return: encrypted and base64 encoded PIN as well as an encrypted and base64 encoded 
-                 JSON containing the PIN encryption key
+        :return: encrypted and base64 encoded PIN as well as an
+                 encrypted and base64 encoded JSON containing the PIN encryption key
         """
         # generate AES256 key and IV
         random_password = Random.get_random_bytes(32)
