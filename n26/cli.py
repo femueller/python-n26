@@ -68,7 +68,9 @@ def logout():
     """ Logout """
     cfg = Config()
     login_data_file = cfg.LOGIN_DATA_STORE_PATH.value
-    login_data_file.unlink(missing_ok=True)
+    if login_data_file is not None:
+        login_data_file = login_data_file.expanduser().resolve()
+        login_data_file.unlink(missing_ok=True)
 
 
 @cli.command()
