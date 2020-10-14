@@ -388,7 +388,7 @@ def transaction():
     """Create a bank transfer"""
     # Get all the necessary transfer information from user's input
     iban = click.prompt("Recipient's IBAN (spaces are allowed): ", type=str)
-    bic = click.prompt("Recipient's BIC: ", type=str)
+    bic = click.prompt("Recipient's BIC (optional): ", type=str, default="", show_default=False)
     name = click.prompt("Recipient's name: ", type=str)
     reference = click.prompt("Transfer reference (optional): ", type=str, default="", show_default=False)
     amount = click.prompt("Transfer amount (only numeric value, dot separated): ", type=str)
