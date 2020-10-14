@@ -387,12 +387,12 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
 def transaction():
     """Create a bank transfer"""
     # Get all the necessary transfer information from user's input
-    iban = click.prompt("Please enter recipient's IBAN (spaces are allowed): ", type=str)
-    bic = click.prompt("Please enter recipient's BIC: ", type=str)
-    name = click.prompt("Please enter recipient's bank name: ", type=str)
-    reference = click.prompt("Please enter transfer reference (optional): ", type=str)
-    amount = click.prompt("How much would you like to transfer? (only numeric amount, dot separated) ", type=str)
-    pin = click.prompt("Please enter your PIN: ", type=str)
+    iban = click.prompt("Recipient's IBAN (spaces are allowed): ", type=str)
+    bic = click.prompt("Recipient's BIC: ", type=str)
+    name = click.prompt("Recipient's name: ", type=str)
+    reference = click.prompt("Transfer reference (optional): ", type=str, default="", show_default=False)
+    amount = click.prompt("Transfer amount (only numeric value, dot separated): ", type=str)
+    pin = click.prompt("Please enter your PIN (input is hidden): ", hide_input=True, type=str)
 
     response = API_CLIENT.create_transaction(iban, bic, name, reference, amount, pin)
 
