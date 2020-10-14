@@ -9,6 +9,7 @@ from requests import HTTPError
 from tabulate import tabulate
 
 import n26.api as api
+from n26.config import Config
 from n26.const import AMOUNT, CURRENCY, REFERENCE_TEXT, ATM_WITHDRAW, CARD_STATUS_ACTIVE, DATETIME_FORMATS
 
 LOGGER = logging.getLogger(__name__)
@@ -59,6 +60,15 @@ def cli(json: bool):
     """Interact with the https://n26.com API via the command line."""
     global JSON_OUTPUT
     JSON_OUTPUT = json
+
+
+@cli.command()
+@auth_decorator
+def logout():
+    """ Logout """
+    cfg = Config()
+    login_data_file = cfg.LOGIN_DATA_STORE_PATH.value
+    login_data_file.unlink(missing_ok=True)
 
 
 @cli.command()

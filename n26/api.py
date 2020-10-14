@@ -461,7 +461,7 @@ class Api(object):
 
         return self.token_data[ACCESS_TOKEN_KEY]
 
-    def _request_token(self, username: str, password: str):
+    def _request_token(self, username: str, password: str) -> dict:
         """
         Request an authentication token from the server
         :return: the token or None if the response did not contain a token
