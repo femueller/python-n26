@@ -12,6 +12,7 @@ inflect = "*"
 urllib3 = "~=1.25"
 tenacity = "~=6.2"
 container-app-conf = "~=5.1"
+pycryptodome = ">=3.9"
 
 [dev-packages]
 pytest = "*"
@@ -19,4 +20,4 @@ mock = "*"
 flake8 = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"
