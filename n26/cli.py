@@ -63,7 +63,6 @@ def cli(json: bool):
 
 
 @cli.command()
-@auth_decorator
 def logout():
     """ Logout """
     cfg = Config()
