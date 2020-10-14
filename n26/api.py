@@ -277,7 +277,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
-                    json: dict = None, pin: dict = None) -> list or dict or None:
+                    json: dict = None, headers: dict = None) -> list or dict or None:
         """
         Executes a http request based on the given parameters
 
@@ -285,22 +285,20 @@ class Api(object):
         :param url: the url to use
         :param params: query parameters that will be appended to the url
         :param json: request body
-        :param pin: ecnrypted user PIN and a JSON String containing the PIN encryption key
-                    (required only for issuing a transaction order)
+        :param headers: custom headers
         :return: the response parsed as a json
         """
         access_token = self.get_token()
-        headers = {'Authorization': 'Bearer {}'.format(access_token)}
-
-        if pin is not None:
-            headers.update(pin)
+        _headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        if headers is not None:
+            _headers.update(headers)
 
         url = create_request_url(url, params)
 
         if method is GET:
-            response = requests.get(url, headers=headers, json=json)
+            response = requests.get(url, headers=_headers, json=json)
         elif method is POST:
-            response = requests.post(url, headers=headers, json=json)
+            response = requests.post(url, headers=_headers, json=json)
         else:
             raise ValueError("Unsupported method: {}".format(method))
 
@@ -366,13 +364,13 @@ class Api(object):
         :param pin: user PIN required for the transaction approval
         """
         encrypted_secret, encrypted_pin = self.encrypt_user_pin(pin)
-        pin_dict = {
+        pin_headers = {
             'encrypted-secret': encrypted_secret,
             'encrypted-pin': encrypted_pin
         }
 
         # Prepare headers as a json for a transaction call
-        headers = {
+        data = {
             "transaction": {
                 "amount": amount,
                 "partnerBic": bic,
@@ -383,7 +381,7 @@ class Api(object):
             }
         }
 
-        return self._do_request(POST, BASE_URL_DE + '/api/transactions', json=headers, pin=pin_dict)
+        return self._do_request(POST, BASE_URL_DE + '/api/transactions', json=data, headers=pin_headers)
 
     def is_authenticated(self) -> bool:
         """
