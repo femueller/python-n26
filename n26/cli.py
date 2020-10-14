@@ -382,13 +382,33 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
     click.echo(text.strip())
 
 
-@cli.command("make-transfer")
+@cli.command("transaction")
 @auth_decorator
-def transfer():
+def transaction():
     """Create a bank transfer"""
-    API_CLIENT.create_transaction()
+    # Get all the necessary transfer information from user's input
+    iban = input("Please enter recipient's IBAN (spaces are allowed): ")
+    bic = input("Please enter recipient's BIC: ")
+    name = input("Please enter recipient's bank name: ")
+    reference = input("Please enter transfer reference (optional): ")
+    amount = input("How much would you like to transfer? (only numeric amount, dot separated) ")
+    pin = input("Please enter your PIN: ")
+    # Prepare headers as a json for a transaction call
+    headers = {
+    "transaction":{
+        "amount": amount,
+        "partnerBic": bic,
+        "partnerIban": iban,
+        "partnerName": name,
+        "referenceText": reference,
+        "type": "DT"
+        }
+    }
+    API_CLIENT.create_transaction(headers, pin)
     if JSON_OUTPUT:
         _print_json(standing_orders_data)
+
+
 
 
 @cli.command("standing-orders")

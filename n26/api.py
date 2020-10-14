@@ -20,7 +20,7 @@ from Crypto.Hash import SHA512
 from Crypto.PublicKey import RSA
 from Crypto.Util.Padding import pad
 import base64
-import simplejson
+import json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -277,7 +277,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
-                    json: dict = None) -> list or dict or None:
+                    json: dict = None, pin: dict = None) -> list or dict or None:
         """
         Executes a http request based on the given parameters
 
@@ -285,10 +285,15 @@ class Api(object):
         :param url: the url to use
         :param params: query parameters that will be appended to the url
         :param json: request body
+        :param pin: ecnrypted user PIN and a JSON String containing the PIN encryption key
+                    (required only for issuing a transaction order)
         :return: the response parsed as a json
         """
         access_token = self.get_token()
         headers = {'Authorization': 'Bearer {}'.format(access_token)}
+
+        if pin is not None:
+            headers.update(pin)
 
         url = create_request_url(url, params)
 
@@ -306,32 +311,34 @@ class Api(object):
 
     def get_encryption_key(self, public_key: str = None) -> dict:
         """
-        Receive public encryption key for the JSON containing the encrypted PIN
+        Receive public encryption key for the JSON String containing the PIN encryption key
         """
         return self._do_request(GET, BASE_URL_DE + '/api/encryption/key', params={
-            'publicKey': public_key})
+            'publicKey': public_key
+            })
 
     def encrypt_user_pin(self, pin: str):
         """
-        Encrypts user PIN and prepares to send it in a format specified in the documentation
+        Encrypts user PIN and prepares it in a format required for a transaction order 
 
-        :return: base64 encoded JSON containing the encrypted PIN and its encryption key
+        :return: encrypted and base64 encoded PIN as well as an encrypted and base64 encoded 
+                 JSON containing the PIN encryption key
         """
         # generate AES256 key and IV
         random_password = Random.get_random_bytes(32)
         salt = Random.get_random_bytes(16)
+        # noinspection PyTypeChecker
         key = PBKDF2(random_password, salt, 32, count=1000000, hmac_hash_module=SHA512)
         iv = Random.new().read(AES.block_size)
-        key64 = base64.b64encode(key)
-        iv64 = base64.b64encode(iv)
+        key64 = base64.b64encode(key).decode('utf-8')
+        iv64 = base64.b64encode(iv).decode('utf-8')
         # encode the key and iv as a json string
         aes_secret = {
         'secretKey': key64,
-        'iv': iv64,
+        'iv': iv64
         }
         # json string has to be represented in byte form for encryption
-        # simplejson used instead of json since regular json can handle only strings, not base64 encoded data
-        unencrypted_aes_secret = bytes(simplejson.dumps(aes_secret), 'utf-8')
+        unencrypted_aes_secret = bytes(json.dumps(aes_secret), 'utf-8')
         # Encrypt the secret JSON with RSA using the provided public key
         public_key = self.get_encryption_key()
         public_key_non64 = base64.b64decode(public_key['publicKey'])
@@ -347,40 +354,20 @@ class Api(object):
 
         return encrypted_secret64, encrypted_pin64
 
-    def create_transaction(self):
+    def create_transaction(self, headers: dict, pin: str):
         """
         Creates a bank transfer order
 
-        All the input should be provided by the user via the command line
+        :param headers: http headers containing all the necessary transaction information
+        :param pin: user PIN required for the transaction approval
         """
-        # Get all the necessary transfer information from user's input
-        iban = input("Please enter recipient's IBAN (spaces are allowed): ")
-        bic = input("Please enter recipient's BIC: ")
-        name = input("Please enter recipient's bank name: ")
-        reference = input("Please enter transfer reference (optional): ")
-        amount = input("How much would you like to transfer? (only numeric amount, dot separated) ")
-        pin = input("Please enter your pin: ")
-        # Prepare all the data to be transferred to N26
+        # Transfer all the necessary transfer data to N26 servers
         encrypted_secret, encrypted_pin = self.encrypt_user_pin(pin)
-        access_token = self.get_token()
-        headers = {'Authorization': 'Bearer {}'.format(access_token),
-                   'encrypted-secret': encrypted_secret,
-                   'encrypted-pin': encrypted_pin}
-        json = {
-            "transaction":{
-                "amount": amount,
-                "partnerBic": bic,
-                "partnerIban": iban,
-                "partnerName": name,
-                "referenceText": reference,
-                "type": "DT"}
-                }
-        url = create_request_url(BASE_URL_DE + '/api/transactions')
-        response = requests.post(url, headers=headers, json=json)
-        response.raise_for_status()
-        # some responses do not return data so we just ignore the body in that case
-        if len(response.content) > 0:
-            return response.json()
+        pin_dict = {
+        'encrypted-secret': encrypted_secret,
+        'encrypted-pin': encrypted_pin
+        }
+        return self._do_request(POST, BASE_URL_DE + '/api/transactions', json=headers, pin=pin_dict)
 
     def is_authenticated(self) -> bool:
         """

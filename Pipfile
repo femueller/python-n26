@@ -12,7 +12,6 @@ inflect = "*"
 urllib3 = "~=1.24"
 tenacity = "~=5.1"
 container-app-conf = "~=5.0"
-simplejson = "*"
 
 [dev-packages]
 pytest = "*"
