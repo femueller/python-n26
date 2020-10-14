@@ -387,28 +387,17 @@ def transactions(categories: str, pending: bool, param_from: datetime or None, p
 def transaction():
     """Create a bank transfer"""
     # Get all the necessary transfer information from user's input
-    iban = input("Please enter recipient's IBAN (spaces are allowed): ")
-    bic = input("Please enter recipient's BIC: ")
-    name = input("Please enter recipient's bank name: ")
-    reference = input("Please enter transfer reference (optional): ")
-    amount = input("How much would you like to transfer? (only numeric amount, dot separated) ")
-    pin = input("Please enter your PIN: ")
-    # Prepare headers as a json for a transaction call
-    headers = {
-    "transaction":{
-        "amount": amount,
-        "partnerBic": bic,
-        "partnerIban": iban,
-        "partnerName": name,
-        "referenceText": reference,
-        "type": "DT"
-        }
-    }
-    API_CLIENT.create_transaction(headers, pin)
+    iban = click.prompt("Please enter recipient's IBAN (spaces are allowed): ", type=str)
+    bic = click.prompt("Please enter recipient's BIC: ", type=str)
+    name = click.prompt("Please enter recipient's bank name: ", type=str)
+    reference = click.prompt("Please enter transfer reference (optional): ", type=str)
+    amount = click.prompt("How much would you like to transfer? (only numeric amount, dot separated) ", type=str)
+    pin = click.prompt("Please enter your PIN: ", type=str)
+
+    response = API_CLIENT.create_transaction(iban, bic, name, reference, amount, pin)
+
     if JSON_OUTPUT:
-        _print_json(standing_orders_data)
-
-
+        _print_json(response)
 
 
 @cli.command("standing-orders")

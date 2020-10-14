@@ -315,7 +315,7 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL_DE + '/api/encryption/key', params={
             'publicKey': public_key
-            })
+        })
 
     def encrypt_user_pin(self, pin: str):
         """
@@ -334,8 +334,8 @@ class Api(object):
         iv64 = base64.b64encode(iv).decode('utf-8')
         # encode the key and iv as a json string
         aes_secret = {
-        'secretKey': key64,
-        'iv': iv64
+            'secretKey': key64,
+            'iv': iv64
         }
         # json string has to be represented in byte form for encryption
         unencrypted_aes_secret = bytes(json.dumps(aes_secret), 'utf-8')
@@ -354,19 +354,35 @@ class Api(object):
 
         return encrypted_secret64, encrypted_pin64
 
-    def create_transaction(self, headers: dict, pin: str):
+    def create_transaction(self, iban: str, bic: str, name: str, reference: str, amount: float, pin: str):
         """
         Creates a bank transfer order
 
-        :param headers: http headers containing all the necessary transaction information
+        :param iban: recipient IBAN
+        :param bic: recipient BIC
+        :param name: recipient name
+        :param reference: transaction reference
+        :param amount: money amount
         :param pin: user PIN required for the transaction approval
         """
-        # Transfer all the necessary transfer data to N26 servers
         encrypted_secret, encrypted_pin = self.encrypt_user_pin(pin)
         pin_dict = {
-        'encrypted-secret': encrypted_secret,
-        'encrypted-pin': encrypted_pin
+            'encrypted-secret': encrypted_secret,
+            'encrypted-pin': encrypted_pin
         }
+
+        # Prepare headers as a json for a transaction call
+        headers = {
+            "transaction": {
+                "amount": amount,
+                "partnerBic": bic,
+                "partnerIban": iban,
+                "partnerName": name,
+                "referenceText": reference,
+                "type": "DT"
+            }
+        }
+
         return self._do_request(POST, BASE_URL_DE + '/api/transactions', json=headers, pin=pin_dict)
 
     def is_authenticated(self) -> bool:
