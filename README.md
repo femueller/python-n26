@@ -129,8 +129,8 @@ layout you can use the global `-json` parameter:
 ### API example
 ```python
 from n26.api import Api
-balance = Api()
-print(balance.get_balance())
+api_client = Api()
+print(api_client.get_balance())
 ```
 
 This is going to use the same mechanism to load configuration as the CLI tool, to specify your own configuration you can use it as:
@@ -146,8 +146,8 @@ conf.LOGIN_DATA_STORE_PATH.value = None
 conf.MFA_TYPE.value = "app"
 conf.validate()
 
-client = Api(conf)
-print(client.get_balance())
+api_client = Api(conf)
+print(api_client.get_balance())
 ```
 
 ## Projects using python-n26
