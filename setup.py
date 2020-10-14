@@ -14,9 +14,9 @@ def read_version(package):
 
 
 def read_requirements():
-    with open("requirements.txt", "r") as fh:
+    with open(os.path.join(__location__, "requirements.txt"), "r") as fh:
         requirements = fh.readlines()
-        return [req.split("==")[0] for req in requirements if not req.strip().startswith("#")]
+        return [req.split("==")[0] for req in requirements if req.strip() != '' and not req.strip().startswith("#")]
 
 
 def get_install_requirements(path):
