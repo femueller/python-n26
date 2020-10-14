@@ -13,6 +13,12 @@ def read_version(package):
                 return line.split()[-1].strip().strip("'")
 
 
+def read_requirements():
+    with open("requirements.txt", "r") as fh:
+        requirements = fh.readlines()
+        return [req.split("==")[0] for req in requirements if not req.strip().startswith("#")]
+
+
 def get_install_requirements(path):
     content = open(os.path.join(__location__, path)).read()
     return [req for req in content.split('\\n') if req != '']
@@ -32,7 +38,7 @@ setup(
     url='https://github.com/femueller/python-n26',
     download_url='https://github.com/femueller/python-n26/tarball/{version}'.format(version=VERSION),
     version=VERSION,
-    install_requires=['requests', 'pyyaml', 'click', 'tabulate', 'inflect', 'tenacity', 'container-app-conf'],
+    install_requires=read_requirements(),
     test_requires=['mock', 'pytest'],
     packages=[
         'n26'
