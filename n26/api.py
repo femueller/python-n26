@@ -24,7 +24,7 @@ LOGGER = logging.getLogger(__name__)
 
 BASE_URL_DE = 'https://api.tech26.de'
 BASE_URL_GLOBAL = 'https://api.tech26.global'
-BASIC_AUTH_HEADERS = {"Authorization": "Basic bXktdHJ1c3RlZC13ZHBDbGllbnQ6c2VjcmV0"}
+BASIC_AUTH_HEADERS = {"Authorization": "Basic bmF0aXZld2ViOg=="}
 USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) "
               "AppleWebKit/537.36 (KHTML, like Gecko) "
               "Chrome/59.0.3071.86 Safari/537.36")
