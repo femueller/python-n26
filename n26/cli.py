@@ -312,12 +312,28 @@ def contacts():
 
 
 @cli.command()
+@click.option('--id', default=None, type=str,
+              help='Id of a single statement')
+@click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='Start time limit for statements.')
+@click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='End time limit for statements.')
 @click.option('--download', default=None, type=str,
               help='Download statements as pdf to this dir.')
 @auth_decorator
-def statements(download: str = None):
+def statements(id: str or None, param_from: datetime or None, param_to: datetime or None, download: str = None):
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
+
+    if id:
+        statements_filter = lambda statement: statement['id'] == id
+    elif param_from or param_to:
+        statement_from = param_from if param_from else datetime.fromtimestamp(0)
+        statement_to = param_to if param_to else datetime.utcnow()
+        statements_filter = lambda statement: statement_from <= datetime(int(statement['year']), int(statement['month']), 1) <= statement_to
+
+    if statements_filter:
+        statements_data = list(filter(statements_filter, statements_data))
 
     if JSON_OUTPUT:
         _print_json(statements_data)
