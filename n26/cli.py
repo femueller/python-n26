@@ -345,14 +345,18 @@ def statements(id: str or None, param_from: datetime or None, param_to: datetime
 
     click.echo(text.strip())
 
-    if download:
-        output_path = path.abspath(download)
-        if path.isdir(output_path):
-            for statement in statements_data:
-                statement_data = API_CLIENT.get_balance_statement(statement['url'])
-                filepath = path.join(output_path, f'{statement["id"]}.pdf')
-                with open(filepath, 'wb') as f:
-                    f.write(statement_data)
+    if not download:
+        return
+
+    output_path = path.abspath(download)
+    if not path.isdir(output_path):
+        return
+
+    for statement in statements_data:
+        filepath = path.join(output_path, f'{statement["id"]}.pdf')
+        statement_data = API_CLIENT.get_balance_statement(statement['url'])
+        with open(filepath, 'wb') as f:
+            f.write(statement_data)
 
 
 @cli.command()
