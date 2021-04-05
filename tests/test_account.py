@@ -69,3 +69,28 @@ class AccountTests(N26TestBase):
         self.assertIn("2019-01", result.output)
         self.assertIn("/api/statements/statement-2019-04", result.output)
         self.assertIn("1554076800000", result.output)
+
+    @mock_requests(method=GET, response_file="statements.json")
+    def test_get_statements_by_id_cli(self):
+        from n26.cli import statements
+        result = self._run_cli_cmd(statements, ['--id', 'statement-2017-01'])
+        self.assertEqual(len(result.output.split('\n')), 4)
+        self.assertNotIn("2016-11", result.output)
+        self.assertIn("/api/statements/statement-2017-01", result.output)
+        self.assertNotIn("2018-01", result.output)
+        self.assertNotIn("2019-01", result.output)
+        self.assertNotIn("1554076800000", result.output)
+
+    @mock_requests(method=GET, response_file="statements.json")
+    def test_get_statements_by_date_cli(self):
+        from n26.cli import statements
+        result = self._run_cli_cmd(statements, ['--from', '2017-01-01', '--to', '2017-04-01'])
+        self.assertEqual(len(result.output.split('\n')), 7)
+        self.assertNotIn("2016-11", result.output)
+        self.assertIn("/api/statements/statement-2017-01", result.output)
+        self.assertIn("2017-02", result.output)
+        self.assertIn("2017-03", result.output)
+        self.assertIn("2017-04", result.output)
+        self.assertNotIn("2018-01", result.output)
+        self.assertNotIn("2019-01", result.output)
+        self.assertNotIn("1554076800000", result.output)
