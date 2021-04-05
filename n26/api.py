@@ -223,6 +223,12 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
+    def get_balance_statement(self, statement_url: str):
+        """
+        Retrieves a balance statement as pdf content
+        """
+        return self._do_request(GET, BASE_URL_DE + statement_url, to_json=False)
+
     def get_statements(self) -> list:
         """
         Retrieves a list of all statements
@@ -275,7 +281,7 @@ class Api(object):
         return self._do_request(GET, BASE_URL_DE + '/api/aff/invitations')
 
     def _do_request(self, method: str = GET, url: str = "/", params: dict = None,
-                    json: dict = None, headers: dict = None) -> list or dict or None:
+                    json: dict = None, headers: dict = None, to_json: bool = True) -> list or dict or None:
         """
         Executes a http request based on the given parameters
 
@@ -303,7 +309,7 @@ class Api(object):
         response.raise_for_status()
         # some responses do not return data so we just ignore the body in that case
         if len(response.content) > 0:
-            return response.json()
+            return response.json() if to_json else response.content
 
     def get_encryption_key(self, public_key: str = None) -> dict:
         """

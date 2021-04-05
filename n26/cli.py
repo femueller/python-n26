@@ -2,6 +2,7 @@ import functools
 import logging
 import webbrowser
 from datetime import datetime, timezone
+from os import path
 from typing import Tuple
 
 import click
@@ -311,8 +312,10 @@ def contacts():
 
 
 @cli.command()
+@click.option('--download', default=None, type=str,
+              help='Download statements as pdf to this dir.')
 @auth_decorator
-def statements():
+def statements(download: str = None):
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
 
@@ -325,6 +328,15 @@ def statements():
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
+
+    if download:
+        output_path = path.abspath(download)
+        if path.isdir(output_path):
+            for statement in statements_data:
+                statement_data = API_CLIENT.get_balance_statement(statement['url'])
+                filepath = path.join(output_path, f'{statement["id"]}.pdf')
+                with open(filepath, 'wb') as f:
+                    f.write(statement_data)
 
 
 @cli.command()
