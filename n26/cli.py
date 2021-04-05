@@ -324,6 +324,7 @@ def contacts():
 def statements(id: str or None, param_from: datetime or None, param_to: datetime or None, download: str = None):
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
+    statements_filter = None
 
     if id:
         statements_filter = lambda statement: statement['id'] == id
