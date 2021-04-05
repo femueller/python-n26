@@ -1,8 +1,3 @@
-import filecmp
-from glob import glob
-from os import path
-from tempfile import TemporaryDirectory
-
 from n26.api import GET, POST
 from tests.test_api_base import N26TestBase, mock_requests, read_response_file
 
@@ -103,6 +98,10 @@ class AccountTests(N26TestBase):
     @mock_requests(method=GET, response_file="statement.pdf", url_regex=r"/api/statements/statement-2017-01$")
     @mock_requests(method=GET, response_file="statements.json", url_regex=r"/api/statements$")
     def test_get_statements_download_cli(self):
+        from filecmp import cmp
+        from glob import glob
+        from os import path
+        from tempfile import TemporaryDirectory
         from n26.cli import statements
         id = "statement-2017-01"
         with TemporaryDirectory() as dir:
@@ -112,4 +111,4 @@ class AccountTests(N26TestBase):
             self.assertTrue(len(files) == 1)
             directory = path.dirname(__file__)
             file_path = path.join(directory, 'api_responses', 'statement.pdf')
-            self.assertTrue(filecmp.cmp(file_path, files[0]))
+            self.assertTrue(cmp(file_path, files[0]))

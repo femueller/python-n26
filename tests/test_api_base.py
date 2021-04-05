@@ -25,14 +25,10 @@ def read_response_file(file_name: str or None, to_json: bool = True) -> json or 
     if not os.path.isfile(file_path):
         raise AttributeError("Couldn't find file containing response mock data: {}".format(file_path))
 
-    if to_json:
-        with open(file_path, 'r') as myfile:
-            api_response_text = myfile.read()
-        return json.loads(api_response_text)
-
-    with open(file_path, 'rb') as myfile:
+    mode = 'r' if to_json else 'rb'
+    with open(file_path, mode) as myfile:
         api_response_text = myfile.read()
-    return api_response_text
+    return json.loads(api_response_text) if to_json else api_response_text
 
 
 def mock_auth_token(func: callable):
@@ -87,7 +83,7 @@ def mock_requests(method: str, response_file: str or None, url_regex: str = None
             response = read_response_file(response_file, to_json=not is_pdf)
             content = "" if response is None else response
             mock_request.return_value.content = content if is_pdf else str(content)
-            mock_request.return_value.json.return_value = read_response_file(response_file, to_json=not is_pdf)
+            mock_request.return_value.json.return_value = response
             return new_mock
 
         @mock_auth_token

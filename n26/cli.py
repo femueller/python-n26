@@ -321,7 +321,7 @@ def contacts():
 @click.option('--download', default=None, type=str,
               help='Download statements as pdf to this dir.')
 @auth_decorator
-def statements(id: str or None, param_from: datetime or None, param_to: datetime or None, download: str = None):
+def statements(id: str or None, param_from: datetime or None, param_to: datetime or None, download: str or None):
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
     statements_filter = None
@@ -354,7 +354,7 @@ def statements(id: str or None, param_from: datetime or None, param_to: datetime
         return
 
     for statement in statements_data:
-        filepath = path.join(output_path, f'{statement["id"]}.pdf')
+        filepath = path.join(output_path, '{0}.pdf'.format(statement["id"]))
         statement_data = API_CLIENT.get_balance_statement(statement['url'])
         with open(filepath, 'wb') as f:
             f.write(statement_data)
