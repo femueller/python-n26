@@ -351,6 +351,7 @@ def statements(id: str or None, param_from: datetime or None, param_to: datetime
 
     output_path = path.abspath(download)
     if not path.isdir(output_path):
+        click.echo("Target path doesn't exist or is not a folder, skipping download.")
         return
 
     for statement in statements_data:

@@ -79,11 +79,14 @@ def mock_requests(method: str, response_file: str or None, url_regex: str = None
 
             mock_request.side_effect = side_effect
 
-            is_pdf = response_file.endswith('.pdf') if response_file else False
-            response = read_response_file(response_file, to_json=not is_pdf)
+            is_json = response_file.endswith('.json') if response_file else False
+            response = read_response_file(response_file, to_json=is_json)
             content = "" if response is None else response
-            mock_request.return_value.content = content if is_pdf else str(content)
+            mock_request.return_value.content = content if not is_json else str(content)
             mock_request.return_value.json.return_value = response
+            mock_request.return_value.headers = {
+                "Content-Type": "application/json" if is_json else ""
+            }
             return new_mock
 
         @mock_auth_token
