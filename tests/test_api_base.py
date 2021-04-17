@@ -12,6 +12,7 @@ def read_response_file(file_name: str or None, to_json: bool = True) -> json or 
     """
     Reads a JSON file and returns it's content as a string
     :param file_name: the name of the file
+    :param to_json: whether to parse the file to a json object or not
     :return: file contents
     """
 
