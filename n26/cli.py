@@ -367,9 +367,9 @@ def statements(id: str or None, param_from: datetime or None, param_to: datetime
 @click.option('--pending', default=None, type=bool,
               help='Whether to show only pending transactions.')
 @click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
-              help='Start time limit for statistics.')
+              help='Start time limit for transactions.')
 @click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
-              help='End time limit for statistics.')
+              help='End time limit for transactions.')
 @click.option('--text-filter', default=None, type=str, help='Text filter.')
 @click.option('--limit', default=None, type=click.IntRange(1, 10000), help='Limit transaction output.')
 @auth_decorator
