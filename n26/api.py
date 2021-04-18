@@ -223,6 +223,13 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
+    def get_balance_statement(self, statement_url: str):
+        """
+        Retrieves a balance statement as pdf content
+        :param statement_url: Download URL of a balance statement document
+        """
+        return self._do_request(GET, BASE_URL_DE + statement_url)
+
     def get_statements(self) -> list:
         """
         Retrieves a list of all statements
@@ -303,7 +310,10 @@ class Api(object):
         response.raise_for_status()
         # some responses do not return data so we just ignore the body in that case
         if len(response.content) > 0:
-            return response.json()
+            if "application/json" in response.headers.get("Content-Type", ""):
+                return response.json()
+            else:
+                return response.content
 
     def get_encryption_key(self, public_key: str = None) -> dict:
         """

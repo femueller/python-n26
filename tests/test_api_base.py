@@ -8,10 +8,11 @@ from unittest import mock
 from unittest.mock import Mock, DEFAULT
 
 
-def read_response_file(file_name: str or None) -> json or None:
+def read_response_file(file_name: str or None, to_json: bool = True) -> json or bytes or None:
     """
     Reads a JSON file and returns it's content as a string
     :param file_name: the name of the file
+    :param to_json: whether to parse the file to a json object or not
     :return: file contents
     """
 
@@ -25,9 +26,10 @@ def read_response_file(file_name: str or None) -> json or None:
     if not os.path.isfile(file_path):
         raise AttributeError("Couldn't find file containing response mock data: {}".format(file_path))
 
-    with open(file_path, 'r') as myfile:
+    mode = 'r' if to_json else 'rb'
+    with open(file_path, mode) as myfile:
         api_response_text = myfile.read()
-    return json.loads(api_response_text)
+    return json.loads(api_response_text) if to_json else api_response_text
 
 
 def mock_auth_token(func: callable):
@@ -78,9 +80,14 @@ def mock_requests(method: str, response_file: str or None, url_regex: str = None
 
             mock_request.side_effect = side_effect
 
-            response = read_response_file(response_file)
-            mock_request.return_value.content = "" if response is None else str(response)
-            mock_request.return_value.json.return_value = read_response_file(response_file)
+            is_json = response_file.endswith('.json') if response_file else False
+            response = read_response_file(response_file, to_json=is_json)
+            content = "" if response is None else response
+            mock_request.return_value.content = content if not is_json else str(content)
+            mock_request.return_value.json.return_value = response
+            mock_request.return_value.headers = {
+                "Content-Type": "application/json" if is_json else ""
+            }
             return new_mock
 
         @mock_auth_token

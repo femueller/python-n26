@@ -2,6 +2,7 @@ import functools
 import logging
 import webbrowser
 from datetime import datetime, timezone
+from os import path
 from typing import Tuple
 
 import click
@@ -311,10 +312,29 @@ def contacts():
 
 
 @cli.command()
+@click.option('--id', default=None, type=str,
+              help='Id of a single statement')
+@click.option('--from', 'param_from', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='Start time limit for statements.')
+@click.option('--to', 'param_to', default=None, type=click.DateTime(DATETIME_FORMATS),
+              help='End time limit for statements.')
+@click.option('--download', default=None, type=str,
+              help='Download statements as pdf to this dir.')
 @auth_decorator
-def statements():
+def statements(id: str or None, param_from: datetime or None, param_to: datetime or None, download: str or None):
     """ Show your n26 statements  """
     statements_data = API_CLIENT.get_statements()
+    statements_filter = None
+
+    if id:
+        statements_filter = lambda statement: statement['id'] == id
+    elif param_from or param_to:
+        statement_from = param_from if param_from else datetime.fromtimestamp(0)
+        statement_to = param_to if param_to else datetime.utcnow()
+        statements_filter = lambda statement: statement_from <= datetime(int(statement['year']), int(statement['month']), 1) <= statement_to
+
+    if statements_filter:
+        statements_data = list(filter(statements_filter, statements_data))
 
     if JSON_OUTPUT:
         _print_json(statements_data)
@@ -325,6 +345,20 @@ def statements():
     text = _create_table_from_dict(headers=headers, value_functions=keys, data=statements_data, numalign='right')
 
     click.echo(text.strip())
+
+    if not download:
+        return
+
+    output_path = path.abspath(download)
+    if not path.isdir(output_path):
+        click.echo("Target path doesn't exist or is not a folder, skipping download.")
+        return
+
+    for statement in statements_data:
+        filepath = path.join(output_path, '{0}.pdf'.format(statement["id"]))
+        statement_data = API_CLIENT.get_balance_statement(statement['url'])
+        with open(filepath, 'wb') as f:
+            f.write(statement_data)
 
 
 @cli.command()
