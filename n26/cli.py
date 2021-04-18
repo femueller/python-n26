@@ -2,7 +2,7 @@ import functools
 import logging
 import webbrowser
 from datetime import datetime, timezone
-from os import path
+from pathlib import Path
 from typing import Tuple
 
 import click
@@ -349,13 +349,14 @@ def statements(id: str or None, param_from: datetime or None, param_to: datetime
     if not download:
         return
 
-    output_path = path.abspath(download)
-    if not path.isdir(output_path):
+    output_path = Path(download).expanduser().resolve()
+    if not output_path.is_dir():
         click.echo("Target path doesn't exist or is not a folder, skipping download.")
         return
 
     for statement in statements_data:
-        filepath = path.join(output_path, '{0}.pdf'.format(statement["id"]))
+        filepath = Path.joinpath(output_path, f'{statement["id"]}.pdf')
+        click.echo(f"Downloading {filepath}...")
         statement_data = API_CLIENT.get_balance_statement(statement['url'])
         with open(filepath, 'wb') as f:
             f.write(statement_data)
