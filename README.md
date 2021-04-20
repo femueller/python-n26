@@ -1,5 +1,5 @@
 # N26 Python CLI/API
-[![Build Status](https://travis-ci.org/femueller/python-n26.svg?branch=master)](https://travis-ci.org/femueller/python-n26)
+[![Build Status](https://github.com/femueller/python-n26/actions/workflows/python-app.yml/badge.svg)](https://github.com/femueller/python-n26/actions/workflows/python-app.yml)
 [![PyPI version](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
