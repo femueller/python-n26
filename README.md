@@ -150,12 +150,6 @@ api_client = Api(conf)
 print(api_client.get_balance())
 ```
 
-## Projects using python-n26
-
-The following projects are using [python-n26](https://github.com/femueller/python-n26):
-
-* [home-assistant](https://github.com/home-assistant/home-assistant/tree/dev/homeassistant/components/n26): https://www.home-assistant.io/components/n26
-
 ## Contribute
 If there are any issues, bugs or missing API endpoints, feel free to contribute by forking the project and creating a Pull-Request.
 
