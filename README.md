@@ -4,19 +4,6 @@
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
 
-- [N26 Python CLI/API](#N26-Python-CLIAPI)
-  - [About](#About)
-  - [Install](#Install)
-  - [Configuration](#Configuration)
-  - [Usage](#Usage)
-    - [CLI example](#CLI-example)
-    - [API example](#API-example)
-  - [Projects using python-n26](#Projects-using-python-n26)
-  - [Contribute](#Contribute)
-    - [Run locally](#Run-locally)
-  - [Maintainers](#Maintainers)
-  - [Credits](#Credits)
-  - [Disclaimer](#Disclaimer)
   
 [![asciicast](https://asciinema.org/a/260083.svg)](https://asciinema.org/a/260083)
 
