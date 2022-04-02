@@ -1,13 +1,14 @@
 # N26 Python CLI/API
+
 [![Build Status](https://github.com/femueller/python-n26/actions/workflows/python-app.yml/badge.svg)](https://github.com/femueller/python-n26/actions/workflows/python-app.yml)
 [![PyPI version](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
 [![Downloads](https://img.shields.io/pypi/dm/n26.svg)](https://img.shields.io/pypi/dm/n26.svg)
 
-  
 [![asciicast](https://asciinema.org/a/260083.svg)](https://asciinema.org/a/260083)
 
 ## About
+
 [python-n26](https://github.com/femueller/python-n26) is a Python 3.6+ library and Command Line Interface to request information from n26 bank accounts. You can use it to check your balance from the terminal or include it in your own Python projects.
 
 **Disclaimer:** This is an unofficial community project which is not affiliated with N26 GmbH/N26 Inc.
@@ -27,11 +28,11 @@ python-n26 uses [container-app-conf](https://github.com/markusressel/container-a
 You can place a YAML (`n26.yaml` or `n26.yml`) or TOML (`n26.toml` or `n26.tml`) configuration file in `./`, `~/` or `~/.config/`. Have a look at the [YAML example](n26.yml.example) and [TOML example](n26.tml.example).
 If you want to use environment variables:
 
-- `N26_USER`: username
-- `N26_PASSWORD`: password
-- `N26_DEVICE_TOKEN`: random [uuid](https://de.wikipedia.org/wiki/Universally_Unique_Identifier) to identify the device
-- `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
-- `N26_MFA_TYPE`: `app` will use the paired app as 2 factor authentication, `sms` will use SMS to the registered number.
+-   `N26_USERNAME`: username
+-   `N26_PASSWORD`: password
+-   `N26_DEVICE_TOKEN`: random [uuid](https://de.wikipedia.org/wiki/Universally_Unique_Identifier) to identify the device
+-   `N26_LOGIN_DATA_STORE_PATH`: optional **file** path to store login data (recommended for cli usage)
+-   `N26_MFA_TYPE`: `app` will use the paired app as 2 factor authentication, `sms` will use SMS to the registered number.
 
 Note that **when specifying both** environment variables as well as a config file and a key is present in both locations the **enviroment variable values will be preferred**.
 
@@ -43,11 +44,13 @@ Since 17th of June 2020 N26 requires a device_token to differentiate clients. Th
 config option with a UUID of your choice. To generate a UUID you can use f.ex. one of the following options:
 
 Using python:
+
 ```python
 python -c 'import uuid; print(uuid.uuid4())'
 ```
 
 Using linux built-in tools:
+
 ```shell
 > uuidgen
 ```
@@ -57,7 +60,7 @@ Using a website:
 
 ### 2FA
 
-Since 14th of September 2019 N26 requires a login confirmation (2 factor authentication). 
+Since 14th of September 2019 N26 requires a login confirmation (2 factor authentication).
 
 There are two options here:
 
@@ -83,10 +86,11 @@ Or if using environment variables:
 ```
 
 ### JSON output
-If you would like to work with the raw `JSON` rather than the pretty table 
+
+If you would like to work with the raw `JSON` rather than the pretty table
 layout you can use the global `-json` parameter:
 
-```bash 
+```bash
 > n26 -json balance
 {
   "id": "12345678-1234-1234-1234-123456789012",
@@ -112,8 +116,8 @@ layout you can use the global `-json` parameter:
 }
 ```
 
-
 ### API example
+
 ```python
 from n26.api import Api
 api_client = Api()
@@ -138,6 +142,7 @@ print(api_client.get_balance())
 ```
 
 ## Contribute
+
 If there are any issues, bugs or missing API endpoints, feel free to contribute by forking the project and creating a Pull-Request.
 
 ### Run locally
@@ -162,17 +167,21 @@ make git-release
 ```
 
 ## Maintainers
-* [Markus Ressel](https://github.com/markusressel)
-* [Felix Mueller](https://github.com/femueller)
+
+-   [Markus Ressel](https://github.com/markusressel)
+-   [Felix Mueller](https://github.com/femueller)
 
 ## Credits
-* [Nick Jüttner](https://github.com/njuettner) for providing [the API authentication flow](https://github.com/njuettner/alexa/blob/master/n26/app.py)
-* [Pierrick Paul](https://github.com/PierrickP/) for providing [the API endpoints](https://github.com/PierrickP/n26/blob/develop/lib/api.js)
+
+-   [Nick Jüttner](https://github.com/njuettner) for providing [the API authentication flow](https://github.com/njuettner/alexa/blob/master/n26/app.py)
+-   [Pierrick Paul](https://github.com/PierrickP/) for providing [the API endpoints](https://github.com/PierrickP/n26/blob/develop/lib/api.js)
 
 ## Similar projects
-* Go: https://github.com/guitmz/n26 by [Guilherme Thomazi Bonicontro](https://github.com/guitmz)
-* Go: https://github.com/njuettner/n26 by [Nick Jüttner](https://github.com/njuettner) (unmaintained)
-* Node https://github.com/PierrickP/n26 by [Pierrick Paul](https://github.com/PierrickP/) (unmaintained)
+
+-   Go: https://github.com/guitmz/n26 by [Guilherme Thomazi Bonicontro](https://github.com/guitmz)
+-   Go: https://github.com/njuettner/n26 by [Nick Jüttner](https://github.com/njuettner) (unmaintained)
+-   Node https://github.com/PierrickP/n26 by [Pierrick Paul](https://github.com/PierrickP/) (unmaintained)
 
 ## Disclaimer
+
 This project is not affiliated with N26 GmbH/N26 Inc. if you want to learn more about it, visit https://n26.com/.
