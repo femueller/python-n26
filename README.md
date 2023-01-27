@@ -121,8 +121,7 @@ layout you can use the global `-json` parameter:
 ```shell
 sudo docker run -it --rm \
   -v "/home/markus/.config/n26.yaml:/app/n26.yaml" \
-  -e PUID=1000 \
-  -e PGID=1000 \
+  -u 1000:1000 \
   femueller/python-n26 
 ```
 

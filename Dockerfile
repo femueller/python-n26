@@ -8,14 +8,12 @@ WORKDIR /app
 COPY . .
 
 RUN apt-get update \
-    && apt-get -y install sudo python3-pip python3-evdev \
+    && apt-get -y install sudo python3-pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip;\
     pip install pipenv;\
     PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy;\
     pip install .
 
-ENV PUID=1000 PGID=1000
-
-ENTRYPOINT [ "docker/entrypoint.sh", "n26" ]
+ENTRYPOINT [ "n26" ]
 CMD [ "-h" ]
