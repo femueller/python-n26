@@ -223,6 +223,36 @@ class Api(object):
         )
         return self.get_transactions(limit=limit)
 
+    def get_transactions_new(self) -> dict:
+        result = self.get_account_info()
+        account_id = result["id"]
+
+        filters = []
+        if from_time is not None and to_time is not None:
+            filters.append(
+                {
+                    "criteria": {
+                        "from": from_time,
+                        "to": to_time
+                    },
+                    "type": "DATE_RANGE"
+                }
+            )
+
+        result = self._do_request(
+            GET, BASE_URL_DE + f'/api/feed/accounts/{account_id}/transactions/search',
+            headers={
+                "x-n26-platform": "android",
+                "x-n26-app-version": "3.73",
+            },
+            json={
+                "filterCriteria": {
+                    "filters": filters
+                },
+                "searchText": text_filter
+            })
+        return result
+
     def get_balance_statement(self, statement_url: str):
         """
         Retrieves a balance statement as pdf content
