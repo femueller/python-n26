@@ -119,7 +119,9 @@ layout you can use the global `-json` parameter:
 ### Docker
 
 ```shell
+# ensure the n26 folder exists
 mkdir ~/.config/n26
+# mount the config and launch the command
 sudo docker run -it --rm \
   -v "/home/markus/.config/n26.yaml:/app/n26.yaml" \
   -v "/home/markus/.config/n26:/.config/n26" \
