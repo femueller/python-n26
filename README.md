@@ -119,10 +119,12 @@ layout you can use the global `-json` parameter:
 ### Docker
 
 ```shell
+mkdir ~/.config/n26
 sudo docker run -it --rm \
   -v "/home/markus/.config/n26.yaml:/app/n26.yaml" \
+  -v "/home/markus/.config/n26:/.config/n26" \
   -u 1000:1000 \
-  femueller/python-n26 
+  femueller/python-n26
 ```
 
 ### API example
