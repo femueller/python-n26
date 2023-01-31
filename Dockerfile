@@ -1,7 +1,7 @@
 # Docker image for n26
 
 # dont use alpine for python builds: https://pythonspeed.com/articles/alpine-docker-python/
-FROM python:3.9-slim-buster
+FROM python:3.11-slim-buster
 
 WORKDIR /app
 

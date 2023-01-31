@@ -1,0 +1,14 @@
+name: Docker Image latest
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag femueller/python-n26:latest
