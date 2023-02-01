@@ -183,8 +183,17 @@ class Api(object):
         """
         return self._do_request(GET, BASE_URL_DE + '/api/transactions/so')
 
-    def get_transactions(self, from_time: int = None, to_time: int = None, limit: int = 20, pending: bool = None,
-                         categories: str = None, text_filter: str = None, last_id: str = None) -> dict:
+    def get_transactions(
+            self,
+            from_time: int = None, to_time: int = None,
+            direction: str = None,
+            limit: int = 20,
+            pending: bool = None,
+            categories: str = None,
+            tags: str = None,
+            text_filter: str = None,
+            pagination_key: str = None
+    ) -> dict:
         """
         Get a list of transactions.
 
@@ -193,27 +202,61 @@ class Api(object):
 
         :param from_time: earliest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
         :param to_time: latest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
+        :param direction INCOMING or OUTGOING
         :param limit: Limit the number of transactions to return to the given amount - default 20 as the n26 API returns
-        only the last 20 transactions by default
+        only the last 20 transactions by default, can be 800 at max
         :param pending: show only pending transactions
         :param categories: Comma separated list of category IDs
+        :param tags: Comma separated list of tags
         :param text_filter: Query string to search for
-        :param last_id: ??
+        :param pagination_key: pass this from the last response to get the next badge of results
         :return: list of transactions
         """
-        if pending and limit:
-            # pending does not support limit
-            limit = None
+        filters = []
+        if from_time is not None or to_time is not None:
+            filters.append(
+                {
+                    "criteria": {
+                        "from": from_time,
+                        "to": to_time,
+                    },
+                    "type": "DATE_RANGE"
+                }
+            )
 
-        return self._do_request(GET, BASE_URL_DE + '/api/smrt/transactions', {
-            'from': from_time,
-            'to': to_time,
-            'limit': limit,
-            'pending': pending,
-            'categories': categories,
-            'textFilter': text_filter,
-            'lastId': last_id
-        })
+        if direction is not None:
+            filters.append(
+                {
+                    "criteria": {
+                        "value": direction
+                    },
+                    "type": "DIRECTION"
+                }
+            )
+
+        result = self._do_request(GET, BASE_URL_DE + f'/api/account/primary')
+        account_id = result["accountId"]
+
+        result = self._do_request(
+            method=POST,
+            url=BASE_URL_DE + f'/api/feed/accounts/{account_id}/transactions/search',
+            json={
+                "filterCriteria": {
+                    "filters": filters
+                },
+                "searchText": text_filter,
+                #"categories": categories,
+                #"tags": "computer",
+                "paginationKey": pagination_key,
+            },
+            params={
+                "limit": limit,
+            },
+            headers={
+                "device-token": self.config.DEVICE_TOKEN.value
+            })
+
+        return result
 
     def get_transactions_limited(self, limit: int = 5) -> dict:
         import warnings
@@ -294,7 +337,14 @@ class Api(object):
         :return: the response parsed as a json
         """
         access_token = self.get_token()
-        _headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        _headers = {
+            'Authorization': 'Bearer {}'.format(access_token),
+            "n26-timezone-identifier": "Europe/Paris",
+            "x-n26-platform": "android",
+            "x-n26-app-version": "3.73",
+            "n26-app-build-number": "202203000",
+            "content-type": "application/json; charset=utf-8",
+        }
         if headers is not None:
             _headers.update(headers)
 
