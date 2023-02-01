@@ -1,0 +1,91 @@
+{
+  "tags": [],
+  "results": [
+    {
+      "id": "12345678-1234-abcd-abcd-1234567890ab",
+      "accountId": "12345678-1234-abcd-abcd-1234567890ab",
+      "title": "Transaction Title",
+      "tintedSubtitle": {
+        "elements": [
+          {
+            "value": "1 Feb"
+          }
+        ]
+      },
+      "amount": -100.0,
+      "amountStyle": "NONE",
+      "currency": "EUR",
+      "timestamp": 1675212875923,
+      "type": "TRANSACTION",
+      "category": "micro-v2-household-utilities",
+      "icon": {
+        "type": "CATEGORY",
+        "url": "https://cdn.number26.de/feed/transaction-details/categories/light/household_and_utilities.png",
+        "dark-url": "https://cdn.number26.de/feed/transaction-details/categories/dark/household_and_utilities.png",
+        "darkUrl": "https://cdn.number26.de/feed/transaction-details/categories/dark/household_and_utilities.png"
+      },
+      "balance": {
+        "title": "",
+        "amount": 0,
+        "currency": "EUR"
+      },
+      "deeplink": "number26://main/detail/12345678-1234-abcd-abcd-1234567890ab?accountId=12345678-1234-abcd-abcd-1234567890ab&externalId=12345678-1234-abcd-abcd-1234567890ab&source=TX_SEARCH",
+      "gestures": {
+        "swipeLeft": {
+          "description": "Pay back from a Space",
+          "deeplink": "number26://spaces/transfer?destinationId=12345678-1234-abcd-abcd-1234567890ab&amount=100.00&initialReferenceText=Iris%20%26%20Markus%20Gemeinschaftskonto%20Strom&sourceTxId=12345678-1234-abcd-abcd-1234567890ab",
+          "tracking": {
+            "action": "feed.gesture_swipe.left",
+            "category": "engagement",
+            "property": "payback"
+          }
+        }
+      },
+      "externalId": "12345678-1234-abcd-abcd-1234567890ab",
+      "linkId": "12345678-1234-abcd-abcd-1234567890ab",
+      "subtitle": {
+        "template": ""
+      }
+    }
+  ],
+  "paginationKey": "abJlbmREYXRlIjoxNjc1MjczMTM5Ljc3MjAwMDAwMCwidG90YWxBbW91bnQiOi0xMzIuNzAsInRyYW5zYWN0aW9uQ291bnQiOjIsInRyYW5zYWN0aW9uc1BhZ2luYXRpb25LZXkiOiJleUpzWVhOMFJYaDBaWEp1WVd4SlpDSTZJbVptTm1VeVpUazVMV0V4WTJFdE1URmxaQzA1WTJZMkxUUmtOR05tTkdNd05UZzVOU0o5In0=",
+  "summary": {
+    "totalAmount": {
+      "value": "-€132.70",
+      "appearance": "STANDARD"
+    },
+    "subtitle": "2/1/23 - 2/1/23",
+    "title": "2 Transactions"
+  },
+  "filters": {
+    "filterList": [
+      {
+        "type": "DATE_RANGE",
+        "title": "Date range",
+        "maxRangeInMonths": 6,
+        "violationMessage": "Please select a date within a 6 month range"
+      },
+      {
+        "type": "DIRECTION",
+        "title": "Transaction type",
+        "value": [
+          {
+            "title": "Both incoming & outgoing",
+            "type": "INCOMING_AND_OUTGOING"
+          },
+          {
+            "title": "Incoming only",
+            "type": "INCOMING"
+          },
+          {
+            "title": "Outgoing only",
+            "type": "OUTGOING"
+          }
+        ]
+      }
+    ]
+  },
+  "searchSuggestions": {
+    "suggestions": []
+  }
+}
