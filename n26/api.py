@@ -106,12 +106,17 @@ class Api(object):
             file.write(json.dumps(token_data, indent=2))
             file.truncate()
 
-    # IDEA: @get_token decorator
-    def get_account_info(self) -> dict:
+    def get_account_info_old(self) -> dict:
         """
         Retrieves basic account information
         """
         return self._do_request(GET, BASE_URL_DE + '/api/me')
+
+    def get_account_info(self) -> dict:
+        """
+        Retrieves basic account information
+        """
+        return self._do_request(GET, BASE_URL_DE + f'/api/account/primary')
 
     def get_account_statuses(self) -> dict:
         """
@@ -188,27 +193,18 @@ class Api(object):
             from_time: int = None, to_time: int = None,
             direction: str = None,
             limit: int = 20,
-            pending: bool = None,
-            categories: str = None,
-            tags: str = None,
             text_filter: str = None,
             pagination_key: str = None
     ) -> dict:
         """
         Get a list of transactions.
 
-        Note that some parameters can not be combined in a single request (like text_filter and pending) and
-        will result in a bad request (400) error.
-
-        :param from_time: earliest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
-        :param to_time: latest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
-        :param direction INCOMING or OUTGOING
-        :param limit: Limit the number of transactions to return to the given amount - default 20 as the n26 API returns
+        :param from_time: the earliest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
+        :param to_time: the latest transaction time as a Timestamp > 0 - milliseconds since 1970 in CET
+        :param direction: INCOMING or OUTGOING
+        :param limit: limits the number of transactions to return to the given amount - default 20 as the n26 API returns
         only the last 20 transactions by default, can be 800 at max
-        :param pending: show only pending transactions
-        :param categories: Comma separated list of category IDs
-        :param tags: Comma separated list of tags
-        :param text_filter: Query string to search for
+        :param text_filter: Query string to search for, can also contain tags, merchants and categoriess
         :param pagination_key: pass this from the last response to get the next badge of results
         :return: list of transactions
         """
@@ -234,8 +230,18 @@ class Api(object):
                 }
             )
 
-        result = self._do_request(GET, BASE_URL_DE + f'/api/account/primary')
-        account_id = result["accountId"]
+        # Suggestions
+        # => Bad Request
+        # result = self._do_request(
+        #     method=POST,
+        #     url=BASE_URL_DE + f'/api/feed/accounts/{account_id}/transactions/search/suggestions',
+        #     headers={
+        #         "device-token": self.config.DEVICE_TOKEN.value
+        #     }
+        # )
+
+        account_info = self.get_account_info()
+        account_id = account_info["accountId"]
 
         result = self._do_request(
             method=POST,
@@ -245,26 +251,65 @@ class Api(object):
                     "filters": filters
                 },
                 "searchText": text_filter,
-                #"categories": categories,
-                #"tags": "computer",
                 "paginationKey": pagination_key,
             },
             params={
                 "limit": limit,
-            },
-            headers={
-                "device-token": self.config.DEVICE_TOKEN.value
-            })
+            }
+        )
 
         return result
 
-    def get_transactions_limited(self, limit: int = 5) -> dict:
-        import warnings
-        warnings.warn(
-            "get_transactions_limited is deprecated, use get_transactions(limit=5) instead",
-            DeprecationWarning
+    # TODO:
+    def get_insights(self) -> dict:
+        """
+        Retrieves the Insights dashboard data
+        """
+        return self._do_request(
+            method=GET,
+            url=BASE_URL_DE + f'/api/insights/dashboard',
         )
-        return self.get_transactions(limit=limit)
+
+    # TODO:
+    def get_balance_overview(self) -> dict:
+        """
+        Retrieves balance data
+        """
+        return self._do_request(
+            method=GET,
+            url=BASE_URL_DE + f'/api/insights/balance-overview?page=1',
+        )
+
+    # TODO:
+    def get_recurring_payments(self) -> dict:
+        """
+        Retrieves recurring payments
+        """
+        return self._do_request(
+            method=GET,
+            url=BASE_URL_DE + f'/api/insights/recurring-payments',
+        )
+
+    # TODO:
+    def get_scheduled_payments(self) -> dict:
+        """
+        TODO
+        """
+        return self._do_request(
+            method=GET,
+            url=BASE_URL_DE + f'/api/scheduled-payments/overview',
+        )
+
+    # TODO:
+    def get_expenses_categories(self, category: str, period: str) -> dict:
+        """
+        :param category: id of the category, f.ex. "bars_and_restaurants"
+        :param period: time period to fetch, f.ex. 2023-02
+        """
+        return self._do_request(
+            method=GET,
+            url=BASE_URL_DE + f'/api/insights/balance-overview/expenses/{category}?period=2023-02',
+        )
 
     def get_balance_statement(self, statement_url: str):
         """
@@ -344,6 +389,7 @@ class Api(object):
             "x-n26-app-version": "3.73",
             "n26-app-build-number": "202203000",
             "content-type": "application/json; charset=utf-8",
+            "device-token": self.config.DEVICE_TOKEN.value,
         }
         if headers is not None:
             _headers.update(headers)

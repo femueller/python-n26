@@ -127,6 +127,8 @@ print(api_client.get_balance())
 This is going to use the same mechanism to load configuration as the CLI tool, to specify your own configuration you can use it as:
 
 ```python
+import uuid
+
 from n26.api import Api
 from n26.config import Config
 
@@ -135,6 +137,8 @@ conf.USERNAME.value = "john.doe@example.com"
 conf.PASSWORD.value = "$upersecret"
 conf.LOGIN_DATA_STORE_PATH.value = None
 conf.MFA_TYPE.value = "app"
+conf.DEVICE_TOKEN.value = uuid.uuid4()
+
 conf.validate()
 
 api_client = Api(conf)
