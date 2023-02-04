@@ -116,6 +116,19 @@ layout you can use the global `-json` parameter:
 }
 ```
 
+### Docker
+
+```shell
+# ensure the n26 folder exists
+mkdir ~/.config/n26
+# mount the config and launch the command
+sudo docker run -it --rm \
+  -v "/home/markus/.config/n26.yaml:/app/n26.yaml" \
+  -v "/home/markus/.config/n26:/.config/n26" \
+  -u 1000:1000 \
+  femueller/python-n26
+```
+
 ### API example
 
 ```python
@@ -140,6 +153,8 @@ conf.validate()
 api_client = Api(conf)
 print(api_client.get_balance())
 ```
+
+
 
 ## Contribute
 
