@@ -12,9 +12,7 @@ test:
 	pipenv run pytest
 
 upload:
-	# Upload to Gemfury
-	#	curl -F package=@dist/`ls -t1 dist/ | grep tar.gz | head -n1` https://gems.gemfury.com/<gem fury tokena
-	# Upload to PyPI
+	# Upload to PyPI: https://pypi.org/project/n26/
 	python setup.py sdist upload -r pypi
 
 git-release:

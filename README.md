@@ -9,7 +9,7 @@
 
 ## About
 
-[python-n26](https://github.com/femueller/python-n26) is a Python 3.6+ library and Command Line Interface to request information from n26 bank accounts. You can use it to check your balance from the terminal or include it in your own Python projects.
+[python-n26](https://github.com/femueller/python-n26) is a Python library and Command Line Interface to request information from N26 bank accounts. You can use it to check your balance from the terminal or include it in your own Python projects.
 
 **Disclaimer:** This is an unofficial community project which is not affiliated with N26 GmbH/N26 Inc.
 
@@ -154,8 +154,6 @@ api_client = Api(conf)
 print(api_client.get_balance())
 ```
 
-
-
 ## Contribute
 
 If there are any issues, bugs or missing API endpoints, feel free to contribute by forking the project and creating a Pull-Request.
@@ -174,12 +172,10 @@ python3 -m n26 balance
 
 ### Creating a new release (only for maintainers)
 
-```shell
-# Increment version number in n26/__init__.py
-
-# Create a new release using the Makefile
-make git-release
-```
+1. Increment version number in `n26/__init__.py` according to desired [SemVer](https://semver.org/#summary) release version
+2. Create a new release using the `Makefile`. This creates a new git tag, which triggers the "Upload Python Package" GitHub Action.
+    1. Run `make git-release`, this triggers: [https://github.com/femueller/python-n26/actions/workflows/python-publish.yml]()
+    2. New releases end up at: [https://pypi.org/project/n26/]()
 
 ## Maintainers
 
@@ -200,3 +196,6 @@ make git-release
 ## Disclaimer
 
 This project is not affiliated with N26 GmbH/N26 Inc. if you want to learn more about it, visit https://n26.com/.
+
+We've been trying [hard to collaborate with N26](https://github.com/femueller/python-n26/issues/107#issuecomment-1008825746) however, it's been always really challenging.  
+There is no guarantee that this project continues to work at any point, since none of the API endpoints are really documented.
