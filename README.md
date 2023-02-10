@@ -160,7 +160,7 @@ If there are any issues, bugs or missing API endpoints, feel free to contribute 
 
 ### Run locally
 
-Prerequirements: [Poetry](https://python-poetry.org/)
+Prerequirements: [Poetry](https://python-poetry.org/) and 
 
 ```shell
 git clone git@github.com:femueller/python-n26.git

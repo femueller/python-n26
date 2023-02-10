@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "n26"
 version = "3.3.0"
-description = "Unofficial Python client for n26 (Number 26) "
+description = "Unofficial Python client for n26 (Number 26)"
 authors = ["femueller", "markusressel"]
 
 [tool.poetry.dependencies]
