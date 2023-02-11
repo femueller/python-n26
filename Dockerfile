@@ -11,7 +11,7 @@ RUN apt-get update \
     && apt-get -y install sudo python3-pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip;\
-    pip3 install poetry;\
+    pip install poetry;\
     PIP_IGNORE_INSTALLED=1 poetry install;\
     pip install .
 
