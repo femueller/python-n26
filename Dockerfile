@@ -11,8 +11,8 @@ RUN apt-get update \
     && apt-get -y install sudo python3-pip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip;\
-    pip install pipenv;\
-    PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy;\
+    pip3 install poetry;\
+    PIP_IGNORE_INSTALLED=1 poetry install;\
     pip install .
 
 ENTRYPOINT [ "n26" ]
