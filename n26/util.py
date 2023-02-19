@@ -23,3 +23,9 @@ def create_request_url(url: str, params: dict = None):
             url += "%s=%s" % (k, v)
 
     return url
+
+
+def get_external_ip() -> str:
+    import urllib.request
+    external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+    return external_ip

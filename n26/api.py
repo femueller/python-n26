@@ -18,7 +18,7 @@ from tenacity import retry, stop_after_delay, wait_fixed
 
 from n26.config import Config, MFA_TYPE_SMS
 from n26.const import DAILY_WITHDRAWAL_LIMIT, DAILY_PAYMENT_LIMIT
-from n26.util import create_request_url
+from n26.util import create_request_url, get_external_ip
 
 LOGGER = logging.getLogger(__name__)
 
@@ -294,7 +294,10 @@ class Api(object):
         :return: the response parsed as a json
         """
         access_token = self.get_token()
-        _headers = {'Authorization': 'Bearer {}'.format(access_token)}
+        _headers = {
+            'Authorization': 'Bearer {}'.format(access_token),
+            'x-tpp-userip': get_external_ip()
+        }
         if headers is not None:
             _headers.update(headers)
 
