@@ -8,3 +8,4 @@ MANIFEST
 dist/
 *.sublime-workspace
 *.sublime-project
+.idea
