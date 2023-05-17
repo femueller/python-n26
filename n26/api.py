@@ -480,8 +480,7 @@ class Api(object):
         self._request_mfa_approval(mfa_token)
         return self._complete_authentication_flow(mfa_token)
 
-    @staticmethod
-    def _initiate_authentication_flow(username: str, password: str) -> str:
+    def _initiate_authentication_flow(self, username: str, password: str) -> str:
         LOGGER.debug("Requesting authentication flow for user {}".format(username))
         values_token = {
             "grant_type": GRANT_TYPE_PASSWORD,
@@ -489,7 +488,8 @@ class Api(object):
             "password": password
         }
         # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
-        response = requests.post(BASE_URL_DE + "/oauth2/token", data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(f"{self.config.AUTH_BASE_URL.value}/oauth2/token", data=values_token,
+                                 headers=BASIC_AUTH_HEADERS)
         if response.status_code != 403:
             raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
 
@@ -499,8 +499,7 @@ class Api(object):
         else:
             raise ValueError("Unexpected response data")
 
-    @staticmethod
-    def _refresh_token(refresh_token: str):
+    def _refresh_token(self, refresh_token: str):
         """
         Refreshes an authentication token
         :param refresh_token: the refresh token issued by the server when requesting a token
@@ -512,7 +511,8 @@ class Api(object):
             'refresh_token': refresh_token,
         }
 
-        response = requests.post(BASE_URL_DE + '/oauth2/token', data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(f"{self.config.AUTH_BASE_URL.value}/oauth2/token", data=values_token,
+                                 headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         return response.json()
 
