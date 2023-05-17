@@ -23,7 +23,6 @@ from n26.util import create_request_url
 LOGGER = logging.getLogger(__name__)
 
 BASE_URL_DE = 'https://api.tech26.de'
-BASE_URL_GLOBAL = 'https://api.tech26.global'
 BASIC_AUTH_HEADERS = {"Authorization": "Basic bmF0aXZld2ViOg=="}
 USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) "
               "AppleWebKit/537.36 (KHTML, like Gecko) "
