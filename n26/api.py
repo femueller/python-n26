@@ -489,7 +489,7 @@ class Api(object):
             "password": password
         }
         # TODO: Seems like the user-agent is not necessary but might be a good idea anyway
-        response = requests.post(BASE_URL_GLOBAL + "/oauth2/token", data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(BASE_URL_DE + "/oauth2/token", data=values_token, headers=BASIC_AUTH_HEADERS)
         if response.status_code != 403:
             raise ValueError("Unexpected response for initial auth request: {}".format(response.text))
 
@@ -512,7 +512,7 @@ class Api(object):
             'refresh_token': refresh_token,
         }
 
-        response = requests.post(BASE_URL_GLOBAL + '/oauth2/token', data=values_token, headers=BASIC_AUTH_HEADERS)
+        response = requests.post(BASE_URL_DE + '/oauth2/token', data=values_token, headers=BASIC_AUTH_HEADERS)
         response.raise_for_status()
         return response.json()
 
