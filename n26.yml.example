@@ -1,4 +1,5 @@
 n26:
+    auth_base_url: https://api.tech26.de
     username: john.doe@example.com
     password: $upersecret
     device_token: 00000000-0000-0000-0000-000000000000

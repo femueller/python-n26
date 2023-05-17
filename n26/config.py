@@ -26,6 +26,17 @@ class Config(ConfigBase):
 
         return super(Config, cls).__new__(cls, *args, **kwargs)
 
+    AUTH_BASE_URL = StringConfigEntry(
+        description="Base URL for N26 Authentication",
+        example="",
+        default="https://api.tech26.de",
+        key_path=[
+            NODE_ROOT,
+            "auth_base_url"
+        ],
+        required=True
+    )
+
     USERNAME = StringConfigEntry(
         description="N26 account username",
         example="john.doe@example.com",
