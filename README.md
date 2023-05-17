@@ -160,14 +160,14 @@ If there are any issues, bugs or missing API endpoints, feel free to contribute 
 
 ### Run locally
 
-Prerequirements: [Pipenv](https://pipenv.readthedocs.io/)
+Prerequirements: [Poetry](https://python-poetry.org/) and 
 
 ```shell
 git clone git@github.com:femueller/python-n26.git
 cd python-n26
-pipenv shell
-pipenv install
-python3 -m n26 balance
+poetry shell
+poetry install
+python -m n26 balance
 ```
 
 ### Creating a new release (only for maintainers)

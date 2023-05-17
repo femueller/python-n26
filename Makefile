@@ -9,7 +9,7 @@ build:
 	- git stash pop
 
 test:
-	pipenv run pytest
+	poetry run pytest
 
 upload:
 	# Upload to PyPI: https://pypi.org/project/n26/
