@@ -1,5 +1,10 @@
 # N26 Python CLI/API
 
+## 2023-10-29 - Archiving the repository
+
+Today, I am marking this repository as archived, as I am not making use of the API itself anymore.  
+If you'e interested in taking over the maintenance of the repository, please reach out to me.
+
 [![Build Status](https://github.com/femueller/python-n26/actions/workflows/python-app.yml/badge.svg)](https://github.com/femueller/python-n26/actions/workflows/python-app.yml)
 [![PyPI version](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)](https://img.shields.io/github/pipenv/locked/python-version/femueller/python-n26)
 [![PyPI version](https://badge.fury.io/py/n26.svg)](https://badge.fury.io/py/n26)
